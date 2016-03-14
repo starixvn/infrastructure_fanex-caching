@@ -1,4 +1,4 @@
-﻿namespace Fanex.Caching.MemoryCache
+﻿namespace Fanex.Caching.Memory
 {
     using System;
     using System.Collections.Generic;

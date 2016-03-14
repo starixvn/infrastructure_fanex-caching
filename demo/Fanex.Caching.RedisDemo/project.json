@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0-*",
+  "description": "Fanex.Caching.RedisDemo Console Application",
+  "authors": [ "jason.ly" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Fanex.Caching": "1.0.0-*",
+    "Fanex.Caching.Redis": "1.0.0-*"
+  },
+
+  "commands": {
+    "Fanex.Caching.RedisDemo": "Fanex.Caching.RedisDemo"
+  },
+
+  "frameworks": {
+    "dnx46": {
+      "frameworkAssemblies": {
+        "System.Configuration": "4.0.0.0"
+      }
+    }
+  }
+}

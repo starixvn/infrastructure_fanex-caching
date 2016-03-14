@@ -1,6 +1,8 @@
 ﻿namespace Fanex.Caching.Demo
 {
     using System;
+    using System.Threading;
+    using Memory;
 
     public class Program
     {
@@ -8,37 +10,35 @@
         {
             var customer = new Customer();
 
-            // Use the functionalities of created instances to do our jobs.
-            CacheService.Set<string>("TestKey1", "Test key 1");
-            CacheService.Set<string>("TestKey2", "Test key 2", new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(500)));
+            Console.WriteLine("Using Memory cache");
 
-            System.Console.WriteLine("Using Memory cache");
-            System.Console.WriteLine(CacheService.Get<string>("TestKey1"));
-            System.Console.WriteLine(CacheService.Get<string>("TestKey2"));
+            // Cache in 120 seconds, default timeout value.
+            CacheService.Set("TestKey1", "Test key 1");
+            Console.WriteLine(CacheService.Get<string>("TestKey1"));
 
-            CacheService.Set<Customer>("TestCust", customer);
-            var cachedCust = CacheService.Get<Customer>("TestCust");
+            // Cache in 500 seconds.
+            CacheService.Set("TestKey2", "Test key 2", new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(500)));
+            Console.WriteLine(CacheService.Get<string>("TestKey2"));
 
-            System.Console.WriteLine(cachedCust.ToString());
-            System.Console.ReadLine();
-        }
-    }
+            // Cache an object.
+            CacheService.Set("TestCust", customer);
+            Console.WriteLine(CacheService.Get<Customer>("TestCust")?.ToString());
 
-    public class Customer
-    {
-        public Customer()
-        {
-            this.FirstName = "Test First Name";
-            this.LastName = "Test Last Name";
-        }
+            // Callback when evicted
+            var options = new MemoryCacheItemOptions()
+                .RegisterPostEvictionCallback(
+                (key, value, reason, substate) =>
+                {
+                    Console.WriteLine($"'{key}: {value}' was evicted due to {reason}.");
+                })
+                .SetAbsoluteExpiration(TimeSpan.FromSeconds(5));
+            CacheService.Set("TestKey3", "Test key 3", options);
+            Thread.Sleep(3000);
+            Console.WriteLine(CacheService.Get<string>("TestKey3"));
+            Thread.Sleep(6000);
+            Console.WriteLine(CacheService.Get<string>("TestKey3"));
 
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public override string ToString()
-        {
-            return string.Format("{0} {1}", this.FirstName, this.LastName);
+            Console.ReadLine();
         }
     }
 }

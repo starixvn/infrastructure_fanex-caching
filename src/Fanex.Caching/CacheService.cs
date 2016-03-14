@@ -4,7 +4,7 @@
     using System.Collections;
     using System.Threading.Tasks;
     using Configuration;
-    using MC = MemoryCache;
+    using Memory;
 
     public static class CacheService
     {
@@ -17,7 +17,7 @@
             if (settings != null)
             {
                 Type cacheType = string.IsNullOrEmpty(settings.CacheType)
-                    ? typeof(MC.MemoryCache)
+                    ? typeof(MemoryCache)
                     : Type.GetType(settings.CacheType);
                 Hashtable connectionSettings = settings?.ConnectionSettingCollection?.ToHashtable();
 
@@ -32,7 +32,7 @@
             }
             else
             {
-                _cacheStorage = new MC.MemoryCache();
+                _cacheStorage = new MemoryCache();
             }
         }
 

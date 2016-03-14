@@ -8,12 +8,12 @@
     public static class ObjectMapper
     {
         public static T ConvertTo<T>(
-            Hashtable connectionSettings,
+            Hashtable data,
             Dictionary<string, Func<object, object>> propertiesMapper = null) where T : new()
         {
-            if (connectionSettings == null)
+            if (data == null)
             {
-                throw new ArgumentNullException(nameof(connectionSettings));
+                throw new ArgumentNullException(nameof(data));
             }
 
             T result = new T();
@@ -21,20 +21,20 @@
 
             foreach (PropertyInfo property in properties)
             {
-                if (connectionSettings.ContainsKey(property.Name))
+                if (data.ContainsKey(property.Name))
                 {
-                    object connectionSettingValue = connectionSettings[property.Name];
+                    object itemValue = data[property.Name];
                     Type propertyType = property.PropertyType;
 
                     try
                     {
                         if (propertiesMapper?.ContainsKey(property.Name) == true)
                         {
-                            property.SetValue(result, propertiesMapper[property.Name](connectionSettingValue));
+                            property.SetValue(result, propertiesMapper[property.Name](itemValue));
                         }
                         else
                         {
-                            property.SetValue(result, Convert.ChangeType(connectionSettingValue, propertyType));
+                            property.SetValue(result, Convert.ChangeType(itemValue, propertyType));
                         }
                     }
                     catch

@@ -1,4 +1,4 @@
-﻿namespace Fanex.Caching.MemoryCache
+﻿namespace Fanex.Caching.Memory
 {
     using System;
     using System.Collections;
@@ -18,7 +18,11 @@
 
         public MemoryCache(MemoryCacheOptions options)
         {
-            options = options ?? new MemoryCacheOptions();
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             _memoryStorage = new MemoryStorageImpl(options);
         }
 
@@ -39,14 +43,12 @@
 
         public bool Contain(string key)
         {
-            bool contained = false;
-
             if (!string.IsNullOrEmpty(key))
             {
-                contained = _memoryStorage.Contain(key);
+                return _memoryStorage.Contain(key);
             }
 
-            return contained;
+            return false;
         }
 
         public Task<bool> ContainAsync(string key)
@@ -56,7 +58,7 @@
 
         public T Get<T>(string key)
         {
-            if (key == null)
+            if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
@@ -66,7 +68,7 @@
 
         public Task<T> GetAsync<T>(string key)
         {
-            if (key == null)
+            if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
@@ -76,7 +78,7 @@
 
         public void Remove(string key)
         {
-            if (key == null)
+            if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
@@ -93,9 +95,14 @@
 
         public void Set<T>(string key, T value)
         {
-            if (key == null)
+            if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
+            }
+
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
             }
 
             var memoryCacheItemOptions = new MemoryCacheItemOptions
@@ -108,12 +115,24 @@
 
         public void Set<T>(string key, T value, CacheItemOptions options)
         {
-            if (key == null)
+            if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            var memoryCacheItemOptions = new MemoryCacheItemOptions
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            var memoryCacheItemOptions = options as MemoryCacheItemOptions;
+
+            memoryCacheItemOptions = memoryCacheItemOptions ?? new MemoryCacheItemOptions
             {
                 AbsoluteExpiration = options.AbsoluteExpiration,
                 RelativeExpiration = options.RelativeExpiration,
@@ -125,9 +144,19 @@
 
         public void Set<T>(string key, T value, MemoryCacheItemOptions options)
         {
-            if (key == null)
+            if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
+            }
+
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
             }
 
             _memoryStorage.Set(key, value, options);

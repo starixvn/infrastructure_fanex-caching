@@ -1,4 +1,4 @@
-﻿namespace Fanex.Caching.MemoryCache
+﻿namespace Fanex.Caching.Memory
 {
     using System;
     using System.Collections.Generic;
@@ -20,6 +20,7 @@
             : base(key, value, options)
         {
             _absoluteExpiration = options.CalculateAbsoluteExpiration(createdTime);
+            _postEvictionCallbacks = options.PostEvictionCallbacks;
             LastAccess = createdTime;
         }
 

@@ -1,4 +1,4 @@
-﻿namespace Fanex.Caching.MemoryCache
+﻿namespace Fanex.Caching.Memory
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@
     {
         private const double CompactPercentage = 0.1;
         private readonly Dictionary<object, MemoryCacheItem> _items;
-        private readonly ReaderWriterLockSlim _itemLock;
+        private readonly ReaderWriterLockSlim _lock;
         private readonly SystemClock _clock;
         private TimeSpan _expirationScanFrequency;
         private DateTimeOffset _lastExpirationScan;
@@ -20,7 +20,7 @@
         {
             _clock = new SystemClockImpl();
             _items = new Dictionary<object, MemoryCacheItem>();
-            _itemLock = new ReaderWriterLockSlim();
+            _lock = new ReaderWriterLockSlim();
             _expirationScanFrequency = options.ExpirationScanFrequency;
             _lastExpirationScan = _clock.UtcNow;
 
@@ -45,7 +45,7 @@
             bool contained = false;
 
             CheckDisposed();
-            _itemLock.EnterReadLock();
+            _lock.EnterReadLock();
 
             try
             {
@@ -55,7 +55,7 @@
             }
             finally
             {
-                _itemLock.ExitReadLock();
+                _lock.ExitReadLock();
             }
 
             return contained;
@@ -72,7 +72,7 @@
             MemoryCacheItem expiredItem = null;
 
             CheckDisposed();
-            _itemLock.EnterReadLock();
+            _lock.EnterReadLock();
 
             try
             {
@@ -93,7 +93,7 @@
             }
             finally
             {
-                _itemLock.ExitReadLock();
+                _lock.ExitReadLock();
             }
 
             if (expiredItem != null)
@@ -115,7 +115,7 @@
 
             CheckDisposed();
             MemoryCacheItem item;
-            _itemLock.EnterReadLock();
+            _lock.EnterReadLock();
 
             try
             {
@@ -126,7 +126,7 @@
             }
             finally
             {
-                _itemLock.ExitReadLock();
+                _lock.ExitReadLock();
             }
 
             if (item != null)
@@ -152,7 +152,7 @@
             bool added = false;
             var item = new MemoryCacheItem(key, value, options, utcNow);
 
-            _itemLock.EnterWriteLock();
+            _lock.EnterWriteLock();
 
             try
             {
@@ -170,7 +170,7 @@
             }
             finally
             {
-                _itemLock.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
 
             if (previousItem != null)
@@ -192,7 +192,7 @@
         {
             var expiredEntries = new List<MemoryCacheItem>();
 
-            cache._itemLock.EnterReadLock();
+            cache._lock.EnterReadLock();
 
             try
             {
@@ -208,7 +208,7 @@
             }
             finally
             {
-                cache._itemLock.ExitReadLock();
+                cache._lock.ExitReadLock();
             }
 
             cache.RemoveItems(expiredEntries);
@@ -251,7 +251,7 @@
             var highPriorityItems = new List<MemoryCacheItem>();
             var neverRemovePriorityItems = new List<MemoryCacheItem>();
 
-            _itemLock.EnterReadLock();
+            _lock.EnterReadLock();
 
             try
             {
@@ -276,7 +276,7 @@
             }
             finally
             {
-                _itemLock.ExitReadLock();
+                _lock.ExitReadLock();
             }
 
             RemoveItems(expiredItems);
@@ -361,7 +361,7 @@
 
         private void RemoveItems(List<MemoryCacheItem> items)
         {
-            _itemLock.EnterWriteLock();
+            _lock.EnterWriteLock();
 
             try
             {
@@ -377,7 +377,7 @@
             }
             finally
             {
-                _itemLock.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
 
             foreach (MemoryCacheItem item in items)
@@ -388,7 +388,7 @@
 
         private void RemoveItem(MemoryCacheItem item)
         {
-            _itemLock.EnterWriteLock();
+            _lock.EnterWriteLock();
 
             try
             {
@@ -401,7 +401,7 @@
             }
             finally
             {
-                _itemLock.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
 
             item.InvokeEvictionCallbacks();

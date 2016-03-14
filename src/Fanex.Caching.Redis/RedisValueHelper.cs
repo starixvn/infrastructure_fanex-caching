@@ -5,6 +5,8 @@
 
     internal static class RedisValueHelper
     {
+        public const string DateTimeFormat = "yyMMddTHHmmss";
+
         public static RedisValue ConvertToRedisValue(object value, Serializer serializer)
         {
             if (value == null)
@@ -14,11 +16,37 @@
 
             Type valueType = value.GetType();
 
-            if (valueType.IsPrimitive
-                || typeof(byte[]) == valueType
-                || typeof(string) == valueType)
+            if (typeof(byte[]) == valueType)
             {
-                return (RedisValue)value;
+                return (byte[])value;
+            }
+            else if (typeof(string) == valueType)
+            {
+                return (string)value;
+            }
+            else if (typeof(short) == valueType)
+            {
+                return (short)value;
+            }
+            else if (typeof(int) == valueType)
+            {
+                return (int)value;
+            }
+            else if (typeof(long) == valueType)
+            {
+                return (long)value;
+            }
+            else if (typeof(bool) == valueType)
+            {
+                return (bool)value;
+            }
+            else if (typeof(float) == valueType)
+            {
+                return (float)value;
+            }
+            else if (typeof(double) == valueType)
+            {
+                return (double)value;
             }
             else
             {
@@ -28,15 +56,41 @@
 
         public static object ConvertToObject(RedisValue value, Type valueType, Serializer serializer)
         {
-            if (valueType.IsPrimitive
-                || typeof(byte[]) == valueType
-                || typeof(string) == valueType)
+            if (typeof(byte[]) == valueType)
             {
-                return value;
+                return (byte[])value;
+            }
+            else if (typeof(string) == valueType)
+            {
+                return (string)value;
+            }
+            else if (typeof(short) == valueType)
+            {
+                return (short)value;
+            }
+            else if (typeof(int) == valueType)
+            {
+                return (int)value;
+            }
+            else if (typeof(long) == valueType)
+            {
+                return (long)value;
+            }
+            else if (typeof(bool) == valueType)
+            {
+                return (bool)value;
+            }
+            else if (typeof(float) == valueType)
+            {
+                return (float)value;
+            }
+            else if (typeof(double) == valueType)
+            {
+                return (double)value;
             }
             else
             {
-                return serializer.Deserialize(value);
+                return serializer.Deserialize(value, valueType);
             }
         }
     }
