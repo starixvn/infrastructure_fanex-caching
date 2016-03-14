@@ -1,0 +1,16 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "Fanex.Caching.Redis Class Library",
+  "authors": [ "jason.ly" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "dnx46": { }
+  },
+  "dependencies": {
+    "Fanex.Caching": "1.0.0-*",
+    "MsgPack.Cli": "0.6.8",
+    "StackExchange.Redis": "1.0.488"
+  }
+}

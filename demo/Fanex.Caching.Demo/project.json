@@ -1,0 +1,28 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "Fanex.Caching.Demo Console Application",
+  "authors": [ "jason.ly" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Fanex.Caching": "1.0.0-*"
+  },
+
+  "commands": {
+    "Fanex.Caching.Demo": "Fanex.Caching.Demo"
+  },
+
+  "frameworks": {
+    "dnx46": {
+      "frameworkAssemblies": {
+        "System.Configuration": "4.0.0.0"
+      }
+    }
+  }
+}
