@@ -17,26 +17,18 @@
             Console.WriteLine(CacheService.Get<string>("TestKey1"));
 
             // Cache in 500 seconds.
-            CacheService.Set("TestKey2", "Test key 2", new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(500)));
+            CacheService.Set("TestKey2", "Test key 2", new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(10)));
+            Thread.Sleep(6000);
             Console.WriteLine(CacheService.Get<string>("TestKey2"));
 
             // Cache an object.
             CacheService.Set("TestCust", customer);
             Console.WriteLine(CacheService.Get<Customer>("TestCust")?.ToString());
 
-            // Callback when evicted
-            var options = new MemoryCacheItemOptions()
-                .RegisterPostEvictionCallback(
-                (key, value, reason, substate) =>
-                {
-                    Console.WriteLine($"'{key}: {value}' was evicted due to {reason}.");
-                })
-                .SetAbsoluteExpiration(TimeSpan.FromSeconds(5));
-            CacheService.Set("TestKey3", "Test key 3", options);
             Thread.Sleep(3000);
-            Console.WriteLine(CacheService.Get<string>("TestKey3"));
-            Thread.Sleep(6000);
-            Console.WriteLine(CacheService.Get<string>("TestKey3"));
+            Console.WriteLine(CacheService.Get<Customer>("TestCust"));
+            Thread.Sleep(5000);
+            Console.WriteLine(CacheService.Get<Customer>("TestKey2"));
 
             Console.ReadLine();
         }

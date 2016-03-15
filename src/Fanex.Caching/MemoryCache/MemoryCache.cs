@@ -63,7 +63,9 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            return (T)_memoryStorage.Get(key);
+            object value = _memoryStorage.Get(key);
+
+            return value is T ? (T)value : default(T);
         }
 
         public Task<T> GetAsync<T>(string key)

@@ -137,7 +137,7 @@
             StartScanForExpiredItems();
         }
 
-        public object Set(object key, object value, MemoryCacheItemOptions options)
+        public void Set(object key, object value, MemoryCacheItemOptions options)
         {
             if (key == null)
             {
@@ -184,8 +184,6 @@
             }
 
             StartScanForExpiredItems();
-
-            return value;
         }
 
         private static void ScanForExpiredItems(MemoryStorageImpl cache)

@@ -16,7 +16,8 @@
             Console.WriteLine(CacheService.Get<string>("TestKey1"));
 
             // Cache in 500 seconds.
-            CacheService.Set("TestKey2", "Test key 2", new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(500)));
+            CacheService.Set("TestKey2", "Test key 2", new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(10)));
+            Thread.Sleep(6000);
             Console.WriteLine(CacheService.Get<string>("TestKey2"));
 
             // Cache an object.
@@ -25,8 +26,8 @@
 
             Thread.Sleep(3000);
             Console.WriteLine(CacheService.Get<Customer>("TestCust"));
-            Thread.Sleep(6000);
-            Console.WriteLine(CacheService.Get<Customer>("TestCust"));
+            Thread.Sleep(10000);
+            Console.WriteLine(CacheService.Get<string>("TestKey2"));
 
             Console.ReadLine();
         }
