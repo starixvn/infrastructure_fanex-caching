@@ -6,7 +6,8 @@
   "projectUrl": "",
   "licenseUrl": "",
   "frameworks": {
-    "dnx46": { }
+    "dnx46": { },
+    "net461": { }
   },
   "dependencies": {
     "Fanex.Caching": "1.0.0-*",
