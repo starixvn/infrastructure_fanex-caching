@@ -39,7 +39,7 @@
                     }
                     catch
                     {
-                        throw new InvalidOperationException("Invalid connection settings.");
+                        throw new InvalidOperationException($"Invalid setting value for {property.Name}.");
                     }
                 }
             }
