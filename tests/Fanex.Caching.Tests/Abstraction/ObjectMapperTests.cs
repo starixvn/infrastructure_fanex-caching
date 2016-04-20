@@ -3,9 +3,10 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using Mocks;
     using Ploeh.AutoFixture;
     using Xunit;
-    using Xunit.Extensions;
+
     public class ObjectMapperTests
     {
         private Fixture _fixture;
@@ -28,24 +29,82 @@
                     _fixture.Create<Dictionary<string, Func<object, object>>>()));
         }
 
-        [Theory, MemberData(nameof(SampleData))]
-        public void ConvertTo(string param1, int param2)
+        [Fact]
+        public void ConvertTo_HashtableDoesNotContainNeededData_ReturnEmptyObject()
         {
+            // Arrange.
+            var data = new Hashtable
+            {
+                {"prop1", "value1" },
+                {"prop2", "value2" }
+            };
 
+            // Act.
+            var actualObject = ObjectMapper.ConvertTo<ConnectionSettingMock>(
+                    data,
+                    _fixture.Create<Dictionary<string, Func<object, object>>>());
+
+            // Assert.
+            Assert.Equal(actualObject, new ConnectionSettingMock());
         }
 
-        public static IEnumerable<object[]> SampleData
+        [Fact]
+        public void ConvertTo_HashtableDoesNotContainAllData_DefaultValuesForMissingProperties()
         {
-            get
+            // Arrange.
+            var data = new Hashtable
             {
-                // Or this could read from a file. :)
-                return new[]
-                {
-                    new object[] { "xUnit", 1 },
-                    new object[] { "is fun", 2 },
-                    new object[] { "to test with", 3 }
-                };
-            }
+                {"Property1", "value1" },
+                {"prop2", "value2" }
+            };
+
+            // Act.
+            var actualObject = ObjectMapper.ConvertTo<ConnectionSettingMock>(
+                    data,
+                    _fixture.Create<Dictionary<string, Func<object, object>>>());
+
+            // Assert.
+            Assert.Null(actualObject.Property2);
+        }
+
+        [Fact]
+        public void ConvertTo_HashtableContainAllData_ReturnExpectedObject()
+        {
+            // Arrange.
+            var data = new Hashtable
+            {
+                {"Property1", "value1" },
+                {"Property2", "value2" }
+            };
+
+            // Act.
+            var actualObject = ObjectMapper.ConvertTo<ConnectionSettingMock>(
+                    data,
+                    _fixture.Create<Dictionary<string, Func<object, object>>>());
+
+            // Assert.
+            var expectedObject = new ConnectionSettingMock("value1", "value2");
+            Assert.Equal(actualObject, expectedObject);
+        }
+
+        [Fact]
+        public void ConvertTo_PropertiesMaperIsNotEmpty_CallMapperWithAssociateProperty()
+        {
+            // Arrange.
+            var data = new Hashtable
+            {
+                {"Property1", "value1" },
+                {"Property2", "value2" }
+            };
+            var propertiesMapper = new Dictionary<string, Func<object, object>>();
+            propertiesMapper.Add("Property2", configuredValue => "Updated value2");
+
+            // Act.
+            var actualObject = ObjectMapper.ConvertTo<ConnectionSettingMock>(data, propertiesMapper);
+
+            // Assert.
+            var expectedObject = new ConnectionSettingMock("value1", "Updated value2");
+            Assert.Equal(actualObject, expectedObject);
         }
     }
 }
