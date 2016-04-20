@@ -3,18 +3,14 @@
     internal static class RedisScripts
     {
         public const string GetValue =
-            @"local cachedData = redis.call('HGET', KEYS[1], 'data')
+            @"local cachingData = redis.call('HGET', KEYS[1], 'data')
               local slidingExpiration = redis.call('HGET', KEYS[1], 'sliding-expiration')
 
               if slidingExpiration ~= false then
                   redis.call('EXPIRE', KEYS[1], slidingExpiration)
               end
 
-              if cachedData ~= false then
-                  return cachedData
-              else
-                  return ''
-              end";
+              return cachingData";
 
         public const string SetValueWithAbsoluteExpiration =
             @"redis.call('HMSET', KEYS[1], 'data', ARGV[1])

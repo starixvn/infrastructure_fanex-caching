@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Caching
 {
+    using System;
     using System.Threading.Tasks;
 
     public interface Cache
@@ -8,15 +9,11 @@
 
         Task<bool> ContainAsync(string key);
 
-        T Get<T>(string key);
+        bool TryGet<T>(string key, out T value);
 
-        Task<T> GetAsync<T>(string key);
-
-        void Set<T>(string key, T value);
+        Task<Tuple<T, bool>> TryGetAsync<T>(string key);
 
         void Set<T>(string key, T value, CacheItemOptions options);
-
-        Task SetAsync<T>(string key, T value);
 
         Task SetAsync<T>(string key, T value, CacheItemOptions options);
 

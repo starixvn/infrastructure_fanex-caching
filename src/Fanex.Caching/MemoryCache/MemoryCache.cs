@@ -56,26 +56,35 @@
             return Task.FromResult(Contain(key));
         }
 
-        public T Get<T>(string key)
+        public bool TryGet<T>(string key, out T value)
         {
             if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            object value = _memoryStorage.Get(key);
+            object result = null;
+            bool found = _memoryStorage.TryGet(key, out result);
 
-            return value is T ? (T)value : default(T);
+            if ((result != null) && (result is T))
+            {
+                value = (T)result;
+            }
+            else
+            {
+                value = default(T);
+                found = false;
+            }
+
+            return found;
         }
 
-        public Task<T> GetAsync<T>(string key)
+        public Task<Tuple<T, bool>> TryGetAsync<T>(string key)
         {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            T value = default(T);
+            bool isExisting = TryGet(key, out value);
 
-            return Task.FromResult(Get<T>(key));
+            return Task.FromResult(new Tuple<T, bool>(value, isExisting));
         }
 
         public void Remove(string key)
@@ -93,26 +102,6 @@
             Remove(key);
 
             return CompletedTask;
-        }
-
-        public void Set<T>(string key, T value)
-        {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            var memoryCacheItemOptions = new MemoryCacheItemOptions
-            {
-                RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
-            };
-
-            _memoryStorage.Set(key, value, memoryCacheItemOptions);
         }
 
         public void Set<T>(string key, T value, CacheItemOptions options)
@@ -162,13 +151,6 @@
             }
 
             _memoryStorage.Set(key, value, options);
-        }
-
-        public Task SetAsync<T>(string key, T value)
-        {
-            Set(key, value);
-
-            return CompletedTask;
         }
 
         public Task SetAsync<T>(string key, T value, CacheItemOptions options)

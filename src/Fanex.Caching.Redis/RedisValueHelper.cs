@@ -40,10 +40,6 @@
             {
                 return (bool)value;
             }
-            else if (typeof(float) == valueType)
-            {
-                return (float)value;
-            }
             else if (typeof(double) == valueType)
             {
                 return (double)value;
@@ -79,10 +75,6 @@
             else if (typeof(bool) == valueType)
             {
                 return (bool)value;
-            }
-            else if (typeof(float) == valueType)
-            {
-                return (float)value;
             }
             else if (typeof(double) == valueType)
             {

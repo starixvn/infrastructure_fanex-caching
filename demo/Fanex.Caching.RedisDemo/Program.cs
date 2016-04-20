@@ -9,7 +9,7 @@
         {
             var customer = new Customer();
 
-            Console.WriteLine("Using Memory cache");
+            Console.WriteLine("Using Redis cache");
 
             // Cache in 120 seconds, default timeout value.
             CacheService.Set("TestKey1", "Test key 1");

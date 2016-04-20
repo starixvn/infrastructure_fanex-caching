@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Caching.Redis
 {
+    using System;
     using System.Threading.Tasks;
     using StackExchange.Redis;
 
@@ -34,38 +35,43 @@
             return await _connection.KeyExistsAsync(ModifyKey(key));
         }
 
-        public T Get<T>(string key)
+        public bool TryGet<T>(string key, out T value)
         {
             Connect();
 
-            T value = default(T);
             RedisCacheItem item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
-            RedisCommand command = item.GetGetCommand();
+            RedisCommand command = item.ToGetCommand();
             RedisResult dataFromRedis = _connection.ScriptEvaluate(command.Script, command.Keys);
+            bool found = false;
 
-            if (dataFromRedis != null)
+            value = default(T);
+
+            if (!dataFromRedis.IsNull)
             {
                 value = (T)RedisValueHelper.ConvertToObject((RedisValue)dataFromRedis, typeof(T), _serializer);
+                found = true;
             }
 
-            return value;
+            return found;
         }
 
-        public async Task<T> GetAsync<T>(string key)
+        public async Task<Tuple<T, bool>> TryGetAsync<T>(string key)
         {
             await ConnectAsync();
 
-            T value = default(T);
             RedisCacheItem item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
-            RedisCommand command = item.GetGetCommand();
+            RedisCommand command = item.ToGetCommand();
             RedisResult dataFromRedis = await _connection.ScriptEvaluateAsync(command.Script, command.Keys);
+            bool found = false;
+            T value = default(T);
 
-            if (dataFromRedis != null)
+            if (!dataFromRedis.IsNull)
             {
                 value = (T)RedisValueHelper.ConvertToObject((RedisValue)dataFromRedis, typeof(T), _serializer);
+                found = true;
             }
 
-            return value;
+            return new Tuple<T, bool>(value, found);
         }
 
         public void Remove(string key)
@@ -83,7 +89,7 @@
         public void Set<T>(string key, T value, CacheItemOptions options)
         {
             RedisCacheItem item = new RedisCacheItem(ModifyKey(key), value, options, _serializer);
-            RedisCommand command = item.GetSetCommand();
+            RedisCommand command = item.ToSetCommand();
 
             Connect();
             _connection.ScriptEvaluate(command.Script, command.Keys, command.Values);
@@ -92,7 +98,7 @@
         public async Task SetAsync<T>(string key, T value, CacheItemOptions options)
         {
             RedisCacheItem item = new RedisCacheItem(ModifyKey(key), value, options, _serializer);
-            RedisCommand command = item.GetSetCommand();
+            RedisCommand command = item.ToSetCommand();
 
             await ConnectAsync();
             await _connection.ScriptEvaluateAsync(command.Script, command.Keys, command.Values);

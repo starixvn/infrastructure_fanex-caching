@@ -4,7 +4,7 @@
     {
         bool Contain(object key);
 
-        object Get(object key);
+        bool TryGet(object key, out object value);
 
         void Set(object key, object value, MemoryCacheItemOptions options);
 

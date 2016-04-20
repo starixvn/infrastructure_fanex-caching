@@ -12,7 +12,7 @@
             _serializer = serializer;
         }
 
-        public RedisCommand GetGetCommand()
+        public RedisCommand ToGetCommand()
         {
             var command = new RedisCommand();
 
@@ -22,21 +22,21 @@
             return command;
         }
 
-        public RedisCommand GetSetCommand()
+        public RedisCommand ToSetCommand()
         {
             if (Options.AbsoluteExpiration.HasValue)
             {
-                return GetSetCommandWithAbsoluteExpiration();
+                return ToSetCommandWithAbsoluteExpiration();
             }
             else if (Options.SlidingExpiration.HasValue)
             {
-                return GetSetCommandWithSlidingExpiration();
+                return ToSetCommandWithSlidingExpiration();
             }
 
-            return GetSetCommandWithRelativeExpiration();
+            return ToSetCommandWithRelativeExpiration();
         }
 
-        private RedisCommand GetSetCommandWithAbsoluteExpiration()
+        private RedisCommand ToSetCommandWithAbsoluteExpiration()
         {
             var command = new RedisCommand();
 
@@ -51,9 +51,11 @@
             return command;
         }
 
-        private RedisCommand GetSetCommandWithRelativeExpiration()
+        private RedisCommand ToSetCommandWithRelativeExpiration()
         {
             var command = new RedisCommand();
+
+            Options.RelativeExpiration = Options.RelativeExpiration ?? CacheItemOptions.DefaultRelativeExpiration;
 
             command.Script = RedisScripts.SetValueWithRelativeExpiration;
             command.Keys = new RedisKey[] { (string)Key };
@@ -66,11 +68,9 @@
             return command;
         }
 
-        private RedisCommand GetSetCommandWithSlidingExpiration()
+        private RedisCommand ToSetCommandWithSlidingExpiration()
         {
             var command = new RedisCommand();
-
-            Options.SlidingExpiration = Options.SlidingExpiration ?? CacheItemOptions.DefaultRelativeExpiration;
 
             command.Script = RedisScripts.SetValueWithSlidingExpiration;
             command.Keys = new RedisKey[] { (string)Key };

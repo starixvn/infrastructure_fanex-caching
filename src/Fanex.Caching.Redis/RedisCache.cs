@@ -69,24 +69,24 @@
             return Task.FromResult(false);
         }
 
-        public T Get<T>(string key)
+        public bool TryGet<T>(string key, out T value)
         {
             if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            return _redisConnection.Get<T>(key);
+            return _redisConnection.TryGet(key, out value);
         }
 
-        public Task<T> GetAsync<T>(string key)
+        public Task<Tuple<T, bool>> TryGetAsync<T>(string key)
         {
             if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            return _redisConnection.GetAsync<T>(key);
+            return _redisConnection.TryGetAsync<T>(key);
         }
 
         public void Remove(string key)
@@ -109,26 +109,6 @@
             return _redisConnection.RemoveAsync(key);
         }
 
-        public void Set<T>(string key, T value)
-        {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            var redisCacheItemOptions = new CacheItemOptions
-            {
-                RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
-            };
-
-            _redisConnection.Set(key, value, redisCacheItemOptions);
-        }
-
         public void Set<T>(string key, T value, CacheItemOptions options)
         {
             if (string.IsNullOrEmpty(key))
@@ -147,26 +127,6 @@
             }
 
             _redisConnection.Set(key, value, options);
-        }
-
-        public Task SetAsync<T>(string key, T value)
-        {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            var redisCacheItemOptions = new CacheItemOptions
-            {
-                RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
-            };
-
-            return _redisConnection.SetAsync(key, value, redisCacheItemOptions);
         }
 
         public Task SetAsync<T>(string key, T value, CacheItemOptions options)
