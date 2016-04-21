@@ -11,7 +11,7 @@
 
         bool TryGet<T>(string key, out T value);
 
-        Task<Tuple<T, bool>> TryGetAsync<T>(string key);
+        Task<Tuple<bool, T>> TryGetAsync<T>(string key);
 
         void Set<T>(string key, T value, CacheItemOptions options);
 

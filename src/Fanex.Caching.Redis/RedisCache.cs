@@ -79,7 +79,7 @@
             return _redisConnection.TryGet(key, out value);
         }
 
-        public Task<Tuple<T, bool>> TryGetAsync<T>(string key)
+        public Task<Tuple<bool, T>> TryGetAsync<T>(string key)
         {
             if (string.IsNullOrEmpty(key))
             {

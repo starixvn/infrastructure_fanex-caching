@@ -55,7 +55,7 @@
             return found;
         }
 
-        public async Task<Tuple<T, bool>> TryGetAsync<T>(string key)
+        public async Task<Tuple<bool, T>> TryGetAsync<T>(string key)
         {
             await ConnectAsync();
 
@@ -71,7 +71,7 @@
                 found = true;
             }
 
-            return new Tuple<T, bool>(value, found);
+            return new Tuple<bool, T>(found, value);
         }
 
         public void Remove(string key)

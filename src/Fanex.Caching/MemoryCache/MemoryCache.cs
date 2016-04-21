@@ -79,12 +79,12 @@
             return found;
         }
 
-        public Task<Tuple<T, bool>> TryGetAsync<T>(string key)
+        public Task<Tuple<bool, T>> TryGetAsync<T>(string key)
         {
             T value = default(T);
-            bool isExisting = TryGet(key, out value);
+            bool found = TryGet(key, out value);
 
-            return Task.FromResult(new Tuple<T, bool>(value, isExisting));
+            return Task.FromResult(new Tuple<bool, T>(found, value));
         }
 
         public void Remove(string key)

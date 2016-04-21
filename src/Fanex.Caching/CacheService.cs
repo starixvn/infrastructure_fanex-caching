@@ -56,12 +56,94 @@
 
         public static T Get<T>(string key)
         {
-            return _cacheStorage.Get<T>(key);
+            T value = default(T);
+
+            _cacheStorage.TryGet(key, out value);
+
+            return value;
         }
 
-        public static Task<T> GetAsync<T>(string key)
+        public static async Task<T> GetAsync<T>(string key)
         {
-            return _cacheStorage.GetAsync<T>(key);
+            Tuple<bool, T> result = await _cacheStorage.TryGetAsync<T>(key);
+
+            return result.Item2;
+        }
+
+        public static bool TryGet<T>(string key, out T value)
+        {
+            return _cacheStorage.TryGet(key, out value);
+        }
+
+        public static Task<Tuple<bool, T>> TryGetAsync<T>(string key)
+        {
+            return _cacheStorage.TryGetAsync<T>(key);
+        }
+
+        public static T GetOrSet<T>(string key, Func<T> factory)
+        {
+            T value = default(T);
+            bool found = _cacheStorage.TryGet(key, out value);
+
+            if (!found && factory != null)
+            {
+                var cacheItemOptions = new CacheItemOptions
+                {
+                    RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
+                };
+
+                value = factory();
+                _cacheStorage.Set(key, value, cacheItemOptions);
+            }
+
+            return value;
+        }
+
+        public static T GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)
+        {
+            T value = default(T);
+            bool found = _cacheStorage.TryGet(key, out value);
+
+            if (!found && factory != null)
+            {
+                value = factory();
+                _cacheStorage.Set(key, value, options);
+            }
+
+            return value;
+        }
+
+        public static async Task<T> GetOrSetAsync<T>(string key, Func<T> factory)
+        {
+            T value = default(T);
+            Tuple<bool, T> found = await _cacheStorage.TryGetAsync<T>(key);
+
+            if (!found.Item1 && factory != null)
+            {
+                var cacheItemOptions = new CacheItemOptions
+                {
+                    RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
+                };
+
+                value = factory();
+                await _cacheStorage.SetAsync(key, value, cacheItemOptions);
+            }
+
+            return value;
+        }
+
+        public static async Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)
+        {
+            T value = default(T);
+            Tuple<bool, T> found = await _cacheStorage.TryGetAsync<T>(key);
+
+            if (!found.Item1 && factory != null)
+            {
+                value = factory();
+                await _cacheStorage.SetAsync(key, value, options);
+            }
+
+            return value;
         }
 
         public static void Remove(string key)
@@ -76,22 +158,32 @@
 
         public static void Set<T>(string key, T value)
         {
-            _cacheStorage.Set<T>(key, value);
+            var cacheItemOptions = new CacheItemOptions
+            {
+                RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
+            };
+
+            _cacheStorage.Set(key, value, cacheItemOptions);
         }
 
         public static void Set<T>(string key, T value, CacheItemOptions options)
         {
-            _cacheStorage.Set<T>(key, value, options);
+            _cacheStorage.Set(key, value, options);
         }
 
         public static Task SetAsync<T>(string key, T value)
         {
-            return _cacheStorage.SetAsync<T>(key, value);
+            var cacheItemOptions = new CacheItemOptions
+            {
+                RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
+            };
+
+            return _cacheStorage.SetAsync(key, value, cacheItemOptions);
         }
 
         public static Task SetAsync<T>(string key, T value, CacheItemOptions options)
         {
-            return _cacheStorage.SetAsync<T>(key, value, options);
+            return _cacheStorage.SetAsync(key, value, options);
         }
     }
 }
