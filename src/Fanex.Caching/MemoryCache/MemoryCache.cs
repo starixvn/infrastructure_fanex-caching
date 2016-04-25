@@ -34,7 +34,7 @@
                 {
                     {
                         nameof(MemoryCacheOptions.ExpirationScanFrequency),
-                        (object expirationScanFrequency) => TimeSpan.FromSeconds(Convert.ToDouble(expirationScanFrequency))
+                        expirationScanFrequency => TimeSpan.FromSeconds(Convert.ToDouble(expirationScanFrequency))
                     }
                 });
 

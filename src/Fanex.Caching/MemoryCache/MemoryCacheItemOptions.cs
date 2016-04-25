@@ -39,7 +39,7 @@
             return this;
         }
 
-        public DateTimeOffset? CalculateAbsoluteExpiration(DateTimeOffset now)
+        internal DateTimeOffset? CalculateAbsoluteExpiration(DateTimeOffset now)
         {
             if (RelativeExpiration.HasValue)
             {
