@@ -2,17 +2,19 @@
 {
     using System;
     using System.Collections;
+    using System.Configuration;
     using System.Threading.Tasks;
     using Configuration;
     using Memory;
 
     public static class CacheService
     {
+        private const string SectionName = "Fanex.Caching";
         private static Cache _cacheStorage;
 
         static CacheService()
         {
-            CacheSettings settings = CacheSettings.GetSettings();
+            CacheSettings settings = ConfigurationManager.GetSection(SectionName) as CacheSettings;
 
             if (settings != null)
             {

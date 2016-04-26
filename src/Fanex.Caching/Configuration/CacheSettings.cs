@@ -6,7 +6,6 @@
     {
         private const string CacheTypeAttributeName = "cacheType";
         private const string ConnectionSettingsElementName = "connectionSettings";
-        private const string SectionName = "Fanex.Caching";
 
         [ConfigurationProperty(CacheTypeAttributeName, IsRequired = false)]
         public string CacheType
@@ -29,11 +28,6 @@
 
                 return connectionSettingCollection;
             }
-        }
-
-        public static CacheSettings GetSettings()
-        {
-            return ConfigurationManager.GetSection(SectionName) as CacheSettings;
         }
     }
 }

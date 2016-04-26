@@ -23,7 +23,7 @@
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _memoryStorage = new MemoryStorageImpl(options);
+            _memoryStorage = new MemoryStorageImpl(options, new SystemClockImpl());
         }
 
         public MemoryCache(Hashtable settings)
@@ -38,7 +38,7 @@
                     }
                 });
 
-            _memoryStorage = new MemoryStorageImpl(options);
+            _memoryStorage = new MemoryStorageImpl(options, new SystemClockImpl());
         }
 
         public bool Contain(string key)

@@ -35,8 +35,8 @@
             // Arrange.
             var data = new Hashtable
             {
-                {"prop1", "value1" },
-                {"prop2", "value2" }
+                { "prop1", "value1" },
+                { "prop2", "value2" }
             };
 
             // Act.
@@ -54,8 +54,8 @@
             // Arrange.
             var data = new Hashtable
             {
-                {"Property1", "value1" },
-                {"prop2", "value2" }
+                { "Property1", "value1" },
+                { "prop2", "value2" }
             };
 
             // Act.
@@ -73,8 +73,8 @@
             // Arrange.
             var data = new Hashtable
             {
-                {"Property1", "value1" },
-                {"Property2", "value2" }
+                { "Property1", "value1" },
+                { "Property2", "value2" }
             };
 
             // Act.
@@ -93,8 +93,8 @@
             // Arrange.
             var data = new Hashtable
             {
-                {"Property1", "value1" },
-                {"Property2", "value2" }
+                { "Property1", "value1" },
+                { "Property2", "value2" }
             };
             var propertiesMapper = new Dictionary<string, Func<object, object>>();
             propertiesMapper.Add("Property2", configuredValue => "Updated value2");

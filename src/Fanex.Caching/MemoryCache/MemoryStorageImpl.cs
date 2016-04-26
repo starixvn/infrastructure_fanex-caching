@@ -16,11 +16,11 @@
         private DateTimeOffset _lastExpirationScan;
         private bool _disposed;
 
-        public MemoryStorageImpl(MemoryCacheOptions options)
+        public MemoryStorageImpl(MemoryCacheOptions options, SystemClock clock)
         {
-            _clock = new SystemClockImpl();
             _items = new Dictionary<object, MemoryCacheItem>();
             _lock = new ReaderWriterLockSlim();
+            _clock = clock;
             _expirationScanFrequency = options.ExpirationScanFrequency;
             _lastExpirationScan = _clock.UtcNow;
 
