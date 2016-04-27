@@ -163,5 +163,35 @@
             Assert.True(found);
             Assert.Equal(value, addedValue);
         }
+
+        [Fact]
+        public void SlidingExpirationRenewedByThouchUntilAbsoluteExpirationMet()
+        {
+            // Arrange.
+            var key = "myKey";
+            var value = new object();
+            object result = null;
+            bool found = false;
+
+            _cachingOptions.SetSlidingExpiration(TimeSpan.FromMinutes(1))
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(2));
+            _storage.Set(key, value, _cachingOptions);
+
+            // Act - touch the key when the absolute expiration has not met.
+            _clock.Add(TimeSpan.FromSeconds(59));
+            found = _storage.TryGet(key, out result);
+
+            // Assert.
+            Assert.True(found);
+            Assert.Same(value, result);
+
+            // Act - after 2 minutes from the time the key was stored.
+            _clock.Add(TimeSpan.FromSeconds(61));
+            found = _storage.TryGet(key, out result);
+
+            // Assert.
+            Assert.False(found);
+            Assert.Null(result);
+        }
     }
 }

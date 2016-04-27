@@ -119,11 +119,11 @@
             var newValueCachingOptions = new MemoryCacheItemOptions();
 
             oldValueCachingOptions.RegisterPostEvictionCallback(
-                (subkey, subValue, reason, state) =>
+                (subKey, subValue, reason, state) =>
                 {
                     var localCallbackInvoked = (ManualResetEvent)state;
 
-                    Assert.Equal(key, subkey);
+                    Assert.Equal(key, subKey);
                     Assert.Same(subValue, oldValue);
                     Assert.Equal(EvictionReason.Replaced, reason);
 
@@ -131,7 +131,7 @@
                 },
                 oldValueCallbackInvoked);
             newValueCachingOptions.RegisterPostEvictionCallback(
-                (subkey, subValue, reason, state) =>
+                (subKey, subValue, reason, state) =>
                 {
                     // Shouldn't be invoked.
                     var localCallbackInvoked = (ManualResetEvent)state;
@@ -165,7 +165,7 @@
             EvictionReason actualReason = EvictionReason.None;
 
             _cachingOptions.RegisterPostEvictionCallback(
-                (subkey, subValue, reason, state) =>
+                (subKey, subValue, reason, state) =>
                 {
                     var localCallbackInvoked = (ManualResetEvent)state;
 
@@ -212,11 +212,11 @@
             var callbackInvoked = new ManualResetEvent(false);
 
             _cachingOptions.RegisterPostEvictionCallback(
-                (subkey, subValue, reason, state) =>
+                (subKey, subValue, reason, state) =>
                 {
                     var localCallbackInvoked = (ManualResetEvent)state;
 
-                    Assert.Equal(key, subkey);
+                    Assert.Equal(key, subKey);
                     Assert.Same(value, subValue);
                     Assert.Equal(EvictionReason.Removed, reason);
 
@@ -248,11 +248,11 @@
             var callbackInvoked = new ManualResetEvent(false);
 
             _cachingOptions.RegisterPostEvictionCallback(
-                (subkey, subValue, reason, state) =>
+                (subKey, subValue, reason, state) =>
                 {
                     var localCallbackInvoked = (ManualResetEvent)state;
 
-                    Assert.Equal(key, subkey);
+                    Assert.Equal(key, subKey);
                     Assert.Same(subValue, oldValue);
                     Assert.Equal(EvictionReason.Removed, reason);
 
