@@ -5,11 +5,11 @@
     using Memory;
     using Xunit;
 
-    public class GcNotificationTest
+    public class GcNotificationTests
     {
         private ManualResetEvent _callbackInvoked;
 
-        public GcNotificationTest()
+        public GcNotificationTests()
         {
             _callbackInvoked = new ManualResetEvent(false);
         }
@@ -67,13 +67,13 @@
             GcCollectAndWait();
 
             // Assert.
-            // No callback expected the 3rd time
+            // No callback expected to invoke the 3rd time.
             Assert.False(_callbackInvoked.WaitOne(0));
         }
 
         private static void GcCollectAndWait()
         {
-            GC.Collect(2, GCCollectionMode.Forced, blocking: true);
+            GC.Collect(2, GCCollectionMode.Forced, true);
             GC.WaitForPendingFinalizers();
         }
     }

@@ -35,6 +35,14 @@
             Dispose(false);
         }
 
+        internal int Count
+        {
+            get
+            {
+                return _items.Count;
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -244,7 +252,7 @@
             return true;
         }
 
-        private void Compact(double percentage)
+        internal void Compact(double percentage)
         {
             var expiredItems = new List<MemoryCacheItem>();
             var lowPriorityItems = new List<MemoryCacheItem>();

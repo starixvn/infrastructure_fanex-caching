@@ -42,6 +42,7 @@
         {
             // Assert.
             string expectedValue = "Fanex.Caching.Redis.RedisCache, Fanex.Caching.Redis";
+
             Assert.Equal(expectedValue, _cacheSettings.CacheType);
         }
 

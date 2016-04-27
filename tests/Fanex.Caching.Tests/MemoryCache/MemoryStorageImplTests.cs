@@ -9,8 +9,8 @@
     public partial class MemoryStorageImplTests
     {
         private MemoryCacheOptions _options;
-        private SystemClock _clock;
-        private MemoryStorage _storage;
+        private SystemClockMock _clock;
+        private MemoryStorageImpl _storage;
         private MemoryCacheItemOptions _cachingOptions;
 
         public MemoryStorageImplTests()
@@ -54,29 +54,33 @@
         {
             // Arrange.
             var key = "cachingObject";
-            var obj = new object();
-            _storage.Set(key, obj, _cachingOptions);
+            var value = new object();
+
+            _storage.Set(key, value, _cachingOptions);
 
             // Act.
             object result = null;
-            _storage.TryGet(key, out result);
+            bool found = _storage.TryGet(key, out result);
 
             // Assert.
-            Assert.Same(obj, result);
+            Assert.True(found);
+            Assert.Same(value, result);
         }
 
         [Fact]
-        public void SetAndTryGetWorksWithCaseSensitiveKeys()
+        public void SetAndTryGetWorkWithCaseSensitiveKeys()
         {
             // Arrange.
             var key = "cachingObject";
             var caseSensitiveKey = "cachingobject";
-            var obj = new object();
+            var value = new object();
 
             // Act.
-            _storage.Set(key, obj, _cachingOptions);
             object result = null;
-            bool found = _storage.TryGet(caseSensitiveKey, out result);
+            bool found = false;
+
+            _storage.Set(key, value, _cachingOptions);
+            found = _storage.TryGet(caseSensitiveKey, out result);
 
             // Assert.
             Assert.False(found);
@@ -88,46 +92,45 @@
         {
             // Arrange.
             var key = "cachingObject";
-            var firstObj = new object();
-            var secondObj = new object();
+            var oldValue = new object();
+            var newValue = new object();
 
             // Act.
-            _storage.Set(key, firstObj, _cachingOptions);
-            _storage.Set(key, secondObj, _cachingOptions);
+            _storage.Set(key, oldValue, _cachingOptions);
+            _storage.Set(key, newValue, _cachingOptions);
 
             // Assert.
             object result = null;
+
             _storage.TryGet(key, out result);
-            Assert.Same(secondObj, result);
+            Assert.Same(newValue, result);
         }
 
         [Fact]
-        public void SetOverwritesAndInvokesCallback()
+        public void SetOverwritesKeyAndInvokesCallback()
         {
             // Arrange.
             string key = "cachingKey";
-            var value1 = new object();
-            var callback1Invoked = new ManualResetEvent(false);
-            var cachingOptions1 = new MemoryCacheItemOptions();
-            cachingOptions1.RegisterPostEvictionCallback(
+            var oldValue = new object();
+            var oldValueCallbackInvoked = new ManualResetEvent(false);
+            var oldValueCachingOptions = new MemoryCacheItemOptions();
+            var newValue = new object();
+            var newValueCallbackInvoked = new ManualResetEvent(false);
+            var newValueCachingOptions = new MemoryCacheItemOptions();
+
+            oldValueCachingOptions.RegisterPostEvictionCallback(
                 (subkey, subValue, reason, state) =>
                 {
                     var localCallbackInvoked = (ManualResetEvent)state;
 
                     Assert.Equal(key, subkey);
-                    Assert.Same(subValue, value1);
+                    Assert.Same(subValue, oldValue);
                     Assert.Equal(EvictionReason.Replaced, reason);
 
                     localCallbackInvoked.Set();
                 },
-                callback1Invoked);
-            _storage.Set(key, value1, cachingOptions1);
-
-            // Act.
-            var value2 = new object();
-            var callback2Invoked = new ManualResetEvent(false);
-            var cachingOptions2 = new MemoryCacheItemOptions();
-            cachingOptions2.RegisterPostEvictionCallback(
+                oldValueCallbackInvoked);
+            newValueCachingOptions.RegisterPostEvictionCallback(
                 (subkey, subValue, reason, state) =>
                 {
                     // Shouldn't be invoked.
@@ -135,27 +138,30 @@
 
                     localCallbackInvoked.Set();
                 },
-                callback2Invoked);
-            _storage.Set(key, value2, cachingOptions2);
+                newValueCallbackInvoked);
+
+            // Act.
+            _storage.Set(key, oldValue, oldValueCachingOptions);
+            _storage.Set(key, newValue, newValueCachingOptions);
 
             // Assert.
-            Assert.True(callback1Invoked.WaitOne(TimeSpan.FromSeconds(30)), "Callback1");
-            Assert.False(callback2Invoked.WaitOne(TimeSpan.FromSeconds(1)), "Callback2");
+            Assert.True(oldValueCallbackInvoked.WaitOne(TimeSpan.FromSeconds(30)), "Callback1");
+            Assert.False(newValueCallbackInvoked.WaitOne(TimeSpan.FromSeconds(1)), "Callback2");
 
             object result = null;
             bool found = _storage.TryGet(key, out result);
-            Assert.Same(value2, result);
-            Assert.False(callback2Invoked.WaitOne(TimeSpan.FromSeconds(1)), "Callback2");
+
+            Assert.Same(newValue, result);
         }
 
         [Fact]
-        public void SetOverwritesWithReplacedReason()
+        public void SetOverwritesKeyWithReplacedReason()
         {
             // Arrange.
             string key = "cachingKey";
-            var value1 = new object();
-            var value2 = new object();
-            var callback1Invoked = new ManualResetEvent(false);
+            var oldValue = new object();
+            var newValue = new object();
+            var callbackInvoked = new ManualResetEvent(false);
             EvictionReason actualReason = EvictionReason.None;
 
             _cachingOptions.RegisterPostEvictionCallback(
@@ -166,23 +172,25 @@
                     actualReason = reason;
                     localCallbackInvoked.Set();
                 },
-                callback1Invoked);
-            _storage.Set(key, value1, _cachingOptions);
+                callbackInvoked);
+            _storage.Set(key, oldValue, _cachingOptions);
 
             // Act.
-            _storage.Set(key, value1, new MemoryCacheItemOptions());
+            _storage.Set(key, newValue, new MemoryCacheItemOptions());
 
-            Assert.True(callback1Invoked.WaitOne(TimeSpan.FromSeconds(3)), "Callback1");
+            // Assert.
+            Assert.True(callbackInvoked.WaitOne(TimeSpan.FromSeconds(3)), "Callback");
             Assert.Equal(EvictionReason.Replaced, actualReason);
         }
 
         [Fact]
-        public void RemoveRemoves()
+        public void RemoveRemovesPassedKey()
         {
             // Arrange.
             string key = "cachingKey";
-            var obj = new object();
-            _storage.Set(key, obj, _cachingOptions);
+            var value = new object();
+
+            _storage.Set(key, value, _cachingOptions);
 
             // Act.
             _storage.Remove(key);
@@ -190,16 +198,19 @@
             // Assert.
             object result = null;
             bool found = _storage.TryGet(key, out result);
+
             Assert.False(found);
+            Assert.Null(result);
         }
 
         [Fact]
-        public void RemoveRemovesAndInvokesCallback()
+        public void RemoveRemovesObjectAndInvokesCallback()
         {
             // Arrange.
             string key = "cachingKey";
             var value = new object();
             var callbackInvoked = new ManualResetEvent(false);
+
             _cachingOptions.RegisterPostEvictionCallback(
                 (subkey, subValue, reason, state) =>
                 {
@@ -208,6 +219,7 @@
                     Assert.Equal(key, subkey);
                     Assert.Same(value, subValue);
                     Assert.Equal(EvictionReason.Removed, reason);
+
                     localCallbackInvoked.Set();
                 },
                 callbackInvoked);
@@ -218,42 +230,49 @@
 
             // Assert.
             Assert.True(callbackInvoked.WaitOne(TimeSpan.FromSeconds(30)), "Callback");
+
             object result = null;
             bool found = _storage.TryGet(key, out result);
+
             Assert.False(found);
+            Assert.Null(result);
         }
 
         [Fact]
-        public void RemoveAndReAddFromCallbackWorks()
+        public void RemoveRemovesOldObjectAndCallbackReAddsNewObject()
         {
             // Arrange.
             string key = "cachingKey";
-            var value = new object();
-            var obj2 = new object();
+            var oldValue = new object();
+            var newValue = new object();
             var callbackInvoked = new ManualResetEvent(false);
+
             _cachingOptions.RegisterPostEvictionCallback(
                 (subkey, subValue, reason, state) =>
                 {
                     var localCallbackInvoked = (ManualResetEvent)state;
 
                     Assert.Equal(key, subkey);
-                    Assert.Same(subValue, value);
+                    Assert.Same(subValue, oldValue);
                     Assert.Equal(EvictionReason.Removed, reason);
 
-                    _storage.Set(key, obj2, new MemoryCacheItemOptions());
+                    _storage.Set(key, newValue, new MemoryCacheItemOptions());
                     localCallbackInvoked.Set();
                 },
                 callbackInvoked);
-            _storage.Set(key, value, _cachingOptions);
+            _storage.Set(key, oldValue, _cachingOptions);
 
             // Act.
             _storage.Remove(key);
 
             // Assert.
             Assert.True(callbackInvoked.WaitOne(TimeSpan.FromSeconds(30)), "Callback");
+
             object result = null;
             bool found = _storage.TryGet(key, out result);
-            Assert.Same(obj2, result);
+
+            Assert.True(found);
+            Assert.Same(newValue, result);
         }
     }
 }

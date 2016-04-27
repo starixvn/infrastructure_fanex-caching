@@ -11,12 +11,12 @@
         internal IList<PostEvictionCallbackRegistration> PostEvictionCallbacks { get; }
             = new List<PostEvictionCallbackRegistration>();
 
-        public CacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback)
+        public MemoryCacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback)
         {
             return RegisterPostEvictionCallback(callback, null);
         }
 
-        public CacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback, object state)
+        public MemoryCacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback, object state)
         {
             if (callback == null)
             {
@@ -32,7 +32,7 @@
             return this;
         }
 
-        public CacheItemOptions SetCachePriority(CachePriority priority)
+        public MemoryCacheItemOptions SetCachePriority(CachePriority priority)
         {
             Priority = priority;
 

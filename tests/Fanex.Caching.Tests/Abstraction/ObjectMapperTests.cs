@@ -84,6 +84,7 @@
 
             // Assert.
             var expectedObject = new ConnectionSettingMock("value1", "value2");
+
             Assert.Equal(actualObject, expectedObject);
         }
 
@@ -97,6 +98,7 @@
                 { "Property2", "value2" }
             };
             var propertiesMapper = new Dictionary<string, Func<object, object>>();
+
             propertiesMapper.Add("Property2", configuredValue => "Updated value2");
 
             // Act.
@@ -104,6 +106,7 @@
 
             // Assert.
             var expectedObject = new ConnectionSettingMock("value1", "Updated value2");
+
             Assert.Equal(actualObject, expectedObject);
         }
     }
