@@ -46,6 +46,20 @@
             }
         }
 
+        public static Cache SwitchCacheStorage(Cache newCacheStorage)
+        {
+            if (newCacheStorage == null)
+            {
+                throw new ArgumentNullException(nameof(newCacheStorage));
+            }
+
+            Cache oldCacheStorage = _cacheStorage;
+
+            _cacheStorage = newCacheStorage;
+
+            return oldCacheStorage;
+        }
+
         public static bool Contain(string key)
         {
             return _cacheStorage.Contain(key);
@@ -130,6 +144,10 @@
                 value = factory();
                 await _cacheStorage.SetAsync(key, value, cacheItemOptions);
             }
+            else
+            {
+                value = found.Item2;
+            }
 
             return value;
         }
@@ -143,6 +161,10 @@
             {
                 value = factory();
                 await _cacheStorage.SetAsync(key, value, options);
+            }
+            else
+            {
+                value = found.Item2;
             }
 
             return value;
