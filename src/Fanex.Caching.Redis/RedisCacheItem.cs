@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Caching.Redis
 {
+    using System;
     using StackExchange.Redis;
 
     internal class RedisCacheItem : CacheItem
@@ -45,7 +46,11 @@
             command.Values = new RedisValue[]
             {
                 RedisValueHelper.ConvertToRedisValue(Value, _serializer),
+#if !NET452
                 Options.AbsoluteExpiration?.ToUnixTimeSeconds()
+#else
+                ToUnixTimeSeconds(Options.AbsoluteExpiration.Value)
+#endif
             };
 
             return command;
@@ -82,5 +87,15 @@
 
             return command;
         }
+
+#if NET452
+        private static long ToUnixTimeSeconds(DateTimeOffset absoluteDateTime)
+        {
+            var epochTime = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan(0, 0, 0));
+
+            return (long)(absoluteDateTime.UtcDateTime - epochTime.UtcDateTime).TotalSeconds;
+        }
+
+#endif
     }
 }
