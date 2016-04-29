@@ -45,7 +45,7 @@
             command.Values = new RedisValue[]
             {
                 RedisValueHelper.ConvertToRedisValue(Value, _serializer),
-                Options.AbsoluteExpiration?.ToString(RedisValueHelper.DateTimeFormat)
+                Options.AbsoluteExpiration?.ToUnixTimeSeconds()
             };
 
             return command;

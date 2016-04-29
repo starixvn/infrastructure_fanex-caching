@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0-*",
+  "description": "Fanex.Caching.Redis.Tests Class Library",
+  "authors": [ "jason.ly" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "dnx46": {
+      "frameworkAssemblies": {
+        "System.Data": "4.0.0.0",
+        "System.Runtime": "4.0.20"
+      }
+    }
+  },
+  "dependencies": {
+    "AutoFixture.AutoNSubstitute": "3.42.0",
+    "AutoFixture.Xunit2": "3.42.0",
+    "Fanex.Caching": "1.0.0-*",
+    "Fanex.Caching.Redis": "1.0.0-*",
+    "Fanex.Caching.Tests": "1.0.0-*",
+    "NSubstitute": "1.9.2",
+    "xunit": "2.1.0",
+    "xunit.runner.dnx": "2.1.0-rc1-build204"
+  },
+  "commands": {
+    "test": "xunit.runner.dnx"
+  }
+}

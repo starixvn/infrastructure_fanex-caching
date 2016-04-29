@@ -38,13 +38,13 @@
         public void CallbackInvokedMultipleTimes()
         {
             // Arrange.
-            bool reRegisterForFinalize = true;
+            bool registerAgainForFinalize = true;
             GcNotification.Register(
                 state =>
                 {
                     _callbackInvoked.Set();
 
-                    return reRegisterForFinalize;
+                    return registerAgainForFinalize;
                 },
                 null);
 
@@ -56,7 +56,7 @@
 
             // Act.
             _callbackInvoked.Reset();
-            reRegisterForFinalize = false;
+            registerAgainForFinalize = false;
             GcCollectAndWait();
 
             // Assert.

@@ -6,8 +6,6 @@
 
     internal static class RedisValueHelper
     {
-        public const string DateTimeFormat = "yyMMddTHHmmss";
-
         [SuppressMessage("StyleCop.CSharp.Nexcel.NexcelCustomRules", "SP2101:MethodMustNotContainMoreLinesThan", Justification = "Reviewed.")]
         public static RedisValue ConvertToRedisValue(object value, Serializer serializer)
         {
