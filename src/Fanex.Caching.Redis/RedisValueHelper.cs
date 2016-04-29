@@ -1,12 +1,14 @@
 ﻿namespace Fanex.Caching.Redis
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using StackExchange.Redis;
 
     internal static class RedisValueHelper
     {
         public const string DateTimeFormat = "yyMMddTHHmmss";
 
+        [SuppressMessage("StyleCop.CSharp.Nexcel.NexcelCustomRules", "SP2101:MethodMustNotContainMoreLinesThan", Justification = "Reviewed.")]
         public static RedisValue ConvertToRedisValue(object value, Serializer serializer)
         {
             if (value == null)
@@ -20,29 +22,41 @@
             {
                 return (byte[])value;
             }
-            else if (typeof(string) == valueType)
+            else if (typeof(bool) == valueType)
             {
-                return (string)value;
+                return (bool)value;
             }
-            else if (typeof(short) == valueType)
+            else if (typeof(bool?) == valueType)
             {
-                return (short)value;
+                return (bool?)value;
             }
             else if (typeof(int) == valueType)
             {
                 return (int)value;
             }
+            else if (typeof(int?) == valueType)
+            {
+                return (int?)value;
+            }
             else if (typeof(long) == valueType)
             {
                 return (long)value;
             }
-            else if (typeof(bool) == valueType)
+            else if (typeof(long?) == valueType)
             {
-                return (bool)value;
+                return (long?)value;
             }
             else if (typeof(double) == valueType)
             {
                 return (double)value;
+            }
+            else if (typeof(double?) == valueType)
+            {
+                return (double?)value;
+            }
+            else if (typeof(string) == valueType)
+            {
+                return (string)value;
             }
             else
             {
@@ -56,29 +70,41 @@
             {
                 return (byte[])value;
             }
-            else if (typeof(string) == valueType)
+            else if (typeof(bool) == valueType)
             {
-                return (string)value;
+                return (bool)value;
             }
-            else if (typeof(short) == valueType)
+            else if (typeof(bool?) == valueType)
             {
-                return (short)value;
+                return (bool?)value;
             }
             else if (typeof(int) == valueType)
             {
                 return (int)value;
             }
+            else if (typeof(int?) == valueType)
+            {
+                return (int?)value;
+            }
             else if (typeof(long) == valueType)
             {
                 return (long)value;
             }
-            else if (typeof(bool) == valueType)
+            else if (typeof(long?) == valueType)
             {
-                return (bool)value;
+                return (long?)value;
             }
             else if (typeof(double) == valueType)
             {
                 return (double)value;
+            }
+            else if (typeof(double?) == valueType)
+            {
+                return (double?)value;
+            }
+            else if (typeof(string) == valueType)
+            {
+                return (string)value;
             }
             else
             {

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
@@ -20,3 +21,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("bcc0e8cc-b2a4-4404-82c6-eed30c27ebb6")]
+[assembly: InternalsVisibleTo("Fanex.Caching.Redis.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
