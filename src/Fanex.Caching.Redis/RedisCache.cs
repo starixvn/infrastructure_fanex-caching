@@ -66,7 +66,11 @@
                 return _redisConnection.ContainAsync(key);
             }
 
+#if NET40
+            return TaskEx.FromResult(false);
+#else
             return Task.FromResult(false);
+#endif
         }
 
         public bool TryGet<T>(string key, out T value)

@@ -49,7 +49,11 @@
                     state => InvokeCallbacks((MemoryCacheItem)state),
                     this,
                     CancellationToken.None,
+#if NET40
+                    TaskCreationOptions.None,
+#else
                     TaskCreationOptions.DenyChildAttach,
+#endif
                     TaskScheduler.Default);
             }
         }

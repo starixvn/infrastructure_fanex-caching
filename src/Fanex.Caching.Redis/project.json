@@ -6,9 +6,15 @@
   "projectUrl": "",
   "licenseUrl": "",
   "frameworks": {
-    "dnx46": { },
+    "net40": {
+      "dependencies": {
+        "Microsoft.Bcl": "1.1.10",
+        "Microsoft.Bcl.Async": "1.0.168"
+      }
+    },
     "net452": { },
-    "net461": { }
+    "net461": { },
+    "dnx46": { }
   },
   "dependencies": {
     "Fanex.Caching": "1.0.0-*",

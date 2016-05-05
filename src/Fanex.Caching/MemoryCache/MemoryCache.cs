@@ -5,9 +5,17 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+#if NET40
+    using static System.Threading.Tasks.TaskEx;
+#else
+    using static System.Threading.Tasks.Task;
+#endif
+
     public class MemoryCache : Cache
     {
-        private static readonly Task CompletedTask = Task.FromResult<object>(null);
+#if NET40 || NET452
+        private static readonly Task CompletedTask = FromResult<object>(null);
+#endif
 
         private readonly MemoryStorage _memoryStorage;
 
@@ -53,7 +61,7 @@
 
         public Task<bool> ContainAsync(string key)
         {
-            return Task.FromResult(Contain(key));
+            return FromResult(Contain(key));
         }
 
         public bool TryGet<T>(string key, out T value)
@@ -84,7 +92,7 @@
             T value = default(T);
             bool found = TryGet(key, out value);
 
-            return Task.FromResult(new Tuple<bool, T>(found, value));
+            return FromResult(new Tuple<bool, T>(found, value));
         }
 
         public void Remove(string key)

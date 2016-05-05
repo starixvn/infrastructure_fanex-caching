@@ -30,11 +30,11 @@
                     {
                         if (propertiesMapper?.ContainsKey(property.Name) == true)
                         {
-                            property.SetValue(result, propertiesMapper[property.Name](itemValue));
+                            property.SetValue(result, propertiesMapper[property.Name](itemValue), null);
                         }
                         else
                         {
-                            property.SetValue(result, Convert.ChangeType(itemValue, propertyType));
+                            property.SetValue(result, Convert.ChangeType(itemValue, propertyType), null);
                         }
                     }
                     catch

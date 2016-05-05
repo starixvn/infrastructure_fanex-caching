@@ -46,7 +46,7 @@
             command.Values = new RedisValue[]
             {
                 RedisValueHelper.ConvertToRedisValue(Value, _serializer),
-#if !NET452
+#if NET461 || DNX46
                 Options.AbsoluteExpiration?.ToUnixTimeSeconds()
 #else
                 ToUnixTimeSeconds(Options.AbsoluteExpiration.Value)
@@ -88,7 +88,7 @@
             return command;
         }
 
-#if NET452
+#if NET452 || NET40
         private static long ToUnixTimeSeconds(DateTimeOffset absoluteDateTime)
         {
             var epochTime = new DateTimeOffset(1970, 1, 1, 0, 0, 0, new TimeSpan(0, 0, 0));

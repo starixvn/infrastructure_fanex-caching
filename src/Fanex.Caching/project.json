@@ -7,9 +7,13 @@
   "licenseUrl": "",
 
   "frameworks": {
-    "dnx46": {
+    "net40": {
       "frameworkAssemblies": {
         "System.Configuration": "4.0.0.0"
+      },
+      "dependencies": {
+        "Microsoft.Bcl": "1.1.10",
+        "Microsoft.Bcl.Async": "1.0.168"
       }
     },
     "net452": {
@@ -20,6 +24,11 @@
     "net461": {
       "frameworkAssemblies": {
         "System.Configuration": "4.0.0.0"
+      },
+      "dnx46": {
+        "frameworkAssemblies": {
+          "System.Configuration": "4.0.0.0"
+        }
       }
     }
   }
