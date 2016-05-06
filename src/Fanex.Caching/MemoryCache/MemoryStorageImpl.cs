@@ -8,6 +8,12 @@
 
     internal class MemoryStorageImpl : MemoryStorage, IDisposable
     {
+#if NET40
+        private const TaskCreationOptions TaskCreationOption = TaskCreationOptions.None;
+#else
+        private const TaskCreationOptions TaskCreationOption = TaskCreationOptions.DenyChildAttach;
+#endif
+
         private const double CompactPercentage = 0.1;
         private readonly Dictionary<object, MemoryCacheItem> _items;
         private readonly ReaderWriterLockSlim _lock;
@@ -158,7 +164,6 @@
             CheckDisposed();
 
             DateTimeOffset utcNow = _clock.UtcNow;
-
             MemoryCacheItem previousItem = null;
             bool added = false;
             var item = new MemoryCacheItem(key, value, options, utcNow);
@@ -235,11 +240,7 @@
                     state => ScanForExpiredItems((MemoryStorageImpl)state),
                     this,
                     CancellationToken.None,
-#if NET40
-                    TaskCreationOptions.None,
-#else
-                    TaskCreationOptions.DenyChildAttach,
-#endif
+                    TaskCreationOption,
                     TaskScheduler.Default);
             }
         }

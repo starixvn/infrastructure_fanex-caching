@@ -7,6 +7,12 @@
 
     internal class MemoryCacheItem : CacheItem
     {
+#if NET40
+        private const TaskCreationOptions TaskCreationOption = TaskCreationOptions.None;
+#else
+        private const TaskCreationOptions TaskCreationOption = TaskCreationOptions.DenyChildAttach;
+#endif
+
         private IList<PostEvictionCallbackRegistration> _postEvictionCallbacks;
         private DateTimeOffset? _absoluteExpiration;
         private EvictionReason _evictionReason;
@@ -49,11 +55,7 @@
                     state => InvokeCallbacks((MemoryCacheItem)state),
                     this,
                     CancellationToken.None,
-#if NET40
-                    TaskCreationOptions.None,
-#else
-                    TaskCreationOptions.DenyChildAttach,
-#endif
+                    TaskCreationOption,
                     TaskScheduler.Default);
             }
         }

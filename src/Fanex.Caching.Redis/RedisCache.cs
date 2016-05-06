@@ -5,6 +5,12 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+#if NET40
+    using static System.Threading.Tasks.TaskEx;
+#else
+    using static System.Threading.Tasks.Task;
+#endif
+
     public class RedisCache : Cache
     {
         private readonly RedisConnection _redisConnection;
@@ -66,11 +72,7 @@
                 return _redisConnection.ContainAsync(key);
             }
 
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.FromResult(false);
-#endif
+            return FromResult(false);
         }
 
         public bool TryGet<T>(string key, out T value)
