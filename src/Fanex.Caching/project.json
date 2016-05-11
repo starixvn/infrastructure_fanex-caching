@@ -1,11 +1,11 @@
 {
-  "version": "1.0.0-*",
-  "description": "Fanex.Caching Class Library",
+  "version": "2.0.0-beta1",
+  "description": "New version of Fanex.Caching which supports many target frameworks and asynchronous APIs.\nYou'd better think of using the new version of the library carefully, because it is incapable with what the old version offers you.\nRead this article for more information about the library and its offered APIs:\nhttp://dev.nexcel.vn/?p=3137",
+  "summary": "New version of Fanex.Caching which supports many target frameworks and asynchronous APIs.",
   "authors": [ "jason.ly" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
+  "tags": [ "caching" ],
+  "projectUrl": "https://gitlab.nexcel.vn/infrastructure/fanex-caching",
+  "releaseNotes": "Initialized new project.",
   "frameworks": {
     "net40": {
       "frameworkAssemblies": {
@@ -24,11 +24,6 @@
     "net461": {
       "frameworkAssemblies": {
         "System.Configuration": "4.0.0.0"
-      },
-      "dnx46": {
-        "frameworkAssemblies": {
-          "System.Configuration": "4.0.0.0"
-        }
       }
     }
   }
