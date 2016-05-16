@@ -30,7 +30,7 @@ Let's get started by  these 3 following steps:
         PM> Install-Package Fanex.Caching.Redis -Pre
         ```
 2. Configure your Fanex.Caching section in the configuration file
-    - If you want to use MemoryCache, add these to your app.config or web.config. Refer the [Memory as Cache Storage]( Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.) for more details:
+    - If you want to use MemoryCache, add these to your app.config or web.config. Refer the [Memory as Cache Storage](#memory-as-cache-storage) for more information about its properties and methods.) for more details:
         ```xml
         <configSections>
             <section name="Fanex.Caching" type="Fanex.Caching.Configuration.CacheSettings, Fanex.Caching" />
@@ -42,7 +42,7 @@ Let's get started by  these 3 following steps:
             </connectionSettings>
         </Fanex.Caching>
         ```
-    - If you want Redis as your cache storage, add these lines to you app.config or web.config. Refer the [Redis as Cache Storage](https://gitlab.nexcel.vn/infrastructure/fanex-caching#redis-as-cache-storage) for more details:
+    - If you want Redis as your cache storage, add these lines to you app.config or web.config. Refer the [Redis as Cache Storage](#redis-as-cache-storage) for more details:
         ```xml
         <configSections>
             <section name="Fanex.Caching" type="Fanex.Caching.Configuration.CacheSettings, Fanex.Caching" />
@@ -60,7 +60,7 @@ Let's get started by  these 3 following steps:
     CacheService.Set("TestKey1", "Test key 1", new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(10)));
     Console.WriteLine(CacheService.Get<string>("TestKey1"));
     ```
-Please head to the section named ['CacheService's Methods'](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheservices-methods) for more information about methods offered by CacheService class
+Please head to the section named ['CacheService's Methods'](#cacheservices-methods) for more information about methods offered by CacheService class
 
 # `CacheService`'s methods
 The `CacheService` class reads your configuration, news CacheStorage based on the configured properties, and exposes methods so that you can access to the cache in your code. The following is the lists of its properties and methods
@@ -82,14 +82,14 @@ TryGet<T>(string key, out T value)|bool|If there is any value stored in the cach
 TryGetAsync<T>(string key)|Task<Tuple<bool, T>>|If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`. 
 GetOrSet<T>(string key, Func<T> factory)|T|If the `key` has not been stored or cannot be casted to the type of `T`, call the `factory` to create a new value, insert it into the cache associates with the `key`, then return it. Otherwise, return inserted entry.
 GetOrSetAsync<T>(string key, Func<T> factory)|Task<T>|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, insert it into the cache, then return it.
-GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)|T|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.
-GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)|Task<T>|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.
+GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)|T|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)|Task<T>|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
 Remove(string key)||Removes a key from the cache storage.
 RemoveAsync(string key)|Task|Removes a key from the cache storage.
 Set<T>(string key, T value)||Inserts a cache entry with the specific key and value of type `T` into the cache storage.
 SetAsync<T>(string key, T value)|Task|Inserts a cache entry with the specific key and value of type `T` into the cache storage.
-Set<T>(string key, T value, CacheItemOptions options)||Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.
-SetAsync<T>(string key, T value, CacheItemOptions options)|Task|Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.
+Set<T>(string key, T value, CacheItemOptions options)||Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+SetAsync<T>(string key, T value, CacheItemOptions options)|Task|Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
 # `CacheItemOptions`
 ## Property list
 Name| Type| Decription
