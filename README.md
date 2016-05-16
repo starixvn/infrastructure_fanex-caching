@@ -30,7 +30,7 @@ Let's get started by  these 3 following steps:
         PM> Install-Package Fanex.Caching.Redis -Pre
         ```
 2. Configure your Fanex.Caching section in the configuration file
-    - If you want to use MemoryCache, add these to your app.config or web.config. Refer the Memory as Cache Storage for more details:
+    - If you want to use MemoryCache, add these to your app.config or web.config. Refer the [Memory as Cache Storage]( Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.) for more details:
         ```xml
         <configSections>
             <section name="Fanex.Caching" type="Fanex.Caching.Configuration.CacheSettings, Fanex.Caching" />
@@ -42,7 +42,7 @@ Let's get started by  these 3 following steps:
             </connectionSettings>
         </Fanex.Caching>
         ```
-    - If you want Redis as your cache storage, add these lines to you app.config or web.config. Refer the Redis as Cache Storage for more details:
+    - If you want Redis as your cache storage, add these lines to you app.config or web.config. Refer the [Redis as Cache Storage](https://gitlab.nexcel.vn/infrastructure/fanex-caching#redis-as-cache-storage) for more details:
         ```xml
         <configSections>
             <section name="Fanex.Caching" type="Fanex.Caching.Configuration.CacheSettings, Fanex.Caching" />
@@ -60,7 +60,7 @@ Let's get started by  these 3 following steps:
     CacheService.Set("TestKey1", "Test key 1", new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(10)));
     Console.WriteLine(CacheService.Get<string>("TestKey1"));
     ```
-Please head to the section named 'CacheService's Methods' for more information about methods offered by CacheService class
+Please head to the section named ['CacheService's Methods'](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheservices-methods) for more information about methods offered by CacheService class
 
 # `CacheService`'s methods
 The `CacheService` class reads your configuration, news CacheStorage based on the configured properties, and exposes methods so that you can access to the cache in your code. The following is the lists of its properties and methods
@@ -82,14 +82,14 @@ TryGet<T>(string key, out T value)|bool|If there is any value stored in the cach
 TryGetAsync<T>(string key)|Task<Tuple<bool, T>>|If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`. 
 GetOrSet<T>(string key, Func<T> factory)|T|If the `key` has not been stored or cannot be casted to the type of `T`, call the `factory` to create a new value, insert it into the cache associates with the `key`, then return it. Otherwise, return inserted entry.
 GetOrSetAsync<T>(string key, Func<T> factory)|Task<T>|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, insert it into the cache, then return it.
-GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)|T|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the `CacheItemOptions` section for more information about its properties and methods.
-GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)|Task<T>|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the `CacheItemOptions` section for more information about its properties and methods.
+GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)|T|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.
+GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)|Task<T>|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.
 Remove(string key)||Removes a key from the cache storage.
 RemoveAsync(string key)|Task|Removes a key from the cache storage.
 Set<T>(string key, T value)||Inserts a cache entry with the specific key and value of type `T` into the cache storage.
 SetAsync<T>(string key, T value)|Task|Inserts a cache entry with the specific key and value of type `T` into the cache storage.
-Set<T>(string key, T value, CacheItemOptions options)||Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted.
-SetAsync<T>(string key, T value, CacheItemOptions options)|Task|Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted.
+Set<T>(string key, T value, CacheItemOptions options)||Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.
+SetAsync<T>(string key, T value, CacheItemOptions options)|Task|Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](https://gitlab.nexcel.vn/infrastructure/fanex-caching#cacheitemoptions) for more information about its properties and methods.
 # `CacheItemOptions`
 ## Property list
 Name| Type| Decription
@@ -104,15 +104,17 @@ SetAbsoluteExpiration(DateTimeOffset absolute)|CacheItemOptions|Sets value to `A
 SetAbsoluteExpiration(TimeSpan relative)|CacheItemOptions|Sets value to `RelativeExpiration` property. Returns the `CacheItemOptions` object for fluent configuration.
 SetSlidingExpiration(TimeSpan offset)|CacheItemOptions|Sets value to `SlidingExpiration` property. Returns the `CacheItemOptions` object for fluent configuration.
 # Memory as cache storage
-The following is the list of properties you can use to configure the local memory as cache storage in your app.config or web.config
+The following is the list of properties you can use to configure the local memory as cache storage in your app.config or web.config.
+
 Name|Type|Description
---|--|--
+---|---|---
 CompactOnMemoryPressure|bool|If it set to `true`, the library will try to cleanup your memory in case the memory is in a pressure. Otherwise, it will do nothing. Default value is set to `true`.
 ExpirationScanFrequency|TimeSpan|Specify the time the cleanup process will run to free your memory. Its default value is 1 minute.
 # Redis as cache storage
 The following is the list of properties you can use to configure in your app.config or web.config once the Redis is set as your cache storage.
+
 Name|Type|Description
---|--|--
+---|---|---
 Serializer|string|The assembly-qualified name of the class which will take the role of an object serializer. It will serialze and deserialize objects before they are sent to or afted they are fetched from Redis servers.<br> Fanex.Caching.Redis uses [MsgPack-Cli](https://github.com/msgpack/msgpack-cli) as the default serializer.<br> You can implement your own serializer with your favorite 3rd library by creating a class that implements  `Fanex.Caching.Redis.Serializer` interface
 ApplicationName|string|Name of the site or application which is using the library. This is used to seperate the keys in Redis databases into namespaces.
 ConnectionString|string|A well full configured connection string. **If this property is set, its value will be used to connect to Redis servers and the properties listed after this property in table will be ignored.** Its format follows `StackExchange.Redis.ConfigurationOptions`.
