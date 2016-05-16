@@ -66,6 +66,7 @@ The version of 2.0 gives you 2 options of cache storage: local memory and distri
     Console.WriteLine(CacheService.Get<string>("TestKey1"));
     ```
 Please head to the next section named 'CacheService's Methods' for more information about methods offered by CacheService class
+
 # `CacheService`'s methods
 
 # Memory as cache storage
