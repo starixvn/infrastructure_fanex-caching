@@ -17,20 +17,23 @@ We did not have time to do a renovation, so we accepted to live with them by lea
 # Introduction
 Fanex.Caching 2.x comes to life with the expectation to be fixing known issues of the 1.x one, as well as to be an easy-to-add-new-storage structure. The accomplishments with this new version are: providing new APIs, another way to instantiate a cache storage via configuration, and bringing the EnterpriseLibrary.Caching and Couchbase's memcache out of its underlayer or supported storages. **The way you are using Fanex.Caching version 1.x could be fragile with the changes, so be careful when applying it into your projects or you will put yourself in hot water.**
 
-The version of 2.0 gives you 2 options of cache storage: local memory and distributed data storage with Redis. Two are bundled into separate Nuget packages: Fanex.Caching and Fanex.Caching.Redis. Then the selection is on your hands. 
+The version of 2.0 gives you 2 options of cache storage: local memory and distributed data storage with Redis. Two are bundled into separate Nuget packages: Fanex.Caching and Fanex.Caching.Redis. Then the selection is on your hands.
 
 Let's get started by  these 3 following steps:
 1. Install the Nuget packages
-    - Install Fanex.Caching 2.0.0-*. 
+    - Install Fanex.Caching 2.0.0-*.
+
         ```sh
         PM> Install-Package Fanex.Caching -Pre
         ```
     - Install Fanex.Caching.Redis 0.0.1-* . This package will install Fanex.Caching 2.0.0-* automatically as its dependency. **If you choose to _NOT_ install this package, you only have local memory as your cache storage.**
+    
         ```sh
         PM> Install-Package Fanex.Caching.Redis -Pre
         ```
 2. Configure your Fanex.Caching section in the configuration file
     - If you want to use MemoryCache, add these to your app.config or web.config. Refer the [Memory as Cache Storage](#memory-as-cache-storage) for more information.
+
         ```xml
         <configSections>
             <section name="Fanex.Caching" type="Fanex.Caching.Configuration.CacheSettings, Fanex.Caching" />
@@ -43,6 +46,7 @@ Let's get started by  these 3 following steps:
         </Fanex.Caching>
         ```
     - If you want Redis as your cache storage, add these lines to you app.config or web.config. Refer the [Redis as Cache Storage](#redis-as-cache-storage) for more details:
+        
         ```xml
         <configSections>
             <section name="Fanex.Caching" type="Fanex.Caching.Configuration.CacheSettings, Fanex.Caching" />
@@ -56,6 +60,7 @@ Let's get started by  these 3 following steps:
         </Fanex.Caching>
         ```
 3. Now, you can use methods of the static class named `CacheService` to access the Cache Storage instance you have created with the configuration
+
     ```csharp
     CacheService.Set("TestKey1", "Test key 1", new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(10)));
     Console.WriteLine(CacheService.Get<string>("TestKey1"));
@@ -79,7 +84,7 @@ ContainAsync(string key)|Task&lt;bool&gt;|Checks if there is any object associat
 Get&lt;T&gt;(string key)|T|Gets a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
 GetAsync&lt;T&gt;(string key)|Task&lt;T&gt;|Gets a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
 TryGet&lt;T&gt;(string key, out T value)|bool|If there is any value stored in the cache associated with `key` and the value is castable to the type of `T`, the method returns `true` and the output parameter is the value. Otherwise, it returns `false` and the output parameter is `default(T)`. 
-TryGetAsync&lt;T&gt;(string key)|Task&lt;Tuple&lt;bool, T&gt;&gt;|If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`. 
+TryGetAsync&lt;T&gt;(string key)|Task&lt;Tuple&lt;bool, T&gt;&gt;|If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`.
 GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory)|T|If the `key` has not been stored or cannot be casted to the type of `T`, call the `factory` to create a new value, insert it into the cache associates with the `key`, then return it. Otherwise, return inserted entry.
 GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory)|Task&lt;T&gt;|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, insert it into the cache, then return it.
 GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|T|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
