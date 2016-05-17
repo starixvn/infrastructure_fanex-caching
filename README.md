@@ -75,21 +75,21 @@ Name|Returned Type| Description
 ---|---|---
 SwitchCacheStorage(Cache newCacheStorage)|Fanex.Caching.Cache|Replaces the currently using cache storage with the new one. It returns the old cache storage if the replacement is successful.
 Contain(string key)|bool|Checks if there is any object associated with  `key` in the cache storage or not.
-ContainAsync(string key)|Task<bool>|Checks if there is any object associated with  `key` in the cache storage or not.
-Get<T>(string key)|T|Gets a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
-GetAsync<T>(string key)|Task<T>|Gets a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
-TryGet<T>(string key, out T value)|bool|If there is any value stored in the cache associated with `key` and the value is castable to the type of `T`, the method returns `true` and the output parameter is the value. Otherwise, it returns `false` and the output parameter is `default(T)`. 
-TryGetAsync<T>(string key)|Task<Tuple<bool, T>>|If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`. 
-GetOrSet<T>(string key, Func<T> factory)|T|If the `key` has not been stored or cannot be casted to the type of `T`, call the `factory` to create a new value, insert it into the cache associates with the `key`, then return it. Otherwise, return inserted entry.
-GetOrSetAsync<T>(string key, Func<T> factory)|Task<T>|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, insert it into the cache, then return it.
-GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)|T|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
-GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)|Task<T>|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passed by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+ContainAsync(string key)|Task&lt;bool&gt;|Checks if there is any object associated with  `key` in the cache storage or not.
+Get&lt;T&gt;(string key)|T|Gets a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
+GetAsync&lt;T&gt;(string key)|Task&lt;T&gt;|Gets a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
+TryGet&lt;T&gt;(string key, out T value)|bool|If there is any value stored in the cache associated with `key` and the value is castable to the type of `T`, the method returns `true` and the output parameter is the value. Otherwise, it returns `false` and the output parameter is `default(T)`. 
+TryGetAsync&lt;T&gt;(string key)|Task&lt;Tuple&lt;bool, T&gt;&gt;|If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`. 
+GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory)|T|If the `key` has not been stored or cannot be casted to the type of `T`, call the `factory` to create a new value, insert it into the cache associates with the `key`, then return it. Otherwise, return inserted entry.
+GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory)|Task&lt;T&gt;|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, insert it into the cache, then return it.
+GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|T|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|Task&lt;T&gt;|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passed by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
 Remove(string key)||Removes a key from the cache storage.
 RemoveAsync(string key)|Task|Removes a key from the cache storage.
-Set<T>(string key, T value)||Inserts a cache entry with the specific key and value of type `T` into the cache storage.
-SetAsync<T>(string key, T value)|Task|Inserts a cache entry with the specific key and value of type `T` into the cache storage.
-Set<T>(string key, T value, CacheItemOptions options)||Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
-SetAsync<T>(string key, T value, CacheItemOptions options)|Task|Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+Set&lt;T&gt;(string key, T value)||Inserts a cache entry with the specific key and value of type `T` into the cache storage.
+SetAsync&lt;T&gt;(string key, T value)|Task|Inserts a cache entry with the specific key and value of type `T` into the cache storage.
+Set&lt;T&gt;(string key, T value, CacheItemOptions options)||Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+SetAsync&lt;T&gt;(string key, T value, CacheItemOptions options)|Task|Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
 # `CacheItemOptions`
 ## Property list
 Name| Type| Decription
