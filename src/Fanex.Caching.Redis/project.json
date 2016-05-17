@@ -1,6 +1,6 @@
 ﻿{
-  "version": "0.0.1-beta1",
-  "description": "New version of Fanex.Caching which supports many target frameworks and asynchronous APIs.\nRead this article for more information about the library and its offered APIs:\nhttp://dev.nexcel.vn/?p=3137",
+  "version": "0.0.1-beta2",
+  "description": "New version of Fanex.Caching which supports many target frameworks and asynchronous APIs.\nHead to the project gitlab repository for more details: https://gitlab.nexcel.vn/infrastructure/fanex-caching",
   "summary": "An extension of Fanex.Caching which uses Redis as cache storage.",
   "authors": [ "jason.ly" ],
   "tags": [ "caching", "redis" ],
@@ -17,7 +17,7 @@
     "net461": { }
   },
   "dependencies": {
-    "Fanex.Caching": "2.0.0-beta1",
+    "Fanex.Caching": "2.0.0-beta2",
     "MsgPack.Cli": "[0.6.8]",
     "StackExchange.Redis": "1.0.488"
   }
