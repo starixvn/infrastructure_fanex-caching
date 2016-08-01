@@ -1,6 +1,7 @@
 ﻿namespace Fanex.Caching.Tests
 {
     using System;
+    using System.Threading.Tasks;
     using NSubstitute;
     using Xunit;
 
@@ -46,7 +47,7 @@
         }
 
         [Fact]
-        public async void ContainAsyncAlwaysCallCacheStorageContainAsyncMethod()
+        public async Task ContainAsyncAlwaysCallCacheStorageContainAsyncMethod()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -126,7 +127,7 @@
         }
 
         [Fact]
-        public async void GetAsyncAlwaysCallCacheStorageTryGetAsyncMethod()
+        public async Task GetAsyncAlwaysCallCacheStorageTryGetAsyncMethod()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -143,7 +144,7 @@
         }
 
         [Fact]
-        public async void GetAsyncReturnsDefaultValueForMissingKey()
+        public async Task GetAsyncReturnsDefaultValueForMissingKey()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -160,7 +161,7 @@
         }
 
         [Fact]
-        public async void GetAsyncReturnsStoredObject()
+        public async Task GetAsyncReturnsStoredObject()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -195,7 +196,7 @@
         }
 
         [Fact]
-        public async void TryGetAsyncAlwaysCallCacheStorageTryGetAsyncMethod()
+        public async Task TryGetAsyncAlwaysCallCacheStorageTryGetAsyncMethod()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -316,7 +317,7 @@
         }
 
         [Fact]
-        public async void GetOrSetAsyncReturnsExistingObject()
+        public async Task GetOrSetAsyncReturnsExistingObject()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -334,7 +335,7 @@
         }
 
         [Fact]
-        public async void GetOrSetAsyncMissingKeyWithInvalidValueFactoryReturnsNull()
+        public async Task GetOrSetAsyncMissingKeyWithInvalidValueFactoryReturnsNull()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -352,7 +353,7 @@
         }
 
         [Fact]
-        public async void GetOrSetAsyncMissingKeyAddsNewValueAndReturnsIt()
+        public async Task GetOrSetAsyncMissingKeyAddsNewValueAndReturnsIt()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -372,7 +373,7 @@
         }
 
         [Fact]
-        public async void GetOrSetAsyncMissingKeyWithMissingCacheItemOptionStoresNewValueWithDefaultRelativeExpiration()
+        public async Task GetOrSetAsyncMissingKeyWithMissingCacheItemOptionStoresNewValueWithDefaultRelativeExpiration()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -412,7 +413,7 @@
         }
 
         [Fact]
-        public async void RemoveAsyncAlwaysCallCacheStorageRemoveAsyncMethod()
+        public async Task RemoveAsyncAlwaysCallCacheStorageRemoveAsyncMethod()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -468,7 +469,7 @@
         }
 
         [Fact]
-        public async void SetAsyncAlwaysCallCacheStorageSetAsyncMethod()
+        public async Task SetAsyncAlwaysCallCacheStorageSetAsyncMethod()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();
@@ -486,7 +487,7 @@
         }
 
         [Fact]
-        public async void SetAsyncWithoutCachingOptionStoresObjectWithDefaultRelativeExpiration()
+        public async Task SetAsyncWithoutCachingOptionStoresObjectWithDefaultRelativeExpiration()
         {
             // Arrange.
             Cache newCacheStorage = Substitute.For<Cache>();

@@ -1,31 +1,25 @@
-﻿namespace Fanex.Caching.Configuration
+﻿#if XMLCONFIG
+
+namespace Fanex.Caching.Configuration
 {
+    using System;
     using System.Collections;
     using System.Configuration;
 
     internal class ConnectionSettingCollection : ConfigurationElementCollection
     {
         public override ConfigurationElementCollectionType CollectionType
-        {
-            get
-            {
-                return ConfigurationElementCollectionType.AddRemoveClearMap;
-            }
-        }
+            => ConfigurationElementCollectionType.AddRemoveClearMap;
 
         protected override ConfigurationElement CreateNewElement()
-        {
-            return new ConnectionSetting();
-        }
+            => new ConnectionSetting();
 
         protected override object GetElementKey(ConfigurationElement element)
-        {
-            return (element as ConnectionSetting)?.Name;
-        }
+            => (element as ConnectionSetting)?.Name;
 
         public Hashtable ToHashtable()
         {
-            var connectionSettings = new Hashtable();
+            var connectionSettings = new Hashtable(StringComparer.OrdinalIgnoreCase);
 
             foreach (ConfigurationElement item in this)
             {
@@ -41,3 +35,5 @@
         }
     }
 }
+
+#endif

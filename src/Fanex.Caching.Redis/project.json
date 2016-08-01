@@ -1,24 +1,47 @@
 ﻿{
-  "version": "0.0.1-beta2",
-  "description": "New version of Fanex.Caching which supports many target frameworks and asynchronous APIs.\nHead to the project gitlab repository for more details: https://gitlab.nexcel.vn/infrastructure/fanex-caching",
-  "summary": "An extension of Fanex.Caching which uses Redis as cache storage.",
+  "packOptions": {
+    "summary": "An extension of Fanex.Caching which uses Redis as cache storage.",
+    "tags": [ "caching", "redis" ],
+    "owners": [ "jason.ly" ],
+    "projectUrl": "https://gitlab.nexcel.vn/infrastructure/fanex-caching",
+    "releaseNotes": "https://gitlab.nexcel.vn/infrastructure/fanex-caching",
+    "repository": {
+      "type": "git",
+      "url": "https://gitlab.nexcel.vn/infrastructure/fanex-caching"
+    },
+    "files": {
+      "include": [ "content" ]
+    }
+  },
+  "version": "1.0.0-beta",
   "authors": [ "jason.ly" ],
-  "tags": [ "caching", "redis" ],
-  "projectUrl": "https://gitlab.nexcel.vn/infrastructure/fanex-caching",
-  "releaseNotes": "Initialized new project.",
+  "title": "Fanex.Caching.Redis",
+  "description": "New version of Fanex.Caching which supports many target frameworks and asynchronous APIs.\nHead to the project gitlab repository for more details: https://gitlab.nexcel.vn/infrastructure/fanex-caching",
+  "copyright": "2016 Nexdev",
   "frameworks": {
     "net40": {
       "dependencies": {
         "Microsoft.Bcl": "1.1.10",
-        "Microsoft.Bcl.Async": "1.0.168"
+        "Microsoft.Bcl.Async": "1.0.168",
+        "StackExchange.Redis": "1.1.603"
       }
     },
-    "net452": { },
-    "net461": { }
+    "net452": {
+      "dependencies": {
+        "StackExchange.Redis": "1.1.603"
+      }
+    },
+    "net461": {
+      "dependencies": {
+        "StackExchange.Redis": "1.1.603"
+      }
+    }
   },
   "dependencies": {
-    "Fanex.Caching": "2.0.0-beta2",
-    "MsgPack.Cli": "[0.6.8]",
-    "StackExchange.Redis": "1.0.488"
+    "Fanex.Caching": "2.0.0-*",
+    "MsgPack.Cli": "0.8.0"
+  },
+  "scripts": {
+    "postcompile": "dotnet pack --no-build --configuration %compile:Configuration%"
   }
 }

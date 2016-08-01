@@ -1,28 +1,22 @@
 ﻿{
-  "version": "1.0.0-*",
-  "description": "Fanex.Caching.Demo Console Application",
+  "title": "Fanex.Caching.Demo",
+  "description": "Fanex.Caching Demo App",
   "authors": [ "jason.ly" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
-  "compilationOptions": {
+  "copyright": "NexDev",
+  "version": "1.0.0-*",
+  "buildOptions": {
     "emitEntryPoint": true
   },
-
-  "dependencies": {
-    "Fanex.Caching": "2.0.0-beta2"
-  },
-
-  "commands": {
-    "Fanex.Caching.Demo": "Fanex.Caching.Demo"
-  },
-
   "frameworks": {
-    "dnx46": {
+    "net461": {
       "frameworkAssemblies": {
         "System.Configuration": "4.0.0.0"
       }
+    }
+  },
+  "dependencies": {
+    "Fanex.Caching": {
+      "target": "project"
     }
   }
 }

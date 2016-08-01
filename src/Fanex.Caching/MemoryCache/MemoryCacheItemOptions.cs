@@ -12,9 +12,7 @@
             = new List<PostEvictionCallbackRegistration>();
 
         public MemoryCacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback)
-        {
-            return RegisterPostEvictionCallback(callback, null);
-        }
+            => RegisterPostEvictionCallback(callback, null);
 
         public MemoryCacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback, object state)
         {

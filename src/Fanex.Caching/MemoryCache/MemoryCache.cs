@@ -6,9 +6,13 @@
     using System.Threading.Tasks;
 
 #if NET40
+
     using static System.Threading.Tasks.TaskEx;
+
 #else
+
     using static System.Threading.Tasks.Task;
+
 #endif
 
     public class MemoryCache : Cache
@@ -60,9 +64,7 @@
         }
 
         public Task<bool> ContainAsync(string key)
-        {
-            return FromResult(Contain(key));
-        }
+            => FromResult(Contain(key));
 
         public bool TryGet<T>(string key, out T value)
         {

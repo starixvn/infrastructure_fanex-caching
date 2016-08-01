@@ -32,10 +32,7 @@
 
         public DateTimeOffset LastAccess { get; private set; }
 
-        public void Touch(DateTimeOffset now)
-        {
-            LastAccess = now;
-        }
+        public void Touch(DateTimeOffset now) => LastAccess = now;
 
         public void SetExpired(EvictionReason reason)
         {
@@ -77,14 +74,13 @@
                 }
                 catch
                 {
+                    // Ignore all exceptions throw during executing callbacks.
                 }
             }
         }
 
         public bool CheckExpired(DateTimeOffset now)
-        {
-            return _isExpired || CheckForExpiredTime(now);
-        }
+            => _isExpired || CheckForExpiredTime(now);
 
         private bool CheckForExpiredTime(DateTimeOffset now)
         {

@@ -1,18 +1,15 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Fanex.Caching.Redis")]
-[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Fanex.Caching.Redis")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -20,6 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("bcc0e8cc-b2a4-4404-82c6-eed30c27ebb6")]
+[assembly: Guid("aec61dfc-717b-4779-8285-99118ae79cd8")]
+[assembly: CLSCompliant(false)]
 [assembly: InternalsVisibleTo("Fanex.Caching.Redis.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

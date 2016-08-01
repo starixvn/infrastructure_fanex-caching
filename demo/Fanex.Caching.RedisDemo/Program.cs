@@ -27,7 +27,7 @@
             Console.WriteLine("Cache an object:");
             CacheService.Set("TestCust", customer);
             Console.WriteLine(CacheService.Get<Customer>("TestCust")?.ToString());
-            
+
             Thread.Sleep(10000);
             Console.WriteLine("Get expired key which has sliding expiration set to 10s:");
             Console.WriteLine(CacheService.Get<string>("TestKey2"));

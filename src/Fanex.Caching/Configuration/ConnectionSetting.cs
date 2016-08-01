@@ -1,4 +1,6 @@
-﻿namespace Fanex.Caching.Configuration
+﻿#if XMLCONFIG
+
+namespace Fanex.Caching.Configuration
 {
     using System.Configuration;
 
@@ -36,3 +38,5 @@
         }
     }
 }
+
+#endif

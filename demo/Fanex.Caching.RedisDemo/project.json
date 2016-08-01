@@ -1,34 +1,25 @@
-{
-  "version": "1.0.0-*",
-  "description": "Fanex.Caching.RedisDemo Console Application",
+﻿{
+  "title": "Fanex.Caching.Demo.Redis",
+  "description": "Fanex.Caching.Redis Demo App",
   "authors": [ "jason.ly" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
-  "compilationOptions": {
+  "copyright": "NexDev",
+  "version": "1.0.0-*",
+  "buildOptions": {
     "emitEntryPoint": true
   },
-
-  "dependencies": {
-    "Fanex.Caching": "2.0.0-beta2",
-    "Fanex.Caching.Redis": "0.0.1-beta2"
-  },
-
-  "commands": {
-    "Fanex.Caching.RedisDemo": "Fanex.Caching.RedisDemo"
-  },
-
   "frameworks": {
-    "dnx46": {
-      "frameworkAssemblies": {
-        "System.Configuration": "4.0.0.0"
-      }
-    },
     "net461": {
       "frameworkAssemblies": {
         "System.Configuration": "4.0.0.0"
       }
+    }
+  },
+  "dependencies": {
+    "Fanex.Caching": {
+      "target": "project"
+    },
+    "Fanex.Caching.Redis": {
+      "target": "project"
     }
   }
 }

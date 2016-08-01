@@ -1,4 +1,6 @@
-﻿namespace Fanex.Caching.Configuration
+﻿#if XMLCONFIG
+
+namespace Fanex.Caching.Configuration
 {
     using System.Configuration;
 
@@ -8,10 +10,7 @@
         private const string ConnectionSettingsElementName = "connectionSettings";
 
         [ConfigurationProperty(CacheTypeAttributeName, IsRequired = false)]
-        public string CacheType
-        {
-            get { return (string)base[CacheTypeAttributeName]; }
-        }
+        public string CacheType => (string)base[CacheTypeAttributeName];
 
         [ConfigurationProperty(ConnectionSettingsElementName, IsDefaultCollection = false)]
         [ConfigurationCollection(
@@ -20,14 +19,8 @@
             ClearItemsName = "clear",
             RemoveItemName = "remove")]
         public ConnectionSettingCollection ConnectionSettingCollection
-        {
-            get
-            {
-                ConnectionSettingCollection connectionSettingCollection
-                    = (ConnectionSettingCollection)base[ConnectionSettingsElementName];
-
-                return connectionSettingCollection;
-            }
-        }
+            => (ConnectionSettingCollection)base[ConnectionSettingsElementName];
     }
 }
+
+#endif

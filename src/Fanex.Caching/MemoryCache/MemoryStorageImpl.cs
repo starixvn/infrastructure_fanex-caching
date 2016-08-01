@@ -41,13 +41,7 @@
             Dispose(false);
         }
 
-        internal int Count
-        {
-            get
-            {
-                return _items.Count;
-            }
-        }
+        internal int Count => _items.Count;
 
         public void Dispose()
         {

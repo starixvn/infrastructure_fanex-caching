@@ -1,47 +1,21 @@
 ﻿namespace Fanex.Caching
 {
     using System;
-    using System.Collections;
-    using System.Configuration;
     using System.Threading.Tasks;
-    using Configuration;
-    using Memory;
 
     public static class CacheService
     {
-        private const string SectionName = "Fanex.Caching";
         private static Cache _cacheStorage;
-
-        static CacheService()
-        {
-            CacheSettings settings = ConfigurationManager.GetSection(SectionName) as CacheSettings;
-
-            if (settings != null)
-            {
-                Type cacheType = string.IsNullOrEmpty(settings.CacheType)
-                    ? typeof(MemoryCache)
-                    : Type.GetType(settings.CacheType);
-                Hashtable connectionSettings = settings?.ConnectionSettingCollection?.ToHashtable();
-
-                if (connectionSettings != null)
-                {
-                    _cacheStorage = Activator.CreateInstance(cacheType, connectionSettings) as Cache;
-                }
-                else
-                {
-                    _cacheStorage = Activator.CreateInstance(cacheType) as Cache;
-                }
-            }
-            else
-            {
-                _cacheStorage = new MemoryCache();
-            }
-        }
 
         public static Cache CacheStorage
         {
             get
             {
+                if (_cacheStorage == null)
+                {
+                    _cacheStorage = CacheServiceManager.CacheStorage;
+                }
+
                 return _cacheStorage;
             }
         }
@@ -61,45 +35,37 @@
         }
 
         public static bool Contain(string key)
-        {
-            return _cacheStorage.Contain(key);
-        }
+            => CacheStorage.Contain(key);
 
         public static Task<bool> ContainAsync(string key)
-        {
-            return _cacheStorage.ContainAsync(key);
-        }
+            => CacheStorage.ContainAsync(key);
 
         public static T Get<T>(string key)
         {
             T value = default(T);
 
-            _cacheStorage.TryGet(key, out value);
+            CacheStorage.TryGet(key, out value);
 
             return value;
         }
 
         public static async Task<T> GetAsync<T>(string key)
         {
-            Tuple<bool, T> result = await _cacheStorage.TryGetAsync<T>(key);
+            Tuple<bool, T> result = await CacheStorage.TryGetAsync<T>(key);
 
             return result.Item2;
         }
 
         public static bool TryGet<T>(string key, out T value)
-        {
-            return _cacheStorage.TryGet(key, out value);
-        }
+            => CacheStorage.TryGet(key, out value);
 
         public static Task<Tuple<bool, T>> TryGetAsync<T>(string key)
-        {
-            return _cacheStorage.TryGetAsync<T>(key);
-        }
+            => CacheStorage.TryGetAsync<T>(key);
 
         public static T GetOrSet<T>(string key, Func<T> factory)
         {
             T value = default(T);
-            bool found = _cacheStorage.TryGet(key, out value);
+            bool found = CacheStorage.TryGet(key, out value);
 
             if (!found && factory != null)
             {
@@ -109,7 +75,7 @@
                 };
 
                 value = factory();
-                _cacheStorage.Set(key, value, cacheItemOptions);
+                CacheStorage.Set(key, value, cacheItemOptions);
             }
 
             return value;
@@ -118,12 +84,12 @@
         public static T GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)
         {
             T value = default(T);
-            bool found = _cacheStorage.TryGet(key, out value);
+            bool found = CacheStorage.TryGet(key, out value);
 
             if (!found && factory != null)
             {
                 value = factory();
-                _cacheStorage.Set(key, value, options);
+                CacheStorage.Set(key, value, options);
             }
 
             return value;
@@ -132,7 +98,7 @@
         public static async Task<T> GetOrSetAsync<T>(string key, Func<T> factory)
         {
             T value = default(T);
-            Tuple<bool, T> found = await _cacheStorage.TryGetAsync<T>(key);
+            Tuple<bool, T> found = await CacheStorage.TryGetAsync<T>(key);
 
             if (!found.Item1 && factory != null)
             {
@@ -142,7 +108,7 @@
                 };
 
                 value = factory();
-                await _cacheStorage.SetAsync(key, value, cacheItemOptions);
+                await CacheStorage.SetAsync(key, value, cacheItemOptions);
             }
             else
             {
@@ -155,12 +121,12 @@
         public static async Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)
         {
             T value = default(T);
-            Tuple<bool, T> found = await _cacheStorage.TryGetAsync<T>(key);
+            Tuple<bool, T> found = await CacheStorage.TryGetAsync<T>(key);
 
             if (!found.Item1 && factory != null)
             {
                 value = factory();
-                await _cacheStorage.SetAsync(key, value, options);
+                await CacheStorage.SetAsync(key, value, options);
             }
             else
             {
@@ -171,14 +137,10 @@
         }
 
         public static void Remove(string key)
-        {
-            _cacheStorage.Remove(key);
-        }
+            => CacheStorage.Remove(key);
 
         public static Task RemoveAsync(string key)
-        {
-            return _cacheStorage.RemoveAsync(key);
-        }
+            => CacheStorage.RemoveAsync(key);
 
         public static void Set<T>(string key, T value)
         {
@@ -187,13 +149,11 @@
                 RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
             };
 
-            _cacheStorage.Set(key, value, cacheItemOptions);
+            CacheStorage.Set(key, value, cacheItemOptions);
         }
 
         public static void Set<T>(string key, T value, CacheItemOptions options)
-        {
-            _cacheStorage.Set(key, value, options);
-        }
+            => CacheStorage.Set(key, value, options);
 
         public static Task SetAsync<T>(string key, T value)
         {
@@ -202,12 +162,10 @@
                 RelativeExpiration = CacheItemOptions.DefaultRelativeExpiration
             };
 
-            return _cacheStorage.SetAsync(key, value, cacheItemOptions);
+            return CacheStorage.SetAsync(key, value, cacheItemOptions);
         }
 
         public static Task SetAsync<T>(string key, T value, CacheItemOptions options)
-        {
-            return _cacheStorage.SetAsync(key, value, options);
-        }
+            => CacheStorage.SetAsync(key, value, options);
     }
 }
