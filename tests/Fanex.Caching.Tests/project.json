@@ -11,9 +11,8 @@
     "Fanex.Caching": {
       "target": "project"
     },
-    "xunit": "2.2.0-beta2-build3300",
-    "xunit.runner.utility": "2.2.0-beta2-build3300",
-    "dotnet-test-xunit": "2.2.0-preview2-build1029",
+    "xunit": "2.2.0-*",
+    "dotnet-test-xunit": "2.2.0-*",
     "AutoFixture.AutoNSubstitute": "3.49.0",
     "AutoFixture.Xunit2": "3.49.0",
     "NSubstitute": "1.10.0"
