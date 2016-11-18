@@ -1,6 +1,7 @@
 ﻿namespace Fanex.Caching.Memory
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -15,17 +16,17 @@
 #endif
 
         private const double CompactPercentage = 0.1;
-        private readonly Dictionary<object, MemoryCacheItem> _items;
-        private readonly ReaderWriterLockSlim _lock;
+        private readonly ConcurrentDictionary<object, MemoryCacheItem> _items;
+
         private readonly SystemClock _clock;
         private TimeSpan _expirationScanFrequency;
         private DateTimeOffset _lastExpirationScan;
+
         private bool _disposed;
 
         public MemoryStorageImpl(MemoryCacheOptions options, SystemClock clock)
         {
-            _items = new Dictionary<object, MemoryCacheItem>();
-            _lock = new ReaderWriterLockSlim();
+            _items = new ConcurrentDictionary<object, MemoryCacheItem>();
             _clock = clock;
             _expirationScanFrequency = options.ExpirationScanFrequency;
             _lastExpirationScan = _clock.UtcNow;
@@ -43,6 +44,8 @@
 
         internal int Count => _items.Count;
 
+        private ICollection<KeyValuePair<object, MemoryCacheItem>> Items => _items;
+
         public void Dispose()
         {
             Dispose(true);
@@ -50,21 +53,11 @@
 
         public bool Contain(object key)
         {
-            bool found = false;
+            var found = false;
+            MemoryCacheItem item;
 
             CheckDisposed();
-            _lock.EnterReadLock();
-
-            try
-            {
-                MemoryCacheItem item;
-
-                found = _items.TryGetValue(key, out item);
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
+            found = _items.TryGetValue(key, out item);
 
             return found;
         }
@@ -76,40 +69,24 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            MemoryCacheItem expiredItem = null;
-            bool found = false;
+            MemoryCacheItem item;
+            var found = false;
 
             CheckDisposed();
-            _lock.EnterReadLock();
-
             value = null;
 
-            try
+            if (_items.TryGetValue(key, out item))
             {
-                MemoryCacheItem item;
-
-                if (_items.TryGetValue(key, out item))
+                if (item.CheckExpired(_clock.UtcNow) && item.EvictionReason != EvictionReason.Replaced)
                 {
-                    if (item.CheckExpired(_clock.UtcNow))
-                    {
-                        expiredItem = item;
-                    }
-                    else
-                    {
-                        item.Touch(_clock.UtcNow);
-                        value = item.Value;
-                        found = true;
-                    }
+                    RemoveItem(item);
                 }
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
-
-            if (expiredItem != null)
-            {
-                RemoveItem(expiredItem);
+                else
+                {
+                    item.Touch(_clock.UtcNow);
+                    value = item.Value;
+                    found = true;
+                }
             }
 
             StartScanForExpiredItems();
@@ -126,23 +103,11 @@
 
             CheckDisposed();
             MemoryCacheItem item;
-            _lock.EnterReadLock();
 
-            try
+            if (_items.TryRemove(key, out item))
             {
-                if (_items.TryGetValue(key, out item))
-                {
-                    item.SetExpired(EvictionReason.Removed);
-                }
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
-
-            if (item != null)
-            {
-                RemoveItem(item);
+                item.SetExpired(EvictionReason.Removed);
+                item.InvokeEvictionCallbacks();
             }
 
             StartScanForExpiredItems();
@@ -155,71 +120,79 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            CheckDisposed();
+            if (_disposed)
+            {
+                // No-op instead of throwing since this is called during CacheEntry.Dispose
+                return;
+            }
 
             DateTimeOffset utcNow = _clock.UtcNow;
             MemoryCacheItem previousItem = null;
-            bool added = false;
             var item = new MemoryCacheItem(key, value, options, utcNow);
 
-            _lock.EnterWriteLock();
-
-            try
+            if (_items.TryGetValue(key, out previousItem))
             {
-                if (_items.TryGetValue(key, out previousItem))
-                {
-                    _items.Remove(key);
-                    previousItem.SetExpired(EvictionReason.Replaced);
-                }
+                previousItem.SetExpired(EvictionReason.Replaced);
+            }
 
-                if (!item.CheckExpired(utcNow))
+            if (!item.CheckExpired(utcNow))
+            {
+                TryAddOrUpdateItem(item, previousItem);
+
+                if (previousItem != null)
                 {
-                    _items[key] = item;
-                    added = true;
+                    previousItem.InvokeEvictionCallbacks();
                 }
             }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
-
-            if (previousItem != null)
-            {
-                previousItem.InvokeEvictionCallbacks();
-            }
-
-            if (!added)
+            else
             {
                 item.InvokeEvictionCallbacks();
+
+                if (previousItem != null)
+                {
+                    RemoveItem(previousItem);
+                }
             }
 
             StartScanForExpiredItems();
         }
 
-        private static void ScanForExpiredItems(MemoryStorageImpl cache)
+        internal void TryAddOrUpdateItem(MemoryCacheItem item, MemoryCacheItem previousItem)
         {
-            var expiredItems = new List<MemoryCacheItem>();
+            var added = false;
 
-            cache._lock.EnterReadLock();
-
-            try
+            if (previousItem == null)
             {
-                DateTimeOffset now = cache._clock.UtcNow;
+                added = _items.TryAdd(item.Key, item);
+            }
+            else
+            {
+                added = _items.TryUpdate(item.Key, item, previousItem);
 
-                foreach (MemoryCacheItem item in cache._items.Values)
+                if (!added)
                 {
-                    if (item.CheckExpired(now))
-                    {
-                        expiredItems.Add(item);
-                    }
+                    added = _items.TryAdd(item.Key, item);
                 }
             }
-            finally
-            {
-                cache._lock.ExitReadLock();
-            }
 
-            cache.RemoveItems(expiredItems);
+            if (!added)
+            {
+                item.SetExpired(EvictionReason.Replaced);
+                item.InvokeEvictionCallbacks();
+            }
+        }
+
+        private static void ScanForExpiredItems(MemoryStorageImpl cache)
+        {
+            DateTimeOffset now = cache._clock.UtcNow;
+
+            foreach (MemoryCacheItem item in cache._items.Values)
+            {
+                if (item.CheckExpired(now))
+                {
+                    cache.RemoveItem(item);
+                }
+            }
         }
 
         private void StartScanForExpiredItems()
@@ -257,45 +230,30 @@
             var lowPriorityItems = new List<MemoryCacheItem>();
             var normalPriorityItems = new List<MemoryCacheItem>();
             var highPriorityItems = new List<MemoryCacheItem>();
-            var neverRemovePriorityItems = new List<MemoryCacheItem>();
 
-            _lock.EnterReadLock();
-
-            try
-            {
-                CategorizeItems(
+            CategorizeItems(
                     ref expiredItems,
                     ref lowPriorityItems,
                     ref normalPriorityItems,
-                    ref highPriorityItems,
-                    ref neverRemovePriorityItems);
+                    ref highPriorityItems);
 
-                int totalItems =
-                    expiredItems.Count
-                    + lowPriorityItems.Count
-                    + normalPriorityItems.Count
-                    + highPriorityItems.Count
-                    + neverRemovePriorityItems.Count;
-                int removalCountTarget = (int)(totalItems * percentage);
+            int removalCountTarget = (int)(_items.Count * percentage);
 
-                ExpirePriorityBucket(removalCountTarget, expiredItems, lowPriorityItems);
-                ExpirePriorityBucket(removalCountTarget, expiredItems, normalPriorityItems);
-                ExpirePriorityBucket(removalCountTarget, expiredItems, highPriorityItems);
-            }
-            finally
+            ExpirePriorityBucket(removalCountTarget, expiredItems, lowPriorityItems);
+            ExpirePriorityBucket(removalCountTarget, expiredItems, normalPriorityItems);
+            ExpirePriorityBucket(removalCountTarget, expiredItems, highPriorityItems);
+
+            foreach (MemoryCacheItem item in expiredItems)
             {
-                _lock.ExitReadLock();
+                RemoveItem(item);
             }
-
-            RemoveItems(expiredItems);
         }
 
         private void CategorizeItems(
             ref List<MemoryCacheItem> expiredItems,
             ref List<MemoryCacheItem> lowPriorityItems,
             ref List<MemoryCacheItem> normalPriorityItems,
-            ref List<MemoryCacheItem> highPriorityItems,
-            ref List<MemoryCacheItem> neverRemovePriorityItems)
+            ref List<MemoryCacheItem> highPriorityItems)
         {
             DateTimeOffset now = _clock.UtcNow;
 
@@ -324,7 +282,6 @@
                             break;
 
                         case CachePriority.NeverRemove:
-                            neverRemovePriorityItems.Add(item);
                             break;
                     }
                 }
@@ -367,52 +324,12 @@
             }
         }
 
-        private void RemoveItems(List<MemoryCacheItem> items)
+        private void RemoveItem(MemoryCacheItem item)
         {
-            _lock.EnterWriteLock();
-
-            try
-            {
-                foreach (MemoryCacheItem item in items)
-                {
-                    MemoryCacheItem currentItem;
-
-                    if (_items.TryGetValue(item.Key, out currentItem) && ReferenceEquals(currentItem, item))
-                    {
-                        _items.Remove(item.Key);
-                    }
-                }
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
-
-            foreach (MemoryCacheItem item in items)
+            if (Items.Remove(new KeyValuePair<object, MemoryCacheItem>(item.Key, item)))
             {
                 item.InvokeEvictionCallbacks();
             }
-        }
-
-        private void RemoveItem(MemoryCacheItem item)
-        {
-            _lock.EnterWriteLock();
-
-            try
-            {
-                MemoryCacheItem currentItem;
-
-                if (_items.TryGetValue(item.Key, out currentItem) && ReferenceEquals(currentItem, item))
-                {
-                    _items.Remove(item.Key);
-                }
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
-
-            item.InvokeEvictionCallbacks();
         }
 
         private void Dispose(bool disposing)

@@ -15,7 +15,6 @@
 
         private IList<PostEvictionCallbackRegistration> _postEvictionCallbacks;
         private DateTimeOffset? _absoluteExpiration;
-        private EvictionReason _evictionReason;
         private bool _isExpired;
 
         public MemoryCacheItem(
@@ -32,15 +31,17 @@
 
         public DateTimeOffset LastAccess { get; private set; }
 
+        public EvictionReason EvictionReason { get; private set; }
+
         public void Touch(DateTimeOffset now) => LastAccess = now;
 
         public void SetExpired(EvictionReason reason)
         {
             _isExpired = true;
 
-            if (_evictionReason == EvictionReason.None)
+            if (EvictionReason == EvictionReason.None)
             {
-                _evictionReason = reason;
+                EvictionReason = reason;
             }
         }
 
@@ -70,7 +71,7 @@
             {
                 try
                 {
-                    registration.EvictionCallback?.Invoke(item.Key, item.Value, item._evictionReason, registration.State);
+                    registration.EvictionCallback?.Invoke(item.Key, item.Value, item.EvictionReason, registration.State);
                 }
                 catch
                 {
