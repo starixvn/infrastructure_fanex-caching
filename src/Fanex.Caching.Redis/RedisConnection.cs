@@ -1,22 +1,22 @@
 ﻿namespace Fanex.Caching.Redis
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using StackExchange.Redis;
 
     internal class RedisConnection
     {
-        private ConnectionMultiplexer _redisMultiplexer;
-        private IDatabase _connection;
+        private readonly SemaphoreSlim _connectionLock = new SemaphoreSlim(1, 1);
+        private volatile ConnectionMultiplexer _connection;
+        private IDatabase _storage;
         private ConfigurationOptions _redisConnectionOptions;
-        private int _databaseId;
         private Serializer _serializer;
         private string _applicationName;
 
         public RedisConnection(RedisCacheOptions options)
         {
             _redisConnectionOptions = options.ToRedisConnectionOptions();
-            _databaseId = options.DatabaseId;
             _serializer = options.Serializer;
             _applicationName = options.ApplicationName;
         }
@@ -25,14 +25,14 @@
         {
             Connect();
 
-            return _connection.KeyExists(ModifyKey(key));
+            return _storage.KeyExists(ModifyKey(key));
         }
 
         public async Task<bool> ContainAsync(string key)
         {
             await ConnectAsync();
 
-            return await _connection.KeyExistsAsync(ModifyKey(key));
+            return await _storage.KeyExistsAsync(ModifyKey(key));
         }
 
         public bool TryGet<T>(string key, out T value)
@@ -41,7 +41,7 @@
 
             RedisCacheItem item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
             RedisCommand command = item.ToGetCommand();
-            RedisResult dataFromRedis = _connection.ScriptEvaluate(command.Script, command.Keys);
+            RedisResult dataFromRedis = _storage.ScriptEvaluate(command.Script, command.Keys);
             bool found = false;
 
             value = default(T);
@@ -61,7 +61,7 @@
 
             RedisCacheItem item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
             RedisCommand command = item.ToGetCommand();
-            RedisResult dataFromRedis = await _connection.ScriptEvaluateAsync(command.Script, command.Keys);
+            RedisResult dataFromRedis = await _storage.ScriptEvaluateAsync(command.Script, command.Keys);
             bool found = false;
             T value = default(T);
 
@@ -77,13 +77,13 @@
         public void Remove(string key)
         {
             Connect();
-            _connection.KeyDelete(ModifyKey(key));
+            _storage.KeyDelete(ModifyKey(key));
         }
 
         public async Task RemoveAsync(string key)
         {
             await ConnectAsync();
-            await _connection.KeyDeleteAsync(ModifyKey(key));
+            await _storage.KeyDeleteAsync(ModifyKey(key));
         }
 
         public void Set<T>(string key, T value, CacheItemOptions options)
@@ -92,7 +92,7 @@
             RedisCommand command = item.ToSetCommand();
 
             Connect();
-            _connection.ScriptEvaluate(command.Script, command.Keys, command.Values);
+            _storage.ScriptEvaluate(command.Script, command.Keys, command.Values);
         }
 
         public async Task SetAsync<T>(string key, T value, CacheItemOptions options)
@@ -101,24 +101,56 @@
             RedisCommand command = item.ToSetCommand();
 
             await ConnectAsync();
-            await _connection.ScriptEvaluateAsync(command.Script, command.Keys, command.Values);
+            await _storage.ScriptEvaluateAsync(command.Script, command.Keys, command.Values);
         }
 
         private void Connect()
         {
-            if (_redisMultiplexer == null)
+            if (_connection != null)
             {
-                _redisMultiplexer = ConnectionMultiplexer.Connect(_redisConnectionOptions);
-                _connection = _redisMultiplexer.GetDatabase(_databaseId);
+                return;
+            }
+
+            _connectionLock.Wait();
+
+            try
+            {
+                if (_connection == null)
+                {
+                    _connection = ConnectionMultiplexer.Connect(_redisConnectionOptions);
+                    _storage = _connection.GetDatabase();
+                }
+            }
+            finally
+            {
+                _connectionLock.Release();
             }
         }
 
         private async Task ConnectAsync()
         {
-            if (_redisMultiplexer == null)
+            if (_connection != null)
             {
-                _redisMultiplexer = await ConnectionMultiplexer.ConnectAsync(_redisConnectionOptions);
-                _connection = _redisMultiplexer.GetDatabase(_databaseId);
+                return;
+            }
+
+#if !NET40
+            await _connectionLock.WaitAsync();
+#else
+            _connectionLock.Wait();
+#endif
+
+            try
+            {
+                if (_connection == null)
+                {
+                    _connection = await ConnectionMultiplexer.ConnectAsync(_redisConnectionOptions);
+                    _storage = _connection.GetDatabase();
+                }
+            }
+            finally
+            {
+                _connectionLock.Release();
             }
         }
 

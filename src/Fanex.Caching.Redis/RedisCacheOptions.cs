@@ -1,6 +1,5 @@
 ﻿namespace Fanex.Caching.Redis
 {
-    using System;
     using StackExchange.Redis;
 
     public class RedisCacheOptions
@@ -9,8 +8,6 @@
         private const int DefaultPort = 6379;
         private const int DefaultOperationTimeout = 1000;
         private const int DefaultConnectionTimeout = 5000;
-
-        private int _databaseId = 0;
 
         public Serializer Serializer { get; set; }
             = new MessagePackSerializer();
@@ -36,35 +33,6 @@
             = DefaultConnectionTimeout;
 
         public string Password { get; set; }
-
-        public int DatabaseId
-        {
-            internal get
-            {
-                int databaseId = _databaseId;
-
-                if (!string.IsNullOrEmpty(ConnectionString)
-                    && ConnectionString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Length > 0)
-                {
-                    databaseId = 0;
-                }
-
-                return databaseId;
-            }
-
-            set
-            {
-                if (value < 0)
-                {
-                    throw new ArgumentOutOfRangeException(
-                        nameof(DatabaseId),
-                        value,
-                        "Database ID value must be positive.");
-                }
-
-                _databaseId = value;
-            }
-        }
 
         internal ConfigurationOptions ToRedisConnectionOptions()
         {
