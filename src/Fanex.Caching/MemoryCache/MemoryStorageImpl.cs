@@ -77,7 +77,7 @@
 
             if (_items.TryGetValue(key, out item))
             {
-                if (item.CheckExpired(_clock.UtcNow) && item.EvictionReason != EvictionReason.Replaced)
+                if (item.CheckExpired(_clock.UtcNow) && !item.IsReplaced)
                 {
                     RemoveItem(item);
                 }
