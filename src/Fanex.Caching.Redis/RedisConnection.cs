@@ -39,7 +39,7 @@
         {
             Connect();
 
-            RedisCacheItem item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
+            var item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
             RedisCommand command = item.ToGetCommand();
             RedisResult dataFromRedis = _storage.ScriptEvaluate(command.Script, command.Keys);
             bool found = false;
@@ -59,7 +59,7 @@
         {
             await ConnectAsync();
 
-            RedisCacheItem item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
+            var item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
             RedisCommand command = item.ToGetCommand();
             RedisResult dataFromRedis = await _storage.ScriptEvaluateAsync(command.Script, command.Keys);
             bool found = false;
@@ -88,7 +88,7 @@
 
         public void Set<T>(string key, T value, CacheItemOptions options)
         {
-            RedisCacheItem item = new RedisCacheItem(ModifyKey(key), value, options, _serializer);
+            var item = new RedisCacheItem(ModifyKey(key), value, options, _serializer);
             RedisCommand command = item.ToSetCommand();
 
             Connect();
@@ -97,7 +97,7 @@
 
         public async Task SetAsync<T>(string key, T value, CacheItemOptions options)
         {
-            RedisCacheItem item = new RedisCacheItem(ModifyKey(key), value, options, _serializer);
+            var item = new RedisCacheItem(ModifyKey(key), value, options, _serializer);
             RedisCommand command = item.ToSetCommand();
 
             await ConnectAsync();

@@ -4,7 +4,7 @@
     "tags": [ "fanex.caching" ],
     "owners": [ "jason.ly" ],
     "projectUrl": "https://gitlab.nexcel.vn/infrastructure/fanex-caching",
-    "releaseNotes": "https://gitlab.nexcel.vn/infrastructure/fanex-caching",
+    "releaseNotes": "Renamed CacheService to ConfiguredCacheService. Implemented new CacheService",
     "repository": {
       "type": "git",
       "url": "https://gitlab.nexcel.vn/infrastructure/fanex-caching"
@@ -13,10 +13,10 @@
       "include": [ "content" ]
     }
   },
-  "version": "2.0.0",
+  "version": "2.1.0",
   "authors": [ "jason.ly" ],
   "title": "Fanex.Caching",
-  "description": "New version of Fanex.Caching which supports many target frameworks and asynchronous APIs.\nYou'd better think of using the new version of the library carefully, because it is incapable with what the old version offers you.\nHead to the project gitlab repository for more details: https://gitlab.nexcel.vn/infrastructure/fanex-caching",
+  "description": "https://gitlab.nexcel.vn/infrastructure/fanex-caching",
   "copyright": "2016 Nexdev",
   "frameworks": {
     "net40": {

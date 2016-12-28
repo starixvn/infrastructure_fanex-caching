@@ -7,88 +7,64 @@
 
     public class CacheServiceTests
     {
-        [Fact]
-        public void SwitchCacheStorageThrowsArgumentNullExceptionWhenNewCacheStorageIsNull()
+        private readonly Cache _cacheStorage;
+        private readonly CacheService _cacheService;
+
+        public CacheServiceTests()
         {
-            // Arrange.
-            Cache newCacheStorage = null;
-
-            // Act & Assert.
-            Assert.Throws<ArgumentNullException>("newCacheStorage", () => CacheService.SwitchCacheStorage(newCacheStorage));
-        }
-
-        [Fact]
-        public void SwitchCacheStorageSetsNewCacheStorangeToLocalCacheStorage()
-        {
-            // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
-
-            // Act.
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
-            // Assert.
-            Assert.Same(newCacheStorage, CacheService.CacheStorage);
+            _cacheStorage = Substitute.For<Cache>();
+            _cacheService = new CacheServiceImpl(_cacheStorage);
         }
 
         [Fact]
         public void ContainAlwaysCallCacheStorageContainMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            CacheService.Contain(testKey);
+            _cacheService.Contain(testKey);
 
             // Assert.
-            newCacheStorage.Received().Contain(Arg.Is(testKey));
+            _cacheStorage.Received().Contain(Arg.Is(testKey));
         }
 
         [Fact]
         public async Task ContainAsyncAlwaysCallCacheStorageContainAsyncMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            await CacheService.ContainAsync(testKey);
+            await _cacheService.ContainAsync(testKey);
 
             // Assert.
-            await newCacheStorage.Received().ContainAsync(Arg.Is(testKey));
+            await _cacheStorage.Received().ContainAsync(Arg.Is(testKey));
         }
 
         [Fact]
         public void GetAlwaysCallCacheStorageTryGetMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            CacheService.Get<object>(testKey);
+            _cacheService.Get<object>(testKey);
 
             // Assert.
             object result = null;
-            newCacheStorage.Received().TryGet(Arg.Is(testKey), out result);
+
+            _cacheStorage.Received().TryGet(Arg.Is(testKey), out result);
         }
 
         [Fact]
         public void GetReturnsDefaultValueForMissingKey()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             object testValue = null;
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGet(testKey, out testValue).Returns(parameters =>
+            _cacheStorage.TryGet(testKey, out testValue).Returns(parameters =>
             {
                 parameters[1] = null;
 
@@ -96,7 +72,7 @@
             });
 
             // Act.
-            object result = CacheService.Get<object>(testKey);
+            object result = _cacheService.Get<object>(testKey);
 
             // Assert.
             Assert.Null(result);
@@ -106,13 +82,11 @@
         public void GetReturnsStoredObject()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             var testKey = "TestKey";
             var testValue = new object();
             object result = null;
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
                 parameters[1] = testValue;
 
@@ -120,7 +94,7 @@
             });
 
             // Act.
-            result = CacheService.Get<object>(testKey);
+            result = _cacheService.Get<object>(testKey);
 
             // Assert.
             Assert.Same(testValue, result);
@@ -130,31 +104,25 @@
         public async Task GetAsyncAlwaysCallCacheStorageTryGetAsyncMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(true, new object()));
-
             // Act.
-            await CacheService.GetAsync<object>(testKey);
+            await _cacheService.GetAsync<object>(testKey);
 
             // Assert.
-            await newCacheStorage.Received().TryGetAsync<object>(Arg.Is(testKey));
+            await _cacheStorage.Received().TryGetAsync<object>(Arg.Is(testKey));
         }
 
         [Fact]
         public async Task GetAsyncReturnsDefaultValueForMissingKey()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
+            _cacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
 
             // Act.
-            object result = await CacheService.GetAsync<object>(testKey);
+            object result = await _cacheService.GetAsync<object>(testKey);
 
             // Assert.
             Assert.Null(result);
@@ -164,15 +132,13 @@
         public async Task GetAsyncReturnsStoredObject()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             var testKey = "TestKey";
             var testValue = new object();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(true, testValue));
+            _cacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(true, testValue));
 
             // Act.
-            var result = await CacheService.GetAsync<object>(testKey);
+            var result = await _cacheService.GetAsync<object>(testKey);
 
             // Assert.
             Assert.Same(testValue, result);
@@ -182,47 +148,38 @@
         public void TryGetAlwaysCallCacheStorageTryGetMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             object result = null;
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            CacheService.TryGet(testKey, out result);
+            _cacheService.TryGet(testKey, out result);
 
             // Assert.
-            newCacheStorage.Received().TryGet(Arg.Is(testKey), out result);
+            _cacheStorage.Received().TryGet(Arg.Is(testKey), out result);
         }
 
         [Fact]
         public async Task TryGetAsyncAlwaysCallCacheStorageTryGetAsyncMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(true, new object()));
-
             // Act.
-            await CacheService.TryGetAsync<object>(testKey);
+            await _cacheService.TryGetAsync<object>(testKey);
 
             // Assert.
-            await newCacheStorage.Received().TryGetAsync<object>(Arg.Is(testKey));
+            await _cacheStorage.Received().TryGetAsync<object>(Arg.Is(testKey));
         }
 
         [Fact]
         public void GetOrSetReturnsExistingObject()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var testValue = new object();
             object result = null;
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
                 parameters[1] = testValue;
 
@@ -230,7 +187,7 @@
             });
 
             // Act.
-            result = CacheService.GetOrSet(testKey, () => new object(), Arg.Any<CacheItemOptions>());
+            result = _cacheService.GetOrSet(testKey, () => new object(), Arg.Any<CacheItemOptions>());
 
             // Assert.
             Assert.Same(testValue, result);
@@ -240,13 +197,11 @@
         public void GetOrSetMissingKeyWithInvalidValueFactoryReturnsNull()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var testValue = new object();
             object result = null;
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
                 parameters[1] = null;
 
@@ -254,7 +209,7 @@
             });
 
             // Act.
-            result = CacheService.GetOrSet<object>(testKey, null, Arg.Any<CacheItemOptions>());
+            result = _cacheService.GetOrSet<object>(testKey, null, Arg.Any<CacheItemOptions>());
 
             // Assert.
             Assert.Null(result);
@@ -264,14 +219,12 @@
         public void GetOrSetMissingKeyAddsNewValueAndReturnsIt()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var newValue = new object();
             object result = null;
             var testOptions = Arg.Any<CacheItemOptions>();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
                 parameters[1] = null;
 
@@ -279,24 +232,22 @@
             });
 
             // Act.
-            result = CacheService.GetOrSet(testKey, () => newValue, testOptions);
+            result = _cacheService.GetOrSet(testKey, () => newValue, testOptions);
 
             // Assert.
-            newCacheStorage.Received().Set(Arg.Is(testKey), Arg.Is(newValue), Arg.Is(testOptions));
+            _cacheStorage.Received().Set(Arg.Is(testKey), Arg.Is(newValue), Arg.Is(testOptions));
             Assert.Same(newValue, result);
         }
 
         [Fact]
-        public void GetOrSetMissingKeyWithMissingCacheItemOptionStoresNewValueWithDefaultRelativeExpiration()
+        public void GetOrSetMissingKeyWithoutCacheItemOptionStoresNewValueWithDefaultRelativeExpiration()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var newValue = new object();
             object result = null;
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
                 parameters[1] = null;
 
@@ -304,10 +255,10 @@
             });
 
             // Act.
-            result = CacheService.GetOrSet(testKey, () => newValue);
+            result = _cacheService.GetOrSet(testKey, () => newValue);
 
             // Assert.
-            newCacheStorage
+            _cacheStorage
                 .Received()
                 .Set(
                     Arg.Is(testKey),
@@ -320,15 +271,13 @@
         public async Task GetOrSetAsyncReturnsExistingObject()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var testValue = new object();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(true, testValue));
+            _cacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(true, testValue));
 
             // Act.
-            object result = await CacheService.GetOrSetAsync(testKey, () => new object(), Arg.Any<CacheItemOptions>());
+            object result = await _cacheService.GetOrSetAsync(testKey, () => new object(), Arg.Any<CacheItemOptions>());
 
             // Assert.
             Assert.Same(testValue, result);
@@ -338,15 +287,13 @@
         public async Task GetOrSetAsyncMissingKeyWithInvalidValueFactoryReturnsNull()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var testValue = new object();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
+            _cacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
 
             // Act.
-            object result = await CacheService.GetOrSetAsync<object>(testKey, null, Arg.Any<CacheItemOptions>());
+            object result = await _cacheService.GetOrSetAsync<object>(testKey, null, Arg.Any<CacheItemOptions>());
 
             // Assert.
             Assert.Null(result);
@@ -356,19 +303,17 @@
         public async Task GetOrSetAsyncMissingKeyAddsNewValueAndReturnsIt()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var newValue = new object();
             var testOptions = Arg.Any<CacheItemOptions>();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
+            _cacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
 
             // Act.
-            object result = await CacheService.GetOrSetAsync(testKey, () => newValue, testOptions);
+            object result = await _cacheService.GetOrSetAsync(testKey, () => newValue, testOptions);
 
             // Assert.
-            await newCacheStorage.Received().SetAsync(Arg.Is(testKey), Arg.Is(newValue), Arg.Is(testOptions));
+            await _cacheStorage.Received().SetAsync(Arg.Is(testKey), Arg.Is(newValue), Arg.Is(testOptions));
             Assert.Same(newValue, result);
         }
 
@@ -376,18 +321,16 @@
         public async Task GetOrSetAsyncMissingKeyWithMissingCacheItemOptionStoresNewValueWithDefaultRelativeExpiration()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var newValue = new object();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-            newCacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
+            _cacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
 
             // Act.
-            object result = await CacheService.GetOrSetAsync(testKey, () => newValue);
+            object result = await _cacheService.GetOrSetAsync(testKey, () => newValue);
 
             // Assert.
-            await newCacheStorage
+            await _cacheStorage
                 .Received()
                 .SetAsync(
                     Arg.Is(testKey),
@@ -400,67 +343,55 @@
         public void RemoveAlwaysCallCacheStorageRemoveMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            CacheService.Remove(testKey);
+            _cacheService.Remove(testKey);
 
             // Assert.
-            newCacheStorage.Received().Remove(Arg.Is(testKey));
+            _cacheStorage.Received().Remove(Arg.Is(testKey));
         }
 
         [Fact]
         public async Task RemoveAsyncAlwaysCallCacheStorageRemoveAsyncMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            await CacheService.RemoveAsync(testKey);
+            await _cacheService.RemoveAsync(testKey);
 
             // Assert.
-            await newCacheStorage.Received().RemoveAsync(Arg.Is(testKey));
+            await _cacheStorage.Received().RemoveAsync(Arg.Is(testKey));
         }
 
         [Fact]
         public void SetAlwaysCallCacheStorageSetMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var testValue = new object();
             var testOptions = new CacheItemOptions();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            CacheService.Set(testKey, testValue, testOptions);
+            _cacheService.Set(testKey, testValue, testOptions);
 
             // Assert.
-            newCacheStorage.Received().Set(Arg.Is(testKey), Arg.Is(testValue), Arg.Is(testOptions));
+            _cacheStorage.Received().Set(Arg.Is(testKey), Arg.Is(testValue), Arg.Is(testOptions));
         }
 
         [Fact]
         public void SetWithoutCachingOptionStoresObjectWithDefaultRelativeExpiration()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var testValue = new object();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            CacheService.Set(testKey, testValue);
+            _cacheService.Set(testKey, testValue);
 
             // Assert.
-            newCacheStorage
+            _cacheStorage
                 .Received()
                 .Set(
                     Arg.Is(testKey),
@@ -472,35 +403,29 @@
         public async Task SetAsyncAlwaysCallCacheStorageSetAsyncMethod()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var testValue = new object();
             var testOptions = new CacheItemOptions();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            await CacheService.SetAsync(testKey, testValue, testOptions);
+            await _cacheService.SetAsync(testKey, testValue, testOptions);
 
             // Assert.
-            await newCacheStorage.Received().SetAsync(Arg.Is(testKey), Arg.Is(testValue), Arg.Is(testOptions));
+            await _cacheStorage.Received().SetAsync(Arg.Is(testKey), Arg.Is(testValue), Arg.Is(testOptions));
         }
 
         [Fact]
         public async Task SetAsyncWithoutCachingOptionStoresObjectWithDefaultRelativeExpiration()
         {
             // Arrange.
-            Cache newCacheStorage = Substitute.For<Cache>();
             string testKey = "TestKey";
             var testValue = new object();
 
-            CacheService.SwitchCacheStorage(newCacheStorage);
-
             // Act.
-            await CacheService.SetAsync(testKey, testValue);
+            await _cacheService.SetAsync(testKey, testValue);
 
             // Assert.
-            await newCacheStorage
+            await _cacheStorage
                 .Received()
                 .SetAsync(
                     Arg.Is(testKey),

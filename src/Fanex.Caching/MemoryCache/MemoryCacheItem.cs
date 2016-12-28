@@ -13,8 +13,8 @@
         private const TaskCreationOptions TaskCreationOption = TaskCreationOptions.DenyChildAttach;
 #endif
 
+        private readonly DateTimeOffset? _absoluteExpiration;
         private IList<PostEvictionCallbackRegistration> _postEvictionCallbacks;
-        private DateTimeOffset? _absoluteExpiration;
         private EvictionReason _evictionReason;
         private bool _isExpired;
 

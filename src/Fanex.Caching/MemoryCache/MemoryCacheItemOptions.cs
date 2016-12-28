@@ -21,7 +21,7 @@
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            PostEvictionCallbacks.Add(new PostEvictionCallbackRegistration()
+            PostEvictionCallbacks.Add(new PostEvictionCallbackRegistration
             {
                 EvictionCallback = callback,
                 State = state

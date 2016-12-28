@@ -32,7 +32,7 @@ Let's get started by  these 3 following steps:
         PM> Install-Package Fanex.Caching.Redis -Pre
         ```
 2. Configure your Fanex.Caching section in the configuration file
-    - If you want to use MemoryCache, add these to your app.config or web.config. Refer the [Memory as Cache Storage](#memory-as-cache-storage) for more information.
+    - If you want to use MemoryCache, add these to your `app.config` or `web.config`. Refer the [Memory as Cache Storage](#memory-as-cache-storage) for more information.
 
         ```xml
         <configSections>
@@ -45,7 +45,7 @@ Let's get started by  these 3 following steps:
             </connectionSettings>
         </Fanex.Caching>
         ```
-    - If you want Redis as your cache storage, add these lines to you app.config or web.config. Refer the [Redis as Cache Storage](#redis-as-cache-storage) for more details:
+    - If you want Redis as your cache storage, add these lines to you `app.config` or `web.config`. Refer the [Redis as Cache Storage](#redis-as-cache-storage) for more details:
         
         ```xml
         <configSections>
@@ -59,42 +59,83 @@ Let's get started by  these 3 following steps:
             </connectionSettings>
         </Fanex.Caching>
         ```
-3. Now, you can use methods of the static class named `CacheService` to access the Cache Storage instance you have created with the configuration
-
+3. Now, you can simply use the built-in static service named `ConfiguredCacheService` to access cache storage defined in the configuration file.
     ```csharp
-    CacheService.Set("TestKey1", "Test key 1", new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(10)));
-    Console.WriteLine(CacheService.Get<string>("TestKey1"));
+    ConfiguredCacheService.Set("TestKey1", "Test key 1", new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(10)));
+    Console.WriteLine(ConfiguredCacheService.Get<string>("TestKey1"));
     ```
-Please head to the section named ['CacheService's Methods'](#cacheservices-methods) for more information about methods offered by CacheService class
+    If you want to make the IoC framework be happy or want to create the cache storage by your own, you can create an instance of `CacheService` and use it as the access point.
+    ```csharp
+    CacheService cacheService = new CacheServiceImpl(); // the storage is created based on the configuration.
+    cacheService.Set("TestKey1", "Test key 1", new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(10)));
+    Console.WriteLine(cacheService.Get<string>("TestKey1"));
+    ```
+    The choice between creating instance of `CacheService` or using `ConfiguredCacheService` is to depend on your projects' caching strategy, the way you write unit tests, etc.
 
-# `CacheService`'s methods
-The `CacheService` class reads your configuration, creates a Cache Storage based on the configured information in the web.config or app.comfig, and exposes methods so that you can manipulate data in the cache. The following are the lists of its properties and methods
+    For more information, please head to sections named [CacheServiceImpl](#cacheserviceimpl) and [ConfiguredCacheService](#configuredcacheservice).
+
+# `CacheServiceImpl`
+The `CacheServiceImpl` wraps and extends the functionalities provided the the Cache Storage (Memory or Redis).
+It lets your site cache data without any knowledge of which under Cache Storage is being used.
+Switching between storages or concurrently using multiple storages is easier than ever.
+
+Implemented interface: `CacheService`
+
+## Constructor list
+Name| Decription
+---|---
+CacheServiceImpl()|New instance's Cache Storage is created based on information defined in `Fanex.Caching` section in the configuration file
+CacheServiceImpl(Cache cacheStorage)|You create the Cache Storage by your own and pass it to the `CacheService` instance. It is useful in case that your site uses multiple Cache Storages at the same time. Each is for a specific purpose
+## Property list
+Name| Type| Decription
+---|---|---
+CacheStorage|Fanex.Caching.Cache|[Readonly] Provide access to the `Cache` object which the current service instance is basing on
+## Method list
+Name|Returned Type| Description
+---|---|---
+Contain(string key)|bool|Check if there is any object associated with  `key` in the cache storage or not.
+ContainAsync(string key)|Task&lt;bool&gt;|Check if there is any object associated with  `key` in the cache storage or not.
+Get&lt;T&gt;(string key)|T|Get a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
+GetAsync&lt;T&gt;(string key)|Task&lt;T&gt;|Get a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
+TryGet&lt;T&gt;(string key, out T value)|bool|If there is any value stored in the cache associated with `key` and the value is castable to the type of `T`, the method returns `true` and the output parameter is the value. Otherwise, it returns `false` and the output parameter is `default(T)`. 
+TryGetAsync&lt;T&gt;(string key)|Task&lt;Tuple&lt;bool, T&gt;&gt;|If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`.
+GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory)|T|If the `key` has not been stored or cannot be casted to the type of `T`, call the `factory` to create a new value, insert it into the cache associates with the `key`, then return it. Otherwise, return inserted entry.
+GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory)|Task&lt;T&gt;|Get value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, insert it into the cache, then return it.
+GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|T|Get value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|Task&lt;T&gt;|Get value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passed by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+Remove(string key)||Remove a key from the cache storage.
+RemoveAsync(string key)|Task|Remove a key from the cache storage.
+Set&lt;T&gt;(string key, T value)||Insert a cache entry with the specific key and value of type `T` into the cache storage.
+SetAsync&lt;T&gt;(string key, T value)|Task|Insert a cache entry with the specific key and value of type `T` into the cache storage.
+Set&lt;T&gt;(string key, T value, CacheItemOptions options)||Insert a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+SetAsync&lt;T&gt;(string key, T value, CacheItemOptions options)|Task|Insert a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+# `ConfiguredCacheService`
+The `ConfiguredCacheService` class encloses an `CacheService` instance to provide you static medthods to access the Cache Storage. It reads your `web.config` or `app.config`, then creates a Cache Storage based on the configured information.
 
 ## Property list
 Name| Type| Decription
 ---|---|---
-CacheStorage|Fanex.Caching.Cache|Readonly property provides access to the `Cache` object created based on the information configured in the Fanex.Caching section of app.config or web.config
-
-## Method list
+CacheStorage|Fanex.Caching.Cache|[Readonly] Provide access to the `Cache` object created based on the information configured in the `Fanex.Caching` section of `app.config` or `web.config`.
+## Static Method list
 Name|Returned Type| Description
 ---|---|---
-SwitchCacheStorage(Cache newCacheStorage)|Fanex.Caching.Cache|Replaces the currently using cache storage with the new one. It returns the old cache storage if the replacement is successful.
-Contain(string key)|bool|Checks if there is any object associated with  `key` in the cache storage or not.
-ContainAsync(string key)|Task&lt;bool&gt;|Checks if there is any object associated with  `key` in the cache storage or not.
-Get&lt;T&gt;(string key)|T|Gets a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
-GetAsync&lt;T&gt;(string key)|Task&lt;T&gt;|Gets a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
-TryGet&lt;T&gt;(string key, out T value)|bool|If there is any value stored in the cache associated with `key` and the value is castable to the type of `T`, the method returns `true` and the output parameter is the value. Otherwise, it returns `false` and the output parameter is `default(T)`. 
-TryGetAsync&lt;T&gt;(string key)|Task&lt;Tuple&lt;bool, T&gt;&gt;|If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`.
-GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory)|T|If the `key` has not been stored or cannot be casted to the type of `T`, call the `factory` to create a new value, insert it into the cache associates with the `key`, then return it. Otherwise, return inserted entry.
-GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory)|Task&lt;T&gt;|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, insert it into the cache, then return it.
-GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|T|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
-GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|Task&lt;T&gt;|Gets value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passed by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
-Remove(string key)||Removes a key from the cache storage.
-RemoveAsync(string key)|Task|Removes a key from the cache storage.
-Set&lt;T&gt;(string key, T value)||Inserts a cache entry with the specific key and value of type `T` into the cache storage.
-SetAsync&lt;T&gt;(string key, T value)|Task|Inserts a cache entry with the specific key and value of type `T` into the cache storage.
-Set&lt;T&gt;(string key, T value, CacheItemOptions options)||Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
-SetAsync&lt;T&gt;(string key, T value, CacheItemOptions options)|Task|Inserts a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+SwitchCacheStorage(Cache newCacheStorage)|Fanex.Caching.Cache|**[Obsolete] - Consider using 'new CacheService(Cache cacheStorage)' instead.** Replace the currently using cache storage with the new one. It returns the old cache storage if the replacement is successful. If your site switches back and forth storages, make sure that you are pointing to the right storage before sending data to it.
+Contain(string key)|bool|Expose the method of the underlay `CacheService` instance. Check if there is any object associated with  `key` in the cache storage or not.
+ContainAsync(string key)|Task&lt;bool&gt;|Expose the method of the underlay `CacheService` instance. Check if there is any object associated with  `key` in the cache storage or not asynchronously.
+Get&lt;T&gt;(string key)|T|Expose the method of the underlay `CacheService` instance. Get a specific cache entry from the storage. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
+GetAsync&lt;T&gt;(string key)|Task&lt;T&gt;|Expose the method of the underlay `CacheService` instance. Get a specific cache entry from the storage asynchronously. The `default(T)` will be returned if the `key` does not exist or the value cannot be casted to the type of `T`.
+TryGet&lt;T&gt;(string key, out T value)|bool|Expose the method of the underlay `CacheService` instance. If there is any value stored in the cache associated with `key` and the value is castable to the type of `T`, the method returns `true` and the output parameter is the caching value. Otherwise, it returns `false` and the output parameter is `default(T)`. 
+TryGetAsync&lt;T&gt;(string key)|Task&lt;Tuple&lt;bool, T&gt;&gt;|Expose the method of the underlay `CacheService` instance. If the `key` has already been inserted into the cache and the value is castable to the type of `T`, returns a `Tuple` which its `Item1` is set to `true` and its `Item2` is the needed value. Otherwise, `false` and `default(T)` are set as `Item1` and `Item2` of the returned `Tuple`.
+GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory)|T|Expose the method of the underlay `CacheService` instance. If the `key` has not been stored or cannot be casted to the type of `T`, call the `factory` to create a new value, insert it into the cache associates with the `key`, then return it. Otherwise, return inserted entry.
+GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory)|Task&lt;T&gt;|Expose the method of the underlay `CacheService` instance. Get value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, insert it into the cache, then return it.
+GetOrSet&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|T|Expose the method of the underlay `CacheService` instance. Get value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passing by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+GetOrSetAsync&lt;T&gt;(string key, Func&lt;T&gt; factory, CacheItemOptions options)|Task&lt;T&gt;|Expose the method of the underlay `CacheService` instance. Get value stored with the `key`. If the `key` has not been in the storage, call the `factory` to create a new value, cache it under the `key` with rules passed by the `CacheItemOptions`, then return it. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+Remove(string key)||Expose the method of the underlay `CacheService` instance. Remove a key from the cache storage.
+RemoveAsync(string key)|Task|Expose the method of the underlay `CacheService` instance. Remove a key from the cache storage asynchronously.
+Set&lt;T&gt;(string key, T value)||Expose the method of the underlay `CacheService` instance. Insert a cache entry with the specific key and value of type `T` into the cache storage.
+SetAsync&lt;T&gt;(string key, T value)|Task|Expose the method of the underlay `CacheService` instance. Insert a cache entry with the specific key and value of type `T` into the cache storage.
+Set&lt;T&gt;(string key, T value, CacheItemOptions options)||Expose the method of the underlay `CacheService` instance. Insert a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
+SetAsync&lt;T&gt;(string key, T value, CacheItemOptions options)|Task|Expose the method of the underlay `CacheService` instance. Insert a cache entry into the cache storage, specifying information about when the entry will be evicted. Read the [`CacheItemOptions`](#cacheitemoptions) for more information about its properties and methods.
 # `CacheItemOptions`
 ## Property list
 Name| Type| Decription

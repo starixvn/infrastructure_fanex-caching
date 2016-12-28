@@ -230,14 +230,13 @@
             var lowPriorityItems = new List<MemoryCacheItem>();
             var normalPriorityItems = new List<MemoryCacheItem>();
             var highPriorityItems = new List<MemoryCacheItem>();
+            var removalCountTarget = (int)(_items.Count * percentage);
 
             CategorizeItems(
                     ref expiredItems,
                     ref lowPriorityItems,
                     ref normalPriorityItems,
                     ref highPriorityItems);
-
-            int removalCountTarget = (int)(_items.Count * percentage);
 
             ExpirePriorityBucket(removalCountTarget, expiredItems, lowPriorityItems);
             ExpirePriorityBucket(removalCountTarget, expiredItems, normalPriorityItems);
