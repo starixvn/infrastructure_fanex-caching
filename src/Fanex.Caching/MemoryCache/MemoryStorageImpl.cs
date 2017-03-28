@@ -16,12 +16,12 @@
 #endif
 
         private const double CompactPercentage = 0.1;
+
         private readonly ConcurrentDictionary<object, MemoryCacheItem> _items;
-
         private readonly SystemClock _clock;
-        private TimeSpan _expirationScanFrequency;
-        private DateTimeOffset _lastExpirationScan;
+        private readonly TimeSpan _expirationScanFrequency;
 
+        private DateTimeOffset _lastExpirationScan;
         private bool _disposed;
 
         public MemoryStorageImpl(MemoryCacheOptions options, SystemClock clock)
@@ -53,7 +53,7 @@
 
         public bool Contain(object key)
         {
-            var found = false;
+            bool found;
             MemoryCacheItem item;
 
             CheckDisposed();
@@ -127,7 +127,7 @@
             }
 
             DateTimeOffset utcNow = _clock.UtcNow;
-            MemoryCacheItem previousItem = null;
+            MemoryCacheItem previousItem;
             var item = new MemoryCacheItem(key, value, options, utcNow);
 
             if (_items.TryGetValue(key, out previousItem))
@@ -159,7 +159,7 @@
 
         internal void TryAddOrUpdateItem(MemoryCacheItem item, MemoryCacheItem previousItem)
         {
-            var added = false;
+            bool added;
 
             if (previousItem == null)
             {

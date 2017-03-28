@@ -122,7 +122,7 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (value == null)
+            if (ReferenceEquals(value, null))
             {
                 throw new ArgumentNullException(nameof(value));
             }
@@ -142,7 +142,7 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (value == null)
+            if (ReferenceEquals(value, null))
             {
                 throw new ArgumentNullException(nameof(value));
             }

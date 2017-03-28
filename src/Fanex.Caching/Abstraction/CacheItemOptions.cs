@@ -4,50 +4,13 @@
 
     public class CacheItemOptions
     {
-        private DateTimeOffset? _absoluteExpiration;
-        private TimeSpan? _relativeExpiration;
-        private TimeSpan? _slidingExpiration;
-
         public static readonly TimeSpan DefaultRelativeExpiration = TimeSpan.FromSeconds(120);
 
-        public DateTimeOffset? AbsoluteExpiration
-        {
-            get
-            {
-                return _absoluteExpiration;
-            }
+        public DateTimeOffset? AbsoluteExpiration { get; set; }
 
-            set
-            {
-                _absoluteExpiration = value;
-            }
-        }
+        public TimeSpan? RelativeExpiration { get; set; }
 
-        public TimeSpan? RelativeExpiration
-        {
-            get
-            {
-                return _relativeExpiration;
-            }
-
-            set
-            {
-                _relativeExpiration = value;
-            }
-        }
-
-        public TimeSpan? SlidingExpiration
-        {
-            get
-            {
-                return _slidingExpiration;
-            }
-
-            set
-            {
-                _slidingExpiration = value;
-            }
-        }
+        public TimeSpan? SlidingExpiration { get; set; }
 
         public CacheItemOptions SetAbsoluteExpiration(DateTimeOffset absolute)
         {

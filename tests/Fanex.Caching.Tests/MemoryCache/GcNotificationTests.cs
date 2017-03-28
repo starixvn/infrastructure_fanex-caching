@@ -7,7 +7,7 @@
 
     public class GcNotificationTests
     {
-        private ManualResetEvent _callbackInvoked;
+        private readonly ManualResetEvent _callbackInvoked;
 
         public GcNotificationTests()
         {

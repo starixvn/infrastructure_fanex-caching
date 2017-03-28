@@ -5,7 +5,7 @@
 
     public class CacheServiceImpl : CacheService
     {
-        private Cache _cacheStorage;
+        private readonly Cache _cacheStorage;
 
         public CacheServiceImpl()
         {
@@ -32,7 +32,7 @@
 
         public T Get<T>(string key)
         {
-            T value = default(T);
+            T value;
 
             CacheStorage.TryGet(key, out value);
 
@@ -54,7 +54,7 @@
 
         public T GetOrSet<T>(string key, Func<T> factory)
         {
-            T value = default(T);
+            T value;
             bool found = CacheStorage.TryGet(key, out value);
 
             if (!found && factory != null)
@@ -73,7 +73,7 @@
 
         public T GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)
         {
-            T value = default(T);
+            T value;
             bool found = CacheStorage.TryGet(key, out value);
 
             if (!found && factory != null)
@@ -87,7 +87,7 @@
 
         public async Task<T> GetOrSetAsync<T>(string key, Func<T> factory)
         {
-            T value = default(T);
+            T value;
             Tuple<bool, T> found = await CacheStorage.TryGetAsync<T>(key);
 
             if (!found.Item1 && factory != null)
@@ -110,7 +110,7 @@
 
         public async Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)
         {
-            T value = default(T);
+            T value;
             Tuple<bool, T> found = await CacheStorage.TryGetAsync<T>(key);
 
             if (!found.Item1 && factory != null)

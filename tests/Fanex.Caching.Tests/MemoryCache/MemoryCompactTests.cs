@@ -6,19 +6,18 @@
 
     public class MemoryCompactTests
     {
-        private SystemClock _clock;
-        private MemoryCacheOptions _options;
-        private MemoryStorageImpl _storage;
-        private MemoryCacheItemOptions _cachingOptions;
+        private readonly MemoryStorageImpl _storage;
+        private readonly MemoryCacheItemOptions _cachingOptions;
 
         public MemoryCompactTests()
         {
-            _options = new MemoryCacheOptions
+            var options = new MemoryCacheOptions
             {
                 CompactOnMemoryPressure = false
             };
-            _clock = new SystemClockMock();
-            _storage = new MemoryStorageImpl(_options, _clock);
+            var clock = new SystemClockMock();
+
+            _storage = new MemoryStorageImpl(options, clock);
             _cachingOptions = new MemoryCacheItemOptions();
         }
 
@@ -49,7 +48,7 @@
             _storage.Compact(1.0);
 
             // Assert.
-            object result = null;
+            object result;
 
             Assert.Equal(2, _storage.Count);
             Assert.True(_storage.TryGet("key3", out result));
@@ -69,7 +68,7 @@
             _storage.Compact(0.5);
 
             // Assert.
-            object result = null;
+            object result;
 
             Assert.Equal(2, _storage.Count);
             Assert.False(_storage.TryGet("key3", out result));
@@ -89,7 +88,7 @@
             _storage.Compact(0.90);
 
             // Assert.
-            object result = null;
+            object result;
             bool found = _storage.TryGet("key4", out result);
 
             Assert.Equal(1, _storage.Count);

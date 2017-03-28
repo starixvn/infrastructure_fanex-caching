@@ -8,11 +8,11 @@
     internal class RedisConnection
     {
         private readonly SemaphoreSlim _connectionLock = new SemaphoreSlim(1, 1);
+        private readonly ConfigurationOptions _redisConnectionOptions;
+        private readonly Serializer _serializer;
+        private readonly string _applicationName;
         private volatile ConnectionMultiplexer _connection;
         private IDatabase _storage;
-        private ConfigurationOptions _redisConnectionOptions;
-        private Serializer _serializer;
-        private string _applicationName;
 
         public RedisConnection(RedisCacheOptions options)
         {

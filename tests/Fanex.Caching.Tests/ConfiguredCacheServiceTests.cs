@@ -99,7 +99,7 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            object result = null;
+            object result;
 
             // Act.
             ConfiguredCacheService.TryGet(testKey, out result);
@@ -126,7 +126,6 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            var testingValue = new object();
             var testOptions = new CacheItemOptions();
 
             // Act.
@@ -141,7 +140,6 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            var testingValue = new object();
             var testOptions = new CacheItemOptions();
 
             // Act.

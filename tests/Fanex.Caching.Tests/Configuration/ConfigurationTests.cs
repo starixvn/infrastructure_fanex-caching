@@ -10,7 +10,7 @@
     {
         private const string SectionName = "Fanex.Caching";
 
-        private CacheSettings _cacheSettings;
+        private readonly CacheSettings _cacheSettings;
 
         public ConfigurationTests()
         {

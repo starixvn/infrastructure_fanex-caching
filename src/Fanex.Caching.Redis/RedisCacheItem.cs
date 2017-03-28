@@ -5,7 +5,7 @@
 
     internal class RedisCacheItem : CacheItem
     {
-        private Serializer _serializer;
+        private readonly Serializer _serializer;
 
         public RedisCacheItem(object key, object value, CacheItemOptions options, Serializer serializer)
             : base(key, value, options)
@@ -29,7 +29,8 @@
             {
                 return ToSetCommandWithAbsoluteExpiration();
             }
-            else if (Options.SlidingExpiration.HasValue)
+
+            if (Options.SlidingExpiration.HasValue)
             {
                 return ToSetCommandWithSlidingExpiration();
             }

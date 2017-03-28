@@ -6,8 +6,8 @@
 
     public class CacheItemOptionsTests
     {
-        private Fixture _fixture;
-        private CacheItemOptions _cacheItemOptions;
+        private readonly Fixture _fixture;
+        private readonly CacheItemOptions _cacheItemOptions;
 
         public CacheItemOptionsTests()
         {
@@ -34,8 +34,11 @@
             // Arrange.
             var relative = TimeSpan.Zero;
 
-            // Act and Assert.
-            Assert.Throws<ArgumentOutOfRangeException>(() => _cacheItemOptions.SetAbsoluteExpiration(relative));
+            // Act.
+            var exception = Record.Exception(() => _cacheItemOptions.SetAbsoluteExpiration(relative));
+
+            // Assert.
+            Assert.IsType<ArgumentOutOfRangeException>(exception);
         }
 
         [Fact]
@@ -57,8 +60,11 @@
             // Arrange.
             var offset = TimeSpan.Zero;
 
-            // Act and Assert.
-            Assert.Throws<ArgumentOutOfRangeException>(() => _cacheItemOptions.SetSlidingExpiration(offset));
+            // Act.
+            var exception = Record.Exception(() => _cacheItemOptions.SetSlidingExpiration(offset));
+
+            // Assert.
+            Assert.IsType<ArgumentOutOfRangeException>(exception);
         }
 
         [Fact]

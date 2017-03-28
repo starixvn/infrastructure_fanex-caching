@@ -52,7 +52,7 @@
             _cacheService.Get<object>(testKey);
 
             // Assert.
-            object result = null;
+            object result;
 
             _cacheStorage.Received().TryGet(Arg.Is(testKey), out result);
         }
@@ -62,7 +62,7 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            object testValue = null;
+            object testValue;
 
             _cacheStorage.TryGet(testKey, out testValue).Returns(parameters =>
             {
@@ -84,7 +84,7 @@
             // Arrange.
             var testKey = "TestKey";
             var testValue = new object();
-            object result = null;
+            object result;
 
             _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
@@ -149,7 +149,7 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            object result = null;
+            object result;
 
             // Act.
             _cacheService.TryGet(testKey, out result);
@@ -177,7 +177,7 @@
             // Arrange.
             string testKey = "TestKey";
             var testValue = new object();
-            object result = null;
+            object result;
 
             _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
@@ -198,8 +198,7 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            var testValue = new object();
-            object result = null;
+            object result;
 
             _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
@@ -221,8 +220,8 @@
             // Arrange.
             string testKey = "TestKey";
             var newValue = new object();
-            object result = null;
             var testOptions = Arg.Any<CacheItemOptions>();
+            object result;
 
             _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
@@ -245,7 +244,7 @@
             // Arrange.
             string testKey = "TestKey";
             var newValue = new object();
-            object result = null;
+            object result;
 
             _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
             {
@@ -288,7 +287,6 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            var testValue = new object();
 
             _cacheStorage.TryGetAsync<object>(testKey).Returns(new Tuple<bool, object>(false, null));
 

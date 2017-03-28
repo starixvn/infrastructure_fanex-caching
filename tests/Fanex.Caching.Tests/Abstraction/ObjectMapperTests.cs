@@ -9,7 +9,7 @@
 
     public class ObjectMapperTests
     {
-        private Fixture _fixture;
+        private readonly Fixture _fixture;
 
         public ObjectMapperTests()
         {
@@ -22,11 +22,14 @@
             // Arrange.
             Hashtable data = null;
 
-            // Act and assert.
-            Assert.Throws<ArgumentNullException>(
+            // Act.
+            var exception = Record.Exception(
                 () => ObjectMapper.ConvertTo<ConnectionSettingMock>(
                     data,
                     _fixture.Create<Dictionary<string, Func<object, object>>>()));
+
+            // Assert.
+            Assert.IsType<ArgumentNullException>(exception);
         }
 
         [Fact]

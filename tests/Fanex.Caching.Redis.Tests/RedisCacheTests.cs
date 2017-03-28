@@ -7,8 +7,8 @@
 
     public class RedisCacheTests
     {
-        private RedisCache _cache;
-        private CacheItemOptions _options;
+        private readonly RedisCache _cache;
+        private readonly CacheItemOptions _options;
 
         public RedisCacheTests()
         {
@@ -28,7 +28,7 @@
             string key = "non-existent-key";
 
             // Act.
-            int? result = null;
+            int? result;
             bool found = _cache.TryGet(key, out result);
 
             // Assert.
@@ -44,11 +44,10 @@
             int? value = 1;
 
             // Act.
-            int? result = null;
-            bool found = false;
+            int? result;
 
             _cache.Set(key, value, _options);
-            found = _cache.TryGet(key, out result);
+            _cache.TryGet(key, out result);
 
             // Assert.
             Assert.Equal(value, result.Value);
@@ -61,19 +60,18 @@
             string key = "testing-key";
             string caseSensitiveKey = "Testing-Key";
             int? value = 1;
-            int? result = null;
-            bool found = false;
+            int? result;
 
             _cache.Set(key, value, _options);
 
             // Act.
-            found = _cache.TryGet(key, out result);
+            _cache.TryGet(key, out result);
 
             // Assert.
             Assert.Equal(value, result);
 
             // Act.
-            found = _cache.TryGet(caseSensitiveKey, out result);
+            _cache.TryGet(caseSensitiveKey, out result);
 
             // Assert.
             Assert.Null(result);
@@ -86,20 +84,19 @@
             var key = "testing-key";
             int? oldValue = 1;
             int? newValue = 2;
-            int? result = null;
-            bool found = false;
+            int? result;
 
             _cache.Set(key, oldValue, _options);
 
             // Ensure pre-condition.
-            found = _cache.TryGet(key, out result);
+            _cache.TryGet(key, out result);
             Assert.Equal(oldValue, result);
 
             // Act.
             _cache.Set(key, newValue, _options);
 
             // Assert.
-            found = _cache.TryGet(key, out result);
+            _cache.TryGet(key, out result);
             Assert.Equal(newValue, result);
         }
 
@@ -109,8 +106,8 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result = null;
-            bool found = false;
+            int? result;
+            bool found;
 
             _cache.Set(key, value, _options);
 
@@ -134,8 +131,8 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result = null;
-            bool found = false;
+            int? result;
+            bool found;
 
             _options.SetAbsoluteExpiration(new SystemClockMock().UtcNow + TimeSpan.FromSeconds(50));
             _cache.Set(key, value, _options);
@@ -152,8 +149,8 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result = null;
-            bool found = false;
+            int? result;
+            bool found;
 
             _options.SetAbsoluteExpiration(DateTimeOffset.Now + TimeSpan.FromSeconds(5));
             _cache.Set(key, value, _options);
@@ -178,8 +175,8 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result = null;
-            bool found = false;
+            int? result;
+            bool found;
 
             _options.SetAbsoluteExpiration(TimeSpan.FromSeconds(5));
             _cache.Set(key, value, _options);
@@ -204,8 +201,8 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result = null;
-            bool found = false;
+            int? result;
+            bool found;
 
             _options.SetSlidingExpiration(TimeSpan.FromSeconds(1));
             _cache.Set(key, value, _options);

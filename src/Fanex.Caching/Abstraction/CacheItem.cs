@@ -2,7 +2,7 @@
 {
     public abstract class CacheItem
     {
-        public CacheItem(object key, object value, CacheItemOptions options)
+        protected CacheItem(object key, object value, CacheItemOptions options)
         {
             Key = key;
             Value = value;

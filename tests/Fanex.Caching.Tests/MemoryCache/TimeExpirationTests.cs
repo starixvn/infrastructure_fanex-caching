@@ -13,8 +13,8 @@
             // Arrange.
             var key = "myKey";
             var value = new object();
-            bool found = false;
-            object addedValue = null;
+            bool found;
+            object addedValue;
 
             _cachingOptions.SetAbsoluteExpiration(_clock.UtcNow + TimeSpan.FromMinutes(1));
             _storage.Set(key, value, _cachingOptions);
@@ -38,8 +38,8 @@
             // Arrange.
             var key = "myKey";
             var value = new object();
-            bool found = false;
-            object addedValue = null;
+            bool found;
+            object addedValue;
 
             _cachingOptions.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
             _storage.Set(key, value, _cachingOptions);
@@ -64,8 +64,8 @@
             var key = "myKey";
             var value = new object();
             var callbackInvoked = new ManualResetEvent(false);
-            bool found = false;
-            object addedValue = null;
+            bool found;
+            object addedValue;
 
             _cachingOptions
                 .RegisterPostEvictionCallback(
@@ -89,7 +89,7 @@
 
             // Act.
             // Background expiration checks are triggered when TryGet is called no matter what the key is.
-            object otherValue = null;
+            object otherValue;
 
             _clock.Add(TimeSpan.FromMinutes(2));
             _storage.TryGet("otherKey", out otherValue);
@@ -109,8 +109,8 @@
             // Arrange.
             var key = "myKey";
             var value = new object();
-            bool found = false;
-            object addedValue = null;
+            bool found;
+            object addedValue;
 
             _cachingOptions.SetSlidingExpiration(TimeSpan.FromMinutes(1));
             _storage.Set(key, value, _cachingOptions);
@@ -135,8 +135,8 @@
             // Arrange.
             var key = "myKey";
             var value = new object();
-            bool found = false;
-            object addedValue = null;
+            bool found;
+            object addedValue;
 
             _cachingOptions.SetSlidingExpiration(TimeSpan.FromMinutes(1));
             _storage.Set(key, value, _cachingOptions);
@@ -170,8 +170,8 @@
             // Arrange.
             var key = "myKey";
             var value = new object();
-            object result = null;
-            bool found = false;
+            object result;
+            bool found;
 
             _cachingOptions.SetSlidingExpiration(TimeSpan.FromMinutes(1))
                 .SetAbsoluteExpiration(TimeSpan.FromMinutes(2));

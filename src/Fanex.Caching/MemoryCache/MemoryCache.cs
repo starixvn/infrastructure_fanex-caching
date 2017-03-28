@@ -73,7 +73,7 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            object result = null;
+            object result;
             bool found = _memoryStorage.TryGet(key, out result);
 
             if ((result != null) && (result is T))
@@ -91,7 +91,7 @@
 
         public Task<Tuple<bool, T>> TryGetAsync<T>(string key)
         {
-            T value = default(T);
+            T value;
             bool found = TryGet(key, out value);
 
             return FromResult(new Tuple<bool, T>(found, value));
@@ -121,7 +121,7 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (value == null)
+            if (ReferenceEquals(value, null))
             {
                 throw new ArgumentNullException(nameof(value));
             }
@@ -150,7 +150,7 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (value == null)
+            if (ReferenceEquals(value, null))
             {
                 throw new ArgumentNullException(nameof(value));
             }

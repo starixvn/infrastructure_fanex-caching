@@ -6,7 +6,7 @@
 
     internal static class RedisValueHelper
     {
-        [SuppressMessage("StyleCop.CSharp.Nexcel.NexcelCustomRules", "SP2101:MethodMustNotContainMoreLinesThan", Justification = "Reviewed.")]
+        [SuppressMessage("StyleCop.CSharp.StylecopPlus.Rules", "SP2101:MethodMustNotContainMoreLinesThan", Justification = "Reviewed.")]
         public static RedisValue ConvertToRedisValue(object value, Serializer serializer)
         {
             if (value == null)

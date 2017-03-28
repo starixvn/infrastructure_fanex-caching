@@ -8,8 +8,8 @@
 
     public class MemoryCacheItemOptionsTests
     {
-        private MemoryCacheItemOptions _options;
-        private SystemClockMock _clock;
+        private readonly MemoryCacheItemOptions _options;
+        private readonly SystemClockMock _clock;
 
         public MemoryCacheItemOptionsTests()
         {

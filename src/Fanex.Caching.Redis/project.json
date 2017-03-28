@@ -38,7 +38,7 @@
     }
   },
   "dependencies": {
-    "Fanex.Caching": "2.0.0-*",
+    "Fanex.Caching": "2.1.0-*",
     "MsgPack.Cli": "0.8.0"
   },
   "scripts": {
