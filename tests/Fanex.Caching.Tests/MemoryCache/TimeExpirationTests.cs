@@ -14,11 +14,10 @@
             var key = "myKey";
             var value = new object();
             bool found;
-            object addedValue;
 
             _cachingOptions.SetAbsoluteExpiration(_clock.UtcNow + TimeSpan.FromMinutes(1));
             _storage.Set(key, value, _cachingOptions);
-            found = _storage.TryGet(key, out addedValue);
+            found = _storage.TryGet(key, out object addedValue);
 
             Assert.True(found);
             Assert.Same(value, addedValue);
@@ -39,11 +38,10 @@
             var key = "myKey";
             var value = new object();
             bool found;
-            object addedValue;
 
             _cachingOptions.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
             _storage.Set(key, value, _cachingOptions);
-            found = _storage.TryGet(key, out addedValue);
+            found = _storage.TryGet(key, out object addedValue);
 
             Assert.True(found);
             Assert.Same(value, addedValue);
@@ -65,7 +63,6 @@
             var value = new object();
             var callbackInvoked = new ManualResetEvent(false);
             bool found;
-            object addedValue;
 
             _cachingOptions
                 .RegisterPostEvictionCallback(
@@ -83,16 +80,14 @@
                 .SetAbsoluteExpiration(_clock.UtcNow + TimeSpan.FromMinutes(1));
 
             _storage.Set(key, value, _cachingOptions);
-            found = _storage.TryGet(key, out addedValue);
+            found = _storage.TryGet(key, out object addedValue);
             Assert.True(found);
             Assert.Same(value, addedValue);
 
             // Act.
             // Background expiration checks are triggered when TryGet is called no matter what the key is.
-            object otherValue;
-
             _clock.Add(TimeSpan.FromMinutes(2));
-            _storage.TryGet("otherKey", out otherValue);
+            _storage.TryGet("otherKey", out _);
 
             // Assert.
             Assert.True(callbackInvoked.WaitOne(TimeSpan.FromSeconds(30)), "Callback");
@@ -110,11 +105,10 @@
             var key = "myKey";
             var value = new object();
             bool found;
-            object addedValue;
 
             _cachingOptions.SetSlidingExpiration(TimeSpan.FromMinutes(1));
             _storage.Set(key, value, _cachingOptions);
-            found = _storage.TryGet(key, out addedValue);
+            found = _storage.TryGet(key, out object addedValue);
 
             Assert.True(found);
             Assert.Same(value, addedValue);
@@ -136,11 +130,10 @@
             var key = "myKey";
             var value = new object();
             bool found;
-            object addedValue;
 
             _cachingOptions.SetSlidingExpiration(TimeSpan.FromMinutes(1));
             _storage.Set(key, value, _cachingOptions);
-            found = _storage.TryGet(key, out addedValue);
+            found = _storage.TryGet(key, out object addedValue);
 
             Assert.True(found);
             Assert.Same(value, addedValue);
@@ -170,7 +163,6 @@
             // Arrange.
             var key = "myKey";
             var value = new object();
-            object result;
             bool found;
 
             _cachingOptions.SetSlidingExpiration(TimeSpan.FromMinutes(1))
@@ -179,7 +171,7 @@
 
             // Act - touch the key when the absolute expiration has not met.
             _clock.Add(TimeSpan.FromSeconds(59));
-            found = _storage.TryGet(key, out result);
+            found = _storage.TryGet(key, out object result);
 
             // Assert.
             Assert.True(found);

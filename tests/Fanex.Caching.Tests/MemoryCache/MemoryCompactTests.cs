@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Caching.Tests.MemoryCache
 {
+    using System;
     using Memory;
     using Mocks;
     using Xunit;
@@ -8,6 +9,7 @@
     {
         private readonly MemoryStorageImpl _storage;
         private readonly MemoryCacheItemOptions _cachingOptions;
+        private readonly SystemClockMock _clock;
 
         public MemoryCompactTests()
         {
@@ -15,9 +17,9 @@
             {
                 CompactOnMemoryPressure = false
             };
-            var clock = new SystemClockMock();
 
-            _storage = new MemoryStorageImpl(options, clock);
+            _clock = new SystemClockMock();
+            _storage = new MemoryStorageImpl(options, _clock);
             _cachingOptions = new MemoryCacheItemOptions();
         }
 
@@ -48,11 +50,9 @@
             _storage.Compact(1.0);
 
             // Assert.
-            object result;
-
             Assert.Equal(2, _storage.Count);
-            Assert.True(_storage.TryGet("key3", out result));
-            Assert.True(_storage.TryGet("key4", out result));
+            Assert.True(_storage.TryGet("key3", out _));
+            Assert.True(_storage.TryGet("key4", out _));
         }
 
         [Fact]
@@ -68,11 +68,9 @@
             _storage.Compact(0.5);
 
             // Assert.
-            object result;
-
             Assert.Equal(2, _storage.Count);
-            Assert.False(_storage.TryGet("key3", out result));
-            Assert.False(_storage.TryGet("key4", out result));
+            Assert.False(_storage.TryGet("key3", out _));
+            Assert.False(_storage.TryGet("key4", out _));
         }
 
         [Fact]
@@ -80,16 +78,18 @@
         {
             // Arrange.
             _storage.Set("key1", "value1", _cachingOptions);
+            _clock.Add(TimeSpan.FromSeconds(1));
             _storage.Set("key2", "value2", _cachingOptions);
+            _clock.Add(TimeSpan.FromSeconds(1));
             _storage.Set("key3", "value3", _cachingOptions);
+            _clock.Add(TimeSpan.FromSeconds(1));
             _storage.Set("key4", "value4", _cachingOptions);
 
             // Act.
             _storage.Compact(0.90);
 
             // Assert.
-            object result;
-            bool found = _storage.TryGet("key4", out result);
+            bool found = _storage.TryGet("key4", out object result);
 
             Assert.Equal(1, _storage.Count);
             Assert.True(found);

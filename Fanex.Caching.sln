@@ -1,30 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BD7380AD-9DC9-4BE0-BAF8-FFC44FA94AE1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{D3135E60-F80B-416A-AD0A-B96DAF54F0CC}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.build.props = Directory.build.props
+	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{7279C289-5B24-42F1-9E18-E5216F0FB460}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{92606D66-F7F9-4C3C-9066-0A55754581F4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{50FB73D9-9A0E-4AC4-968B-E4FC7FE71427}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{A948B2DB-D7AB-440B-98B6-CD356C12859E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fanex.Caching", "src\Fanex.Caching\Fanex.Caching.xproj", "{D38653C8-E1DD-4AD5-B051-E67B875E53FE}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fanex.Caching.Demo", "demo\Fanex.Caching.Demo\Fanex.Caching.Demo.xproj", "{EA5709F9-1E76-455A-8D4B-56B95B3C0ED8}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fanex.Caching.Tests", "tests\Fanex.Caching.Tests\Fanex.Caching.Tests.xproj", "{05FAC38C-7048-4E23-918B-929F766C3FB1}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fanex.Caching.Redis", "src\Fanex.Caching.Redis\Fanex.Caching.Redis.xproj", "{AEC61DFC-717B-4779-8285-99118AE79CD8}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fanex.Caching.RedisDemo", "demo\Fanex.Caching.RedisDemo\Fanex.Caching.RedisDemo.xproj", "{444CB69E-4CEF-45E9-9A33-E793E0AC1E93}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fanex.Caching.Redis.Tests", "tests\Fanex.Caching.Redis.Tests\Fanex.Caching.Redis.Tests.xproj", "{F8CB92E9-77E4-46CB-BD8E-B37EAFC049F4}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F45A688A-31AB-43CB-9738-502A32544034}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B04BA2A-55D8-49A5-B4E4-E34465E2121F}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Caching", "Sources\Fanex.Caching\Fanex.Caching.csproj", "{49FF80FF-6444-4A04-B8F1-25262C6D49AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Caching.Tests", "Tests\Fanex.Caching.Tests\Fanex.Caching.Tests.csproj", "{1D14C43A-EAD7-460B-A879-2BCC03EC3D0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Caching.Redis", "Sources\Fanex.Caching.Redis\Fanex.Caching.Redis.csproj", "{F81BA9C5-F16D-468E-9E28-A45DB4BCC279}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Caching.Redis.Tests", "Tests\Fanex.Caching.Redis.Tests\Fanex.Caching.Redis.Tests.csproj", "{646B610E-086C-4DA8-A6E3-826D0039FC04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,40 +32,30 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D38653C8-E1DD-4AD5-B051-E67B875E53FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D38653C8-E1DD-4AD5-B051-E67B875E53FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D38653C8-E1DD-4AD5-B051-E67B875E53FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D38653C8-E1DD-4AD5-B051-E67B875E53FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA5709F9-1E76-455A-8D4B-56B95B3C0ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA5709F9-1E76-455A-8D4B-56B95B3C0ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA5709F9-1E76-455A-8D4B-56B95B3C0ED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA5709F9-1E76-455A-8D4B-56B95B3C0ED8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{05FAC38C-7048-4E23-918B-929F766C3FB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{05FAC38C-7048-4E23-918B-929F766C3FB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{05FAC38C-7048-4E23-918B-929F766C3FB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{05FAC38C-7048-4E23-918B-929F766C3FB1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AEC61DFC-717B-4779-8285-99118AE79CD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AEC61DFC-717B-4779-8285-99118AE79CD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AEC61DFC-717B-4779-8285-99118AE79CD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AEC61DFC-717B-4779-8285-99118AE79CD8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{444CB69E-4CEF-45E9-9A33-E793E0AC1E93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{444CB69E-4CEF-45E9-9A33-E793E0AC1E93}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{444CB69E-4CEF-45E9-9A33-E793E0AC1E93}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{444CB69E-4CEF-45E9-9A33-E793E0AC1E93}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8CB92E9-77E4-46CB-BD8E-B37EAFC049F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8CB92E9-77E4-46CB-BD8E-B37EAFC049F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8CB92E9-77E4-46CB-BD8E-B37EAFC049F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8CB92E9-77E4-46CB-BD8E-B37EAFC049F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49FF80FF-6444-4A04-B8F1-25262C6D49AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49FF80FF-6444-4A04-B8F1-25262C6D49AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49FF80FF-6444-4A04-B8F1-25262C6D49AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49FF80FF-6444-4A04-B8F1-25262C6D49AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D14C43A-EAD7-460B-A879-2BCC03EC3D0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D14C43A-EAD7-460B-A879-2BCC03EC3D0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D14C43A-EAD7-460B-A879-2BCC03EC3D0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D14C43A-EAD7-460B-A879-2BCC03EC3D0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F81BA9C5-F16D-468E-9E28-A45DB4BCC279}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F81BA9C5-F16D-468E-9E28-A45DB4BCC279}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F81BA9C5-F16D-468E-9E28-A45DB4BCC279}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F81BA9C5-F16D-468E-9E28-A45DB4BCC279}.Release|Any CPU.Build.0 = Release|Any CPU
+		{646B610E-086C-4DA8-A6E3-826D0039FC04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{646B610E-086C-4DA8-A6E3-826D0039FC04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{646B610E-086C-4DA8-A6E3-826D0039FC04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{646B610E-086C-4DA8-A6E3-826D0039FC04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{D38653C8-E1DD-4AD5-B051-E67B875E53FE} = {BD7380AD-9DC9-4BE0-BAF8-FFC44FA94AE1}
-		{EA5709F9-1E76-455A-8D4B-56B95B3C0ED8} = {7279C289-5B24-42F1-9E18-E5216F0FB460}
-		{05FAC38C-7048-4E23-918B-929F766C3FB1} = {50FB73D9-9A0E-4AC4-968B-E4FC7FE71427}
-		{AEC61DFC-717B-4779-8285-99118AE79CD8} = {BD7380AD-9DC9-4BE0-BAF8-FFC44FA94AE1}
-		{444CB69E-4CEF-45E9-9A33-E793E0AC1E93} = {7279C289-5B24-42F1-9E18-E5216F0FB460}
-		{F8CB92E9-77E4-46CB-BD8E-B37EAFC049F4} = {50FB73D9-9A0E-4AC4-968B-E4FC7FE71427}
+		{49FF80FF-6444-4A04-B8F1-25262C6D49AD} = {D3135E60-F80B-416A-AD0A-B96DAF54F0CC}
+		{1D14C43A-EAD7-460B-A879-2BCC03EC3D0B} = {92606D66-F7F9-4C3C-9066-0A55754581F4}
+		{F81BA9C5-F16D-468E-9E28-A45DB4BCC279} = {D3135E60-F80B-416A-AD0A-B96DAF54F0CC}
+		{646B610E-086C-4DA8-A6E3-826D0039FC04} = {92606D66-F7F9-4C3C-9066-0A55754581F4}
 	EndGlobalSection
 EndGlobal

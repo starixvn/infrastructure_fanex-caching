@@ -10,9 +10,7 @@
         private readonly ManualResetEvent _callbackInvoked;
 
         public GcNotificationTests()
-        {
-            _callbackInvoked = new ManualResetEvent(false);
-        }
+            => _callbackInvoked = new ManualResetEvent(false);
 
         [Fact]
         public void CallbackRegisteredAndInvoked()
@@ -71,10 +69,14 @@
             Assert.False(_callbackInvoked.WaitOne(0));
         }
 
+#pragma warning disable S1215 // "GC.Collect" should not be called
+
         private static void GcCollectAndWait()
         {
             GC.Collect(2, GCCollectionMode.Forced, true);
             GC.WaitForPendingFinalizers();
         }
+
+#pragma warning restore S1215 // "GC.Collect" should not be called
     }
 }

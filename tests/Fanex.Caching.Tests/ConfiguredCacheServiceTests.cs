@@ -99,13 +99,12 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            object result;
 
             // Act.
-            ConfiguredCacheService.TryGet(testKey, out result);
+            ConfiguredCacheService.TryGet<object>(testKey, out _);
 
             // Assert.
-            _cacheService.Received().TryGet(Arg.Is(testKey), out result);
+            _cacheService.Received().TryGet<object>(Arg.Is(testKey), out _);
         }
 
         [Fact]

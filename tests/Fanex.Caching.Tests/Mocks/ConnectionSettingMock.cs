@@ -1,6 +1,8 @@
 ﻿namespace Fanex.Caching.Tests.Mocks
 {
-    public class ConnectionSettingMock
+    using System;
+
+    public class ConnectionSettingMock : IEquatable<ConnectionSettingMock>
     {
         public ConnectionSettingMock()
         {
@@ -30,12 +32,13 @@
                 return true;
             }
 
-            return Equals(Property1, otherObj.Property1) && Equals(Property2, otherObj.Property2);
+            return Equals(otherObj);
         }
 
+        public bool Equals(ConnectionSettingMock other)
+            => Equals(Property1, other?.Property1) && Equals(Property2, other?.Property2);
+
         public override int GetHashCode()
-        {
-            return Property1.GetHashCode() ^ Property2.GetHashCode();
-        }
+            => Property1.GetHashCode() ^ Property2.GetHashCode();
     }
 }

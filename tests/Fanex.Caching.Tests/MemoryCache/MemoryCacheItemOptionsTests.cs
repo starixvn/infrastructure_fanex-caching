@@ -47,6 +47,7 @@
         {
             // Arrange.
             DateTimeOffset checkingTime = _clock.UtcNow;
+
             _options.SetAbsoluteExpiration(TimeSpan.FromMinutes(1))
                 .SetAbsoluteExpiration(_clock.UtcNow + TimeSpan.FromSeconds(5));
 
@@ -64,6 +65,7 @@
             // Arrange.
             DateTimeOffset checkingTime = _clock.UtcNow;
             DateTimeOffset absoluteExpiration = _clock.UtcNow + TimeSpan.FromSeconds(5);
+
             _options.SetAbsoluteExpiration(absoluteExpiration);
 
             // Act.
@@ -75,15 +77,19 @@
         }
 
         [Fact]
-        public void CalculateAbsoluteExpiration_AbsoluteExpirationExpires_ThrowArgumentOutOfRangeException()
+        public void CalculateAbsoluteExpiration_AbsoluteExpirationExpires_ThrowInvalidOperationException()
         {
             // Arrange.
             DateTimeOffset checkingTime = _clock.UtcNow;
             DateTimeOffset absoluteExpiration = _clock.UtcNow + TimeSpan.FromSeconds(-5);
+
             _options.SetAbsoluteExpiration(absoluteExpiration);
 
-            // Act & Assert.
-            Assert.Throws<ArgumentOutOfRangeException>("AbsoluteExpiration", () => _options.CalculateAbsoluteExpiration(checkingTime));
+            // Act.
+            Exception exception = Record.Exception(() => _options.CalculateAbsoluteExpiration(checkingTime));
+
+            // Assert.
+            Assert.IsType<InvalidOperationException>(exception);
         }
     }
 }

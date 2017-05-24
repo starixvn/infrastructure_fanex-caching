@@ -28,8 +28,7 @@
             string key = "non-existent-key";
 
             // Act.
-            int? result;
-            bool found = _cache.TryGet(key, out result);
+            bool found = _cache.TryGet(key, out int? result);
 
             // Assert.
             Assert.False(found);
@@ -44,10 +43,8 @@
             int? value = 1;
 
             // Act.
-            int? result;
-
             _cache.Set(key, value, _options);
-            _cache.TryGet(key, out result);
+            _cache.TryGet(key, out int? result);
 
             // Assert.
             Assert.Equal(value, result.Value);
@@ -60,12 +57,11 @@
             string key = "testing-key";
             string caseSensitiveKey = "Testing-Key";
             int? value = 1;
-            int? result;
 
             _cache.Set(key, value, _options);
 
             // Act.
-            _cache.TryGet(key, out result);
+            _cache.TryGet(key, out int? result);
 
             // Assert.
             Assert.Equal(value, result);
@@ -84,12 +80,11 @@
             var key = "testing-key";
             int? oldValue = 1;
             int? newValue = 2;
-            int? result;
 
             _cache.Set(key, oldValue, _options);
 
             // Ensure pre-condition.
-            _cache.TryGet(key, out result);
+            _cache.TryGet(key, out int? result);
             Assert.Equal(oldValue, result);
 
             // Act.
@@ -106,13 +101,12 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result;
             bool found;
 
             _cache.Set(key, value, _options);
 
             // Ensure pre-condition.
-            found = _cache.TryGet(key, out result);
+            found = _cache.TryGet(key, out int? result);
             Assert.True(found);
             Assert.Equal(value, result);
 
@@ -131,14 +125,13 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result;
             bool found;
 
             _options.SetAbsoluteExpiration(new SystemClockMock().UtcNow + TimeSpan.FromSeconds(50));
             _cache.Set(key, value, _options);
 
             // Act.
-            found = _cache.TryGet(key, out result);
+            found = _cache.TryGet(key, out int? result);
             Assert.False(found);
             Assert.Null(result);
         }
@@ -149,14 +142,13 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result;
             bool found;
 
             _options.SetAbsoluteExpiration(DateTimeOffset.Now + TimeSpan.FromSeconds(5));
             _cache.Set(key, value, _options);
 
             // Ensure pre-condition.
-            found = _cache.TryGet(key, out result);
+            found = _cache.TryGet(key, out int? result);
             Assert.True(found);
             Assert.Equal(value, result);
 
@@ -175,14 +167,13 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result;
             bool found;
 
             _options.SetAbsoluteExpiration(TimeSpan.FromSeconds(5));
             _cache.Set(key, value, _options);
 
             // Ensure pre-condition.
-            found = _cache.TryGet(key, out result);
+            found = _cache.TryGet(key, out int? result);
             Assert.True(found);
             Assert.Equal(value, result);
 
@@ -201,14 +192,13 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            int? result;
             bool found;
 
             _options.SetSlidingExpiration(TimeSpan.FromSeconds(1));
             _cache.Set(key, value, _options);
 
             // Ensure pre-condition.
-            found = _cache.TryGet(key, out result);
+            found = _cache.TryGet(key, out int? result);
             Assert.True(found);
             Assert.Equal(value, result);
 

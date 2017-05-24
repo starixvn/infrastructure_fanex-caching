@@ -52,9 +52,7 @@
             _cacheService.Get<object>(testKey);
 
             // Assert.
-            object result;
-
-            _cacheStorage.Received().TryGet(Arg.Is(testKey), out result);
+            _cacheStorage.Received().TryGet<object>(Arg.Is(testKey), out _);
         }
 
         [Fact]
@@ -62,9 +60,8 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            object testValue;
 
-            _cacheStorage.TryGet(testKey, out testValue).Returns(parameters =>
+            _cacheStorage.TryGet<object>(testKey, out _).Returns(parameters =>
             {
                 parameters[1] = null;
 
@@ -84,9 +81,8 @@
             // Arrange.
             var testKey = "TestKey";
             var testValue = new object();
-            object result;
 
-            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet<object>(testKey, out _).Returns(parameters =>
             {
                 parameters[1] = testValue;
 
@@ -94,7 +90,7 @@
             });
 
             // Act.
-            result = _cacheService.Get<object>(testKey);
+            object result = _cacheService.Get<object>(testKey);
 
             // Assert.
             Assert.Same(testValue, result);
@@ -149,13 +145,12 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            object result;
 
             // Act.
-            _cacheService.TryGet(testKey, out result);
+            _cacheService.TryGet<object>(testKey, out _);
 
             // Assert.
-            _cacheStorage.Received().TryGet(Arg.Is(testKey), out result);
+            _cacheStorage.Received().TryGet<object>(Arg.Is(testKey), out _);
         }
 
         [Fact]
@@ -177,9 +172,8 @@
             // Arrange.
             string testKey = "TestKey";
             var testValue = new object();
-            object result;
 
-            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet<object>(testKey, out _).Returns(parameters =>
             {
                 parameters[1] = testValue;
 
@@ -187,7 +181,7 @@
             });
 
             // Act.
-            result = _cacheService.GetOrSet(testKey, () => new object(), Arg.Any<CacheItemOptions>());
+            object result = _cacheService.GetOrSet(testKey, () => new object(), Arg.Any<CacheItemOptions>());
 
             // Assert.
             Assert.Same(testValue, result);
@@ -198,9 +192,8 @@
         {
             // Arrange.
             string testKey = "TestKey";
-            object result;
 
-            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet<object>(testKey, out _).Returns(parameters =>
             {
                 parameters[1] = null;
 
@@ -208,7 +201,7 @@
             });
 
             // Act.
-            result = _cacheService.GetOrSet<object>(testKey, null, Arg.Any<CacheItemOptions>());
+            object result = _cacheService.GetOrSet<object>(testKey, null, Arg.Any<CacheItemOptions>());
 
             // Assert.
             Assert.Null(result);
@@ -221,9 +214,8 @@
             string testKey = "TestKey";
             var newValue = new object();
             var testOptions = Arg.Any<CacheItemOptions>();
-            object result;
 
-            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet<object>(testKey, out _).Returns(parameters =>
             {
                 parameters[1] = null;
 
@@ -231,7 +223,7 @@
             });
 
             // Act.
-            result = _cacheService.GetOrSet(testKey, () => newValue, testOptions);
+            object result = _cacheService.GetOrSet(testKey, () => newValue, testOptions);
 
             // Assert.
             _cacheStorage.Received().Set(Arg.Is(testKey), Arg.Is(newValue), Arg.Is(testOptions));
@@ -244,9 +236,8 @@
             // Arrange.
             string testKey = "TestKey";
             var newValue = new object();
-            object result;
 
-            _cacheStorage.TryGet(testKey, out result).Returns(parameters =>
+            _cacheStorage.TryGet<object>(testKey, out _).Returns(parameters =>
             {
                 parameters[1] = null;
 
@@ -254,7 +245,7 @@
             });
 
             // Act.
-            result = _cacheService.GetOrSet(testKey, () => newValue);
+            object result = _cacheService.GetOrSet(testKey, () => newValue);
 
             // Assert.
             _cacheStorage

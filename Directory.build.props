@@ -1,0 +1,28 @@
+<Project>
+    <PropertyGroup>
+        <Authors>jason.ly</Authors>
+        <Company>Nexcel Solutions</Company>
+        <Copyright>2017 Nexdev</Copyright>
+        <PackageProjectUrl>https://gitlab.nexcel.vn/infrastructure/fanex-caching</PackageProjectUrl>
+        <RepositoryUrl>https://gitlab.nexcel.vn/infrastructure/fanex-caching</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageReleaseNotes>https://gitlab.nexcel.vn/infrastructure/fanex-caching</PackageReleaseNotes>
+        <PackageIconUrl>https://gitlab.nexcel.vn/uploads/project/avatar/696/Azure_Cache_including_Redis.png</PackageIconUrl>
+        <DefaultLanguage>en-US</DefaultLanguage>
+        <IncludeSymbols>false</IncludeSymbols>
+    </PropertyGroup>
+
+    <!-- Workarounds for https://github.com/NuGet/Home/issues/4853 -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+        <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+        <Reference Include="System.Core" Pack="false" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="NuGet.Build.Tasks.Pack" Version="4.3.0-preview1-4045" PrivateAssets="All" />
+        <DotNetCliToolReference Include="dotnet-sourcelink" Version="2.0.2" />
+        <DotNetCliToolReference Include="dotnet-sourcelink-git" Version="2.0.2" />
+    </ItemGroup>
+</Project>

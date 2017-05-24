@@ -14,10 +14,8 @@
 
         public MemoryStorageImplTests()
         {
-            var options = new MemoryCacheOptions();
-
             _clock = new SystemClockMock();
-            _storage = new MemoryStorageImpl(options, _clock);
+            _storage = new MemoryStorageImpl(new MemoryCacheOptions(), _clock);
             _cachingOptions = new MemoryCacheItemOptions();
         }
 
@@ -26,10 +24,9 @@
         {
             // Arrange.
             var key = "cachingObject";
-            object result;
 
             // Act.
-            bool found = _storage.TryGet(key, out result);
+            bool found = _storage.TryGet(key, out _);
 
             // Assert.
             Assert.False(found);
@@ -40,10 +37,9 @@
         {
             // Arrange.
             var key = "cachingObject";
-            object result;
 
             // Act.
-            _storage.TryGet(key, out result);
+            _storage.TryGet(key, out object result);
 
             // Assert.
             Assert.Null(result);
@@ -59,8 +55,7 @@
             _storage.Set(key, value, _cachingOptions);
 
             // Act.
-            object result;
-            bool found = _storage.TryGet(key, out result);
+            bool found = _storage.TryGet(key, out object result);
 
             // Assert.
             Assert.True(found);
@@ -76,11 +71,9 @@
             var value = new object();
 
             // Act.
-            object result;
-            bool found;
-
             _storage.Set(key, value, _cachingOptions);
-            found = _storage.TryGet(caseSensitiveKey, out result);
+
+            bool found = _storage.TryGet(caseSensitiveKey, out object result);
 
             // Assert.
             Assert.False(found);
@@ -100,9 +93,7 @@
             _storage.Set(key, newValue, _cachingOptions);
 
             // Assert.
-            object result;
-
-            _storage.TryGet(key, out result);
+            _storage.TryGet(key, out object result);
             Assert.Same(newValue, result);
         }
 
@@ -145,12 +136,10 @@
             _storage.Set(key, newValue, newValueCachingOptions);
 
             // Assert.
-            object result;
-
             Assert.True(oldValueCallbackInvoked.WaitOne(TimeSpan.FromSeconds(30)), "Callback1");
             Assert.False(newValueCallbackInvoked.WaitOne(TimeSpan.FromSeconds(1)), "Callback2");
 
-            _storage.TryGet(key, out result);
+            _storage.TryGet(key, out object result);
 
             Assert.Same(newValue, result);
         }
@@ -197,8 +186,7 @@
             _storage.Remove(key);
 
             // Assert.
-            object result;
-            bool found = _storage.TryGet(key, out result);
+            bool found = _storage.TryGet(key, out object result);
 
             Assert.False(found);
             Assert.Null(result);
@@ -232,8 +220,7 @@
             // Assert.
             Assert.True(callbackInvoked.WaitOne(TimeSpan.FromSeconds(30)), "Callback");
 
-            object result;
-            bool found = _storage.TryGet(key, out result);
+            bool found = _storage.TryGet(key, out object result);
 
             Assert.False(found);
             Assert.Null(result);
@@ -269,8 +256,7 @@
             // Assert.
             Assert.True(callbackInvoked.WaitOne(TimeSpan.FromSeconds(30)), "Callback");
 
-            object result;
-            bool found = _storage.TryGet(key, out result);
+            bool found = _storage.TryGet(key, out object result);
 
             Assert.True(found);
             Assert.Same(newValue, result);

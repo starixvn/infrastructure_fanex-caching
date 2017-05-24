@@ -14,27 +14,24 @@
 
         public ConfigurationTests()
         {
-            // Arrange.
-            var fileMap = new ExeConfigurationFileMap
-            {
-                ExeConfigFilename = "Configuration/ConfigurationTests.config"
-            };
-            Configuration config = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+            Configuration config = ConfigurationManager.OpenMappedExeConfiguration(
+                new ExeConfigurationFileMap
+                {
+                    ExeConfigFilename = "Configuration/ConfigurationTests.config"
+                },
+                ConfigurationUserLevel.None);
 
             _cacheSettings = config.GetSection(SectionName) as CacheSettings;
         }
 
         public static IEnumerable<object[]> ExpectedData
         {
-            get
+            get => new[]
             {
-                return new[]
-                {
-                    new object[] { "Host", "10.70.70.249" },
-                    new object[] { "Port", "8000" },
-                    new object[] { "Serializer", "Fanex.Caching.Redis.MessagePackSerializer, Fanex.Caching.Redis" }
-                };
-            }
+                new object[] { "Host", "10.70.70.249" },
+                new object[] { "Port", "8000" },
+                new object[] { "Serializer", "Fanex.Caching.Redis.MessagePackSerializer, Fanex.Caching.Redis" }
+            };
         }
 
         [Fact]
