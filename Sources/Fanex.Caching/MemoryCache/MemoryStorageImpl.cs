@@ -28,7 +28,7 @@
 
             if (options.CompactOnMemoryPressure)
             {
-                GcNotification.Register(DoMemoryPreassureCollection, null);
+                GcNotification.Register(DoMemoryPreassureCollection, this);
             }
         }
 
@@ -200,9 +200,15 @@
                 return false;
             }
 
-            Compact(CompactPercentage);
+            if (state is MemoryStorageImpl storage)
+            {
 
-            return true;
+                storage.Compact(CompactPercentage);
+
+                return true;
+            }
+
+            return false;
         }
 
         internal void Compact(double percentage)

@@ -8,7 +8,7 @@
 
     internal static class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             var builder = new ConfigurationBuilder().SetBasePath(Path.GetFullPath("./")).AddJsonFile("appsettings.json", true, true);
             var configuration = builder.Build();

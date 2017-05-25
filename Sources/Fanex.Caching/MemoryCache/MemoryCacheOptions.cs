@@ -8,7 +8,9 @@
 
     public class MemoryCacheOptions : IOptions<MemoryCacheOptions>
     {
-        MemoryCacheOptions IOptions<MemoryCacheOptions>.Value => this;
+        MemoryCacheOptions IOptions<MemoryCacheOptions>.Value => Value;
+
+        public MemoryCacheOptions Value => this;
 
 #else
 

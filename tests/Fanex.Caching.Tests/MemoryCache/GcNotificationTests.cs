@@ -5,9 +5,9 @@
     using Memory;
     using Xunit;
 
-    public class GcNotificationTests
+    public sealed class GcNotificationTests : IDisposable
     {
-        private readonly ManualResetEvent _callbackInvoked;
+        private ManualResetEvent _callbackInvoked;
 
         public GcNotificationTests()
             => _callbackInvoked = new ManualResetEvent(false);
@@ -78,5 +78,11 @@
         }
 
 #pragma warning restore S1215 // "GC.Collect" should not be called
+
+        public void Dispose()
+        {
+            _callbackInvoked.Dispose();
+            _callbackInvoked = null;
+        }
     }
 }

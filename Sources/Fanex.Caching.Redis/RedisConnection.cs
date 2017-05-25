@@ -5,7 +5,7 @@
     using System.Threading.Tasks;
     using StackExchange.Redis;
 
-    internal class RedisConnection
+    internal sealed class RedisConnection : IDisposable
     {
         private readonly SemaphoreSlim _connectionLock = new SemaphoreSlim(1, 1);
         private readonly ConfigurationOptions _redisConnectionOptions;
@@ -30,9 +30,9 @@
 
         public async Task<bool> ContainAsync(string key)
         {
-            await ConnectAsync();
+            await ConnectAsync().ConfigureAwait(false);
 
-            return await _storage.KeyExistsAsync(ModifyKey(key));
+            return await _storage.KeyExistsAsync(ModifyKey(key)).ConfigureAwait(false);
         }
 
         public bool TryGet<T>(string key, out T value)
@@ -57,11 +57,11 @@
 
         public async Task<Tuple<bool, T>> TryGetAsync<T>(string key)
         {
-            await ConnectAsync();
+            await ConnectAsync().ConfigureAwait(false);
 
             var item = new RedisCacheItem(ModifyKey(key), null, null, _serializer);
             RedisCommand command = item.ToGetCommand();
-            RedisResult dataFromRedis = await _storage.ScriptEvaluateAsync(command.Script, command.Keys);
+            RedisResult dataFromRedis = await _storage.ScriptEvaluateAsync(command.Script, command.Keys).ConfigureAwait(false);
             bool found = false;
             T value = default(T);
 
@@ -82,8 +82,8 @@
 
         public async Task RemoveAsync(string key)
         {
-            await ConnectAsync();
-            await _storage.KeyDeleteAsync(ModifyKey(key));
+            await ConnectAsync().ConfigureAwait(false);
+            await _storage.KeyDeleteAsync(ModifyKey(key)).ConfigureAwait(false);
         }
 
         public void Set<T>(string key, T value, CacheItemOptions options)
@@ -100,8 +100,8 @@
             var item = new RedisCacheItem(ModifyKey(key), value, options, _serializer);
             RedisCommand command = item.ToSetCommand();
 
-            await ConnectAsync();
-            await _storage.ScriptEvaluateAsync(command.Script, command.Keys, command.Values);
+            await ConnectAsync().ConfigureAwait(false);
+            await _storage.ScriptEvaluateAsync(command.Script, command.Keys, command.Values).ConfigureAwait(false);
         }
 
         private void Connect()
@@ -134,13 +134,13 @@
                 return;
             }
 
-            await _connectionLock.WaitAsync();
+            await _connectionLock.WaitAsync().ConfigureAwait(false);
 
             try
             {
                 if (_connection == null)
                 {
-                    _connection = await ConnectionMultiplexer.ConnectAsync(_redisConnectionOptions);
+                    _connection = await ConnectionMultiplexer.ConnectAsync(_redisConnectionOptions).ConfigureAwait(false);
                     _storage = _connection.GetDatabase();
                 }
             }
@@ -152,5 +152,12 @@
 
         private string ModifyKey(string key)
             => string.IsNullOrEmpty(_applicationName) ? key : $"{_applicationName}:{key}";
+
+        public void Dispose()
+        {
+            _connectionLock.Dispose();
+            _connection.Dispose();
+            _connection = null;
+        }
     }
 }

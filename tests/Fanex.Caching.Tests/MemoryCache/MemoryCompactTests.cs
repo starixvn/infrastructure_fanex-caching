@@ -5,11 +5,12 @@
     using Mocks;
     using Xunit;
 
-    public class MemoryCompactTests
+    public sealed class MemoryCompactTests : IDisposable
     {
-        private readonly MemoryStorageImpl _storage;
         private readonly MemoryCacheItemOptions _cachingOptions;
         private readonly SystemClockMock _clock;
+
+        private MemoryStorageImpl _storage;
 
         public MemoryCompactTests()
         {
@@ -94,6 +95,12 @@
             Assert.Equal(1, _storage.Count);
             Assert.True(found);
             Assert.Equal("value4", result);
+        }
+
+        public void Dispose()
+        {
+            _storage.Dispose();
+            _storage = null;
         }
     }
 }

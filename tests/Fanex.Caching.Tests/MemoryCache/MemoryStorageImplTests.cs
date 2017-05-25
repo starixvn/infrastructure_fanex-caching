@@ -6,7 +6,7 @@
     using Mocks;
     using Xunit;
 
-    public partial class MemoryStorageImplTests
+    public sealed partial class MemoryStorageImplTests : IDisposable
     {
         private SystemClockMock _clock;
         private MemoryStorageImpl _storage;
@@ -260,6 +260,12 @@
 
             Assert.True(found);
             Assert.Same(newValue, result);
+        }
+
+        public void Dispose()
+        {
+            _storage.Dispose();
+            _storage = null;
         }
     }
 }

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Threading.Tasks;
-    using static System.Threading.Tasks.Task;
 
 #if NET461
 
@@ -16,9 +15,11 @@
 
 #endif
 
-    public class RedisCache : Cache
+    using static System.Threading.Tasks.Task;
+
+    public sealed class RedisCache : Cache, IDisposable
     {
-        private readonly RedisConnection _redisConnection;
+        private RedisConnection _redisConnection;
 
         public RedisCache()
             : this(new RedisCacheOptions())
@@ -158,6 +159,12 @@
             }
 
             return _redisConnection.SetAsync(key, value, options);
+        }
+
+        public void Dispose()
+        {
+            _redisConnection.Dispose();
+            _redisConnection = null;
         }
     }
 }

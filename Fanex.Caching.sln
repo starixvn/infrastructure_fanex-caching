@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{D3135E60-F80B-416A-AD0A-B96DAF54F0CC}"
-	ProjectSection(SolutionItems) = preProject
-		Directory.build.props = Directory.build.props
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{92606D66-F7F9-4C3C-9066-0A55754581F4}"
 EndProject
@@ -14,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{A948
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B04BA2A-55D8-49A5-B4E4-E34465E2121F}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.build.props = Directory.build.props
 		README.md = README.md
 		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection

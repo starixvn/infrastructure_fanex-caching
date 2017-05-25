@@ -2,7 +2,6 @@
 {
     using System;
     using System.Threading.Tasks;
-    using static System.Threading.Tasks.Task;
 
 #if NET461
 
@@ -15,6 +14,8 @@
     using Microsoft.Extensions.Options;
 
 #endif
+
+    using static System.Threading.Tasks.Task;
 
     public class MemoryCache : Cache
     {

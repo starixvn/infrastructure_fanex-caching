@@ -5,6 +5,7 @@ namespace Fanex.Caching.Configuration
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Reflection;
 
     public static class ObjectMapper
@@ -36,7 +37,7 @@ namespace Fanex.Caching.Configuration
                         }
                         else
                         {
-                            property.SetValue(result, Convert.ChangeType(itemValue, propertyType), null);
+                            property.SetValue(result, Convert.ChangeType(itemValue, propertyType, CultureInfo.InvariantCulture), null);
                         }
                     }
                     catch

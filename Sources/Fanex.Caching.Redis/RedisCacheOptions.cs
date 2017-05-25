@@ -21,7 +21,9 @@
 
 #if COREFX
 
-        RedisCacheOptions IOptions<RedisCacheOptions>.Value => this;
+        RedisCacheOptions IOptions<RedisCacheOptions>.Value => Value;
+
+        public RedisCacheOptions Value => this;
 
 #endif
 
