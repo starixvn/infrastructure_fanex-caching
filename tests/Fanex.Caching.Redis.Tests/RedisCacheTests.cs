@@ -5,7 +5,7 @@
     using Caching.Tests.Mocks;
     using Xunit;
 
-    public class RedisCacheTests
+    public sealed class RedisCacheTests : IDisposable
     {
         private readonly RedisCache _cache;
         private readonly CacheItemOptions _options;
@@ -220,5 +220,8 @@
             Assert.False(found);
             Assert.Null(result);
         }
+
+        public void Dispose()
+            => _cache.Dispose();
     }
 }

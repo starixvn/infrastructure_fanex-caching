@@ -14,12 +14,12 @@ namespace Fanex.Caching.Configuration
 
         [ConfigurationProperty(ConnectionSettingsElementName, IsDefaultCollection = false)]
         [ConfigurationCollection(
-            typeof(ConnectionSettingCollection),
+            typeof(ConnectionSettingCollection<ConnectionSetting>),
             AddItemName = "add",
             ClearItemsName = "clear",
             RemoveItemName = "remove")]
-        public ConnectionSettingCollection ConnectionSettingCollection
-            => base[ConnectionSettingsElementName] as ConnectionSettingCollection;
+        public ConnectionSettingCollection<ConnectionSetting> ConnectionSettingCollection
+            => base[ConnectionSettingsElementName] as ConnectionSettingCollection<ConnectionSetting>;
     }
 }
 

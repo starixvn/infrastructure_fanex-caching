@@ -202,7 +202,6 @@
 
             if (state is MemoryStorageImpl storage)
             {
-
                 storage.Compact(CompactPercentage);
 
                 return true;
