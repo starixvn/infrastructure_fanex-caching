@@ -125,13 +125,14 @@
             // Arrange.
             var key = "testing-key";
             int? value = 1;
-            bool found;
 
             _options.SetAbsoluteExpiration(new SystemClockMock().UtcNow + TimeSpan.FromSeconds(50));
             _cache.Set(key, value, _options);
 
             // Act.
-            found = _cache.TryGet(key, out int? result);
+            bool found = _cache.TryGet(key, out int? result);
+
+            // Assert.
             Assert.False(found);
             Assert.Null(result);
         }

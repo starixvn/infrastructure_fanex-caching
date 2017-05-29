@@ -24,15 +24,12 @@
             _cacheSettings = config.GetSection(SectionName) as CacheSettings;
         }
 
-        public static IEnumerable<object[]> ExpectedData
+        public static IEnumerable<object[]> ExpectedData => new[]
         {
-            get => new[]
-            {
-                new object[] { "Host", "10.70.70.249" },
-                new object[] { "Port", "8000" },
-                new object[] { "Serializer", "Fanex.Caching.Redis.MessagePackSerializer, Fanex.Caching.Redis" }
-            };
-        }
+            new object[] { "Host", "10.70.70.249" },
+            new object[] { "Port", "8000" },
+            new object[] { "Serializer", "Fanex.Caching.Redis.MessagePackSerializer, Fanex.Caching.Redis" }
+        };
 
         [Fact]
         public void AlwaysContainsExpectedCacheTypeName()

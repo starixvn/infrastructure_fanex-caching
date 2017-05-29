@@ -9,10 +9,10 @@
             Options = options;
         }
 
-        public object Key { get; private set; }
+        public object Key { get; }
 
-        public object Value { get; private set; }
+        public object Value { get; }
 
-        public CacheItemOptions Options { get; private set; }
+        public CacheItemOptions Options { get; }
     }
 }

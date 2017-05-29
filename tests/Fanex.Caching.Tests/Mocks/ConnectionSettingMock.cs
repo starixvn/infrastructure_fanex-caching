@@ -14,9 +14,9 @@
             Property2 = property2;
         }
 
-        public string Property1 { get; set; }
+        public string Property1 { get; }
 
-        public string Property2 { get; set; }
+        public string Property2 { get; }
 
         public override bool Equals(object obj)
         {

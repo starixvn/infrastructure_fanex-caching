@@ -6,24 +6,17 @@
         <Description>New storage of Fanex.Caching which is REDIS.</Description>
         <PackageTags>fanex.caching; redis</PackageTags>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
-        <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
-    </PropertyGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-        <None Update="content\**\*">
-            <Pack>true</Pack>
-        </None>
-    </ItemGroup>
     <ItemGroup>
         <PackageReference Include="MsgPack.Cli" Version="0.8.1" />
         <PackageReference Include="StackExchange.Redis" Version="1.2.3" />
     </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="1.1.2" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.2" />
-    </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Fanex.Caching\Fanex.Caching.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="Content\app.config.install.xdt" />
+        <Content Include="Content\app.config.uninstall.xdt" />
+        <Content Include="Content\web.config.install.xdt" />
+        <Content Include="Content\web.config.uninstall.xdt" />
     </ItemGroup>
 </Project>
