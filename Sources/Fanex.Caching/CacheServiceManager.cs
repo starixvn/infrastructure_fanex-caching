@@ -1,60 +1,48 @@
 ﻿namespace Fanex.Caching
 {
     using System;
-    using Memory;
-
-#if NET461
-
-    using System.Collections;
-    using System.Configuration;
-    using Configuration;
-
-#endif
+    using Fanex.Caching.Memory;
 
     public static class CacheServiceManager
     {
-        private static Cache _cacheStorage;
+        private static ICache _cacheStorage;
+        private static Func<ICache> _cacheStorageFactory;
 
-        public static Cache CacheStorage
+        internal static ICache CacheStorage
         {
             get
             {
                 if (_cacheStorage == null)
                 {
-                    _cacheStorage = NewDefaultCacheStorage();
+                    _cacheStorage = _cacheStorageFactory != null ? _cacheStorageFactory() : new MemoryCache();
                 }
 
                 return _cacheStorage;
             }
         }
 
-        public static Cache NewDefaultCacheStorage()
+        public static void Use(ICache cacheStorage)
         {
-            Cache cacheStorage = new MemoryCache();
-
-#if NET461
-            const string SectionName = "Fanex.Caching";
-
-            if (ConfigurationManager.GetSection(SectionName) is CacheSettings settings)
+            if (cacheStorage == null)
             {
-                Type cacheType = string.IsNullOrEmpty(settings.CacheType) ? typeof(MemoryCache) : Type.GetType(settings.CacheType);
-                Hashtable connectionSettings = settings?.ConnectionSettingCollection?.ToHashtable();
-
-                if (connectionSettings != null)
-                {
-                    cacheStorage = Activator.CreateInstance(cacheType, connectionSettings) as Cache;
-                }
-                else
-                {
-                    cacheStorage = Activator.CreateInstance(cacheType) as Cache;
-                }
+                throw new ArgumentNullException(nameof(cacheStorage));
             }
-#endif
 
-            return cacheStorage;
+            if (_cacheStorage != null)
+            {
+                _cacheStorage.Dispose();
+            }
+
+            _cacheStorage = cacheStorage;
         }
 
-        public static void Use(Cache cacheStorage)
-            => _cacheStorage = cacheStorage ?? throw new ArgumentNullException(nameof(cacheStorage));
+        public static void Use(Func<ICache> cacheStorageFactory)
+            => _cacheStorageFactory = cacheStorageFactory ?? throw new ArgumentNullException(nameof(cacheStorageFactory));
+
+        internal static void Reset()
+        {
+            _cacheStorage = null;
+            _cacheStorageFactory = null;
+        }
     }
 }

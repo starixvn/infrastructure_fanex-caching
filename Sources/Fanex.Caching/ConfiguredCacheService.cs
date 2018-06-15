@@ -3,43 +3,30 @@
     using System;
     using System.Threading.Tasks;
 
+#pragma warning disable S1200 // Classes should not be coupled to too many other classes (Single Responsibility Principle)
+
     public static class ConfiguredCacheService
     {
-        private static CacheService _currentInstance;
+        private static ICacheService _currentInstance;
 
-        public static Cache CacheStorage
+        public static ICache CacheStorage
             => CurrentInstance.CacheStorage;
 
-        private static CacheService CurrentInstance
+        private static ICacheService CurrentInstance
         {
             get
             {
                 if (_currentInstance == null)
                 {
-                    _currentInstance = new CacheServiceImpl();
+                    _currentInstance = new CacheService(CacheServiceManager.CacheStorage);
                 }
 
                 return _currentInstance;
             }
         }
 
-        [Obsolete("This method will be removed soon. Use 'new CacheService(Cache cacheStorage)' instead.")]
-        public static Cache SwitchCacheStorage(Cache newCacheStorage)
-        {
-            if (newCacheStorage == null)
-            {
-                throw new ArgumentNullException(nameof(newCacheStorage));
-            }
-
-            Cache oldCacheStorage = CurrentInstance.CacheStorage;
-
-            _currentInstance = new CacheServiceImpl(newCacheStorage);
-
-            return oldCacheStorage;
-        }
-
-        internal static void Initialize(CacheService newInstance)
-            => _currentInstance = newInstance ?? throw new ArgumentNullException(nameof(newInstance));
+        internal static void Initialize(ICacheService newInstance)
+            => _currentInstance = newInstance;
 
         public static bool Contain(string key)
             => CurrentInstance.Contain(key);

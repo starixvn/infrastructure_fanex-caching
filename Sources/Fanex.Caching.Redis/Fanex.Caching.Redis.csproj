@@ -1,22 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net461;netstandard1.6</TargetFrameworks>
-        <Version>1.1.0</Version>
-        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <Description>New storage of Fanex.Caching which is REDIS.</Description>
         <PackageTags>fanex.caching; redis</PackageTags>
+        <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="MsgPack.Cli" Version="0.8.1" />
-        <PackageReference Include="StackExchange.Redis" Version="1.2.3" />
+        <PackageReference Include="MessagePack" Version="1.7.3.4" />
+        <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Fanex.Caching\Fanex.Caching.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <Content Include="Content\app.config.install.xdt" />
-        <Content Include="Content\app.config.uninstall.xdt" />
-        <Content Include="Content\web.config.install.xdt" />
-        <Content Include="Content\web.config.uninstall.xdt" />
     </ItemGroup>
 </Project>

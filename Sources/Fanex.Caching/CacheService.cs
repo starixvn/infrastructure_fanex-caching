@@ -3,40 +3,119 @@
     using System;
     using System.Threading.Tasks;
 
-    public interface CacheService
+#pragma warning disable S1200 // Classes should not be coupled to too many other classes (Single Responsibility Principle)
+
+    public class CacheService : ICacheService
     {
-        Cache CacheStorage { get; }
+        public CacheService(ICache cacheStorage = null)
+            => CacheStorage = cacheStorage ?? CacheServiceManager.CacheStorage;
 
-        bool Contain(string key);
+        public ICache CacheStorage { get; }
 
-        Task<bool> ContainAsync(string key);
+        public bool Contain(string key)
+            => CacheStorage.Contain(key);
 
-        T Get<T>(string key);
+        public Task<bool> ContainAsync(string key)
+            => CacheStorage.ContainAsync(key);
 
-        Task<T> GetAsync<T>(string key);
+        public T Get<T>(string key)
+        {
+            CacheStorage.TryGet(key, out T value);
 
-        bool TryGet<T>(string key, out T value);
+            return value;
+        }
 
-        Task<Tuple<bool, T>> TryGetAsync<T>(string key);
+        public async Task<T> GetAsync<T>(string key)
+        {
+            Tuple<bool, T> result = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
-        T GetOrSet<T>(string key, Func<T> factory);
+            return result != null ? result.Item2 : default(T);
+        }
 
-        T GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options);
+        public bool TryGet<T>(string key, out T value)
+            => CacheStorage.TryGet(key, out value);
 
-        Task<T> GetOrSetAsync<T>(string key, Func<T> factory);
+        public Task<Tuple<bool, T>> TryGetAsync<T>(string key)
+            => CacheStorage.TryGetAsync<T>(key);
 
-        Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options);
+        public T GetOrSet<T>(string key, Func<T> factory)
+        {
+            bool found = CacheStorage.TryGet(key, out T value);
 
-        void Remove(string key);
+            if (!found && factory != null)
+            {
+                value = factory();
+                CacheStorage.Set(key, value, new CacheItemOptions());
+            }
 
-        Task RemoveAsync(string key);
+            return value;
+        }
 
-        void Set<T>(string key, T value);
+        public T GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)
+        {
+            bool found = CacheStorage.TryGet(key, out T value);
 
-        void Set<T>(string key, T value, CacheItemOptions options);
+            if (!found && factory != null)
+            {
+                value = factory();
+                CacheStorage.Set(key, value, options);
+            }
 
-        Task SetAsync<T>(string key, T value);
+            return value;
+        }
 
-        Task SetAsync<T>(string key, T value, CacheItemOptions options);
+        public async Task<T> GetOrSetAsync<T>(string key, Func<T> factory)
+        {
+            T value;
+            Tuple<bool, T> found = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
+
+            if (!found.Item1 && factory != null)
+            {
+                value = factory();
+                await CacheStorage.SetAsync(key, value, new CacheItemOptions()).ConfigureAwait(false);
+            }
+            else
+            {
+                value = found.Item2;
+            }
+
+            return value;
+        }
+
+        public async Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)
+        {
+            T value;
+            Tuple<bool, T> found = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
+
+            if (!found.Item1 && factory != null)
+            {
+                value = factory();
+                await CacheStorage.SetAsync(key, value, options).ConfigureAwait(false);
+            }
+            else
+            {
+                value = found.Item2;
+            }
+
+            return value;
+        }
+
+        public void Remove(string key)
+            => CacheStorage.Remove(key);
+
+        public Task RemoveAsync(string key)
+            => CacheStorage.RemoveAsync(key);
+
+        public void Set<T>(string key, T value)
+            => CacheStorage.Set(key, value, new CacheItemOptions());
+
+        public void Set<T>(string key, T value, CacheItemOptions options)
+            => CacheStorage.Set(key, value, options);
+
+        public Task SetAsync<T>(string key, T value)
+            => CacheStorage.SetAsync(key, value, new CacheItemOptions());
+
+        public Task SetAsync<T>(string key, T value, CacheItemOptions options)
+            => CacheStorage.SetAsync(key, value, options);
     }
 }

@@ -4,14 +4,14 @@
 
     internal class RedisCacheItem : CacheItem
     {
-        private readonly Serializer _serializer;
+        private readonly RedisValue _redisValue;
 
-        public RedisCacheItem(object key, object value, CacheItemOptions options, Serializer serializer)
-            : base(key, value, options)
-            => _serializer = serializer;
+        public RedisCacheItem(object key, RedisValue redisValue, CacheItemOptions options)
+            : base(key, redisValue, options)
+            => _redisValue = redisValue;
 
         public RedisCommand ToGetCommand()
-            => new RedisCommand()
+            => new RedisCommand
             {
                 Script = RedisScripts.GetValue,
                 Keys = new RedisKey[] { Key as string }
@@ -24,52 +24,61 @@
                 return ToSetCommandWithAbsoluteExpiration();
             }
 
+            if (Options.RelativeExpiration.HasValue)
+            {
+                return ToSetCommandWithRelativeExpiration();
+            }
+
             if (Options.SlidingExpiration.HasValue)
             {
                 return ToSetCommandWithSlidingExpiration();
             }
 
-            return ToSetCommandWithRelativeExpiration();
+            return ToSetCommandWithoutExpiration();
         }
 
         private RedisCommand ToSetCommandWithAbsoluteExpiration()
-            => new RedisCommand()
+            => new RedisCommand
             {
                 Script = RedisScripts.SetValueWithAbsoluteExpiration,
                 Keys = new RedisKey[] { Key as string },
-                Values = new RedisValue[]
+                Values = new[]
                 {
-                    RedisValueHelper.ConvertToRedisValue(Value, _serializer),
+                    _redisValue,
                     Options.AbsoluteExpiration?.ToUnixTimeSeconds()
                 }
             };
 
         private RedisCommand ToSetCommandWithRelativeExpiration()
-        {
-            Options.RelativeExpiration = Options.RelativeExpiration ?? CacheItemOptions.DefaultRelativeExpiration;
-
-            return new RedisCommand()
+            => new RedisCommand
             {
                 Script = RedisScripts.SetValueWithRelativeExpiration,
                 Keys = new RedisKey[] { Key as string },
-                Values = new RedisValue[]
+                Values = new[]
                 {
-                    RedisValueHelper.ConvertToRedisValue(Value, _serializer),
+                    _redisValue,
                     Options.RelativeExpiration?.TotalSeconds
                 }
             };
-        }
 
         private RedisCommand ToSetCommandWithSlidingExpiration()
-            => new RedisCommand()
+            => new RedisCommand
             {
                 Script = RedisScripts.SetValueWithSlidingExpiration,
                 Keys = new RedisKey[] { Key as string },
-                Values = new RedisValue[]
+                Values = new[]
                 {
-                    RedisValueHelper.ConvertToRedisValue(Value, _serializer),
+                    _redisValue,
                     Options.SlidingExpiration?.TotalSeconds
                 }
+            };
+
+        private RedisCommand ToSetCommandWithoutExpiration()
+            => new RedisCommand
+            {
+                Script = RedisScripts.SetValueWithoutExpiration,
+                Keys = new RedisKey[] { Key as string },
+                Values = new[] { _redisValue }
             };
     }
 }

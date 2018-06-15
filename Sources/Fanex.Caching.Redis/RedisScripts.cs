@@ -30,5 +30,10 @@
               redis.call('EXPIRE', KEYS[1], ARGV[2])
 
               return 1";
+
+        public const string SetValueWithoutExpiration =
+            @"redis.call('HMSET', KEYS[1], 'data', ARGV[1])
+
+              return 1";
     }
 }

@@ -1,27 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net461</TargetFramework>
+        <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-      <Content Include="Configuration\ConfigurationTests.config">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+        <PackageReference Include="AutoFixture" Version="4.4.0" />
+        <PackageReference Include="NSubstitute" Version="3.1.0" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="AutoFixture.AutoNSubstitute" Version="3.50.2" />
-        <PackageReference Include="AutoFixture.Xunit2" Version="3.50.2" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-        <PackageReference Include="NSubstitute" Version="2.0.3" />
-        <PackageReference Include="xunit" Version="2.2.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\..\Sources\Fanex.Caching\Fanex.Caching.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Reference Include="System.Configuration" />
-    </ItemGroup>
-    <ItemGroup>
-      <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+        <ProjectReference Include="..\..\Sources\Fanex.Caching\Fanex.Caching.csproj" />
     </ItemGroup>
 </Project>

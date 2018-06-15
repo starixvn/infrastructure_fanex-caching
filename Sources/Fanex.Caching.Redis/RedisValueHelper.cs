@@ -3,9 +3,11 @@
     using System;
     using StackExchange.Redis;
 
+#pragma warning disable S1541 // Methods and properties should not be too complex
+
     internal static class RedisValueHelper
     {
-        public static RedisValue ConvertToRedisValue(object value, Serializer serializer)
+        public static RedisValue ConvertToRedisValue(object value, ISerializer serializer)
         {
             if (value == null)
             {
@@ -60,8 +62,10 @@
             }
         }
 
-        public static object ConvertToObject(RedisValue value, Type valueType, Serializer serializer)
+        public static object ConvertToObject<T>(RedisResult value, ISerializer serializer)
         {
+            Type valueType = typeof(T);
+
             if (typeof(byte[]) == valueType)
             {
                 return (byte[])value;
@@ -104,7 +108,7 @@
             }
             else
             {
-                return serializer.Deserialize(value, valueType);
+                return serializer.Deserialize<T>((byte[])value);
             }
         }
     }
