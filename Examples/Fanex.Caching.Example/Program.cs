@@ -3,7 +3,6 @@
     using System;
     using System.IO;
     using System.Threading;
-    using Fanex.Caching.AspNetCore;
     using Fanex.Caching.Memory;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -18,8 +17,7 @@
                 .SetBasePath(Path.GetFullPath("./"))
                 .AddJsonFile("appsettings.json", true, true);
             var configuration = builder.Build();
-            var services = new ServiceCollection()
-                .AddMemoryCache(configuration.GetSection("fanex.caching"));
+            var services = new ServiceCollection().AddMemoryCache(configuration.GetSection("fanex.caching"));
             var provider = services.BuildServiceProvider();
             var cacheService = provider.GetService<ICacheService>();
             var options = provider.GetService<MemoryCacheOptions>();

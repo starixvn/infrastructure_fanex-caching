@@ -13,9 +13,7 @@
         private readonly IServiceCollection _services;
 
         public MemoryCacheServiceCollectionExtensionsTests()
-        {
-            _services = new ServiceCollection();
-        }
+            => _services = new ServiceCollection();
 
         [Fact]
         public void CallAddMemoryCacheOnNullServiceCollectionThrowsArgumentNullException()
@@ -65,10 +63,7 @@
         public void CallAddMemoryCacheWithConfigurationSectionOnNullServiceCollectionThrowsArgumentNullException()
         {
             // Arrange.
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Path.GetFullPath("./"))
-                .AddJsonFile("appsettings.json", true, true);
-            var configuration = builder.Build().GetSection("fanex.caching");
+            var configuration = ReadConfiguration();
 
             // Act.
             Exception exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, configuration));
@@ -94,10 +89,7 @@
         public void AddMemoryCacheWithConfigurationSectionAllowsChaining()
         {
             // Arrange.
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Path.GetFullPath("./"))
-                .AddJsonFile("appsettings.json", true, true);
-            var configuration = builder.Build().GetSection("fanex.caching");
+            var configuration = ReadConfiguration();
 
             // Act.
             var returnedServices = _services.AddMemoryCache(configuration);
@@ -110,10 +102,7 @@
         public void AddMemoryCacheReadsInformationFromConfigurationSection()
         {
             // Arrange.
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Path.GetFullPath("./"))
-                .AddJsonFile("appsettings.json", true, true);
-            var configuration = builder.Build().GetSection("fanex.caching");
+            var configuration = ReadConfiguration();
 
             // Act.
             _services.AddMemoryCache(configuration);
@@ -125,6 +114,15 @@
             Assert.NotNull(options);
             Assert.True(options.CompactOnMemoryPressure);
             Assert.Equal(TimeSpan.FromSeconds(30), options.ExpirationScanFrequency);
+        }
+
+        private static IConfigurationSection ReadConfiguration()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Path.GetFullPath("./"))
+                .AddJsonFile("appsettings.json", true, true);
+
+            return builder.Build().GetSection("fanex.caching");
         }
 
         [Fact]

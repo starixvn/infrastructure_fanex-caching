@@ -1,7 +1,6 @@
-﻿namespace Fanex.Caching.AspNetCore
+﻿namespace Fanex.Caching.Memory
 {
     using System;
-    using Fanex.Caching.Memory;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
