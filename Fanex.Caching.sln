@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{38
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Caching.Example", "Examples\Fanex.Caching.Example\Fanex.Caching.Example.csproj", "{DA1EF1E7-25A5-4F2C-BDB9-4E15D65DFA42}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Caching.Redis", "Sources\Fanex.Caching.Redis\Fanex.Caching.Redis.csproj", "{DE5D0575-CC5D-49ED-8E7E-35517D20DDAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{DA1EF1E7-25A5-4F2C-BDB9-4E15D65DFA42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA1EF1E7-25A5-4F2C-BDB9-4E15D65DFA42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA1EF1E7-25A5-4F2C-BDB9-4E15D65DFA42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE5D0575-CC5D-49ED-8E7E-35517D20DDAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE5D0575-CC5D-49ED-8E7E-35517D20DDAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE5D0575-CC5D-49ED-8E7E-35517D20DDAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE5D0575-CC5D-49ED-8E7E-35517D20DDAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +70,7 @@ Global
 		{4BB18032-A0CD-4F02-8ACC-3A9A4AE5A825} = {131C5329-7276-4695-A3E8-63E8A2DE0B8E}
 		{FA1898B5-D083-4B3E-A8C9-42D559A966BF} = {1AAF9DC9-26B0-4101-9133-D969F1B91404}
 		{DA1EF1E7-25A5-4F2C-BDB9-4E15D65DFA42} = {38AC85EE-0438-426D-A067-54198B0326B8}
+		{DE5D0575-CC5D-49ED-8E7E-35517D20DDAD} = {131C5329-7276-4695-A3E8-63E8A2DE0B8E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {982C59A5-4C03-4A5A-AA22-E85BA138F220}

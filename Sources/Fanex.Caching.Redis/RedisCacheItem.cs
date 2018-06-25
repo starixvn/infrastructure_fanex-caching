@@ -2,19 +2,26 @@
 {
     using StackExchange.Redis;
 
-    internal class RedisCacheItem : CacheItem
+    internal class RedisCacheItem
     {
-        private readonly RedisValue _redisValue;
+        public RedisCacheItem(RedisKey key, RedisValue value, CacheItemOptions options)
+        {
+            Key = key;
+            Value = value;
+            Options = options;
+        }
 
-        public RedisCacheItem(object key, RedisValue redisValue, CacheItemOptions options)
-            : base(key, redisValue, options)
-            => _redisValue = redisValue;
+        public RedisKey Key { get; }
+
+        public RedisValue Value { get; }
+
+        public CacheItemOptions Options { get; }
 
         public RedisCommand ToGetCommand()
             => new RedisCommand
             {
                 Script = RedisScripts.GetValue,
-                Keys = new RedisKey[] { Key as string }
+                Keys = new[] { Key }
             };
 
         public RedisCommand ToSetCommand()
@@ -41,10 +48,10 @@
             => new RedisCommand
             {
                 Script = RedisScripts.SetValueWithAbsoluteExpiration,
-                Keys = new RedisKey[] { Key as string },
+                Keys = new[] { Key },
                 Values = new[]
                 {
-                    _redisValue,
+                    Value,
                     Options.AbsoluteExpiration?.ToUnixTimeSeconds()
                 }
             };
@@ -53,10 +60,10 @@
             => new RedisCommand
             {
                 Script = RedisScripts.SetValueWithRelativeExpiration,
-                Keys = new RedisKey[] { Key as string },
+                Keys = new[] { Key },
                 Values = new[]
                 {
-                    _redisValue,
+                    Value,
                     Options.RelativeExpiration?.TotalSeconds
                 }
             };
@@ -65,10 +72,10 @@
             => new RedisCommand
             {
                 Script = RedisScripts.SetValueWithSlidingExpiration,
-                Keys = new RedisKey[] { Key as string },
+                Keys = new[] { Key },
                 Values = new[]
                 {
-                    _redisValue,
+                    Value,
                     Options.SlidingExpiration?.TotalSeconds
                 }
             };
@@ -77,8 +84,8 @@
             => new RedisCommand
             {
                 Script = RedisScripts.SetValueWithoutExpiration,
-                Keys = new RedisKey[] { Key as string },
-                Values = new[] { _redisValue }
+                Keys = new[] { Key },
+                Values = new[] { Value }
             };
     }
 }

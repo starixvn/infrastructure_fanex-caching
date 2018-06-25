@@ -217,9 +217,7 @@
                 }
                 else
                 {
-                    var itemOptions = item.Options as MemoryCacheItemOptions;
-
-                    switch (itemOptions.Priority)
+                    switch (item.Options.Priority)
                     {
                         case CachePriority.Low:
                             lowPriorityItems.Add(item);

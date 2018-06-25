@@ -12,7 +12,7 @@
         private readonly ISerializer _serializer;
         private readonly string _applicationName;
         private volatile ConnectionMultiplexer _connection;
-        private IDatabase _storage;
+        private IDatabase _database;
 
         public RedisStorage(RedisCacheOptions options)
         {
@@ -25,30 +25,29 @@
         {
             Connect();
 
-            return _storage.KeyExists(ModifyKey(key));
+            return _database.KeyExists(ModifyKey(key));
         }
 
         public async Task<bool> ContainAsync(string key)
         {
             await ConnectAsync().ConfigureAwait(false);
 
-            return await _storage.KeyExistsAsync(ModifyKey(key)).ConfigureAwait(false);
+            return await _database.KeyExistsAsync(ModifyKey(key)).ConfigureAwait(false);
         }
 
         public bool TryGet<T>(string key, out T value)
         {
             Connect();
 
-            var item = new RedisCacheItem(ModifyKey(key), RedisValue.Null, null);
-            RedisCommand command = item.ToGetCommand();
-            RedisResult dataFromRedis = _storage.ScriptEvaluate(command.Script, command.Keys);
+            RedisCommand command = new RedisCacheItem(ModifyKey(key), RedisValue.Null, null).ToGetCommand();
+            RedisResult redisResult = _database.ScriptEvaluate(command.Script, command.Keys);
             bool found = false;
 
             value = default(T);
 
-            if (!dataFromRedis.IsNull)
+            if (!redisResult.IsNull)
             {
-                value = (T)RedisValueHelper.ConvertToObject((RedisValue)dataFromRedis, typeof(T), _serializer);
+                value = (T)RedisTypeConverter.ToObject<T>(redisResult, _serializer);
                 found = true;
             }
 
@@ -59,15 +58,14 @@
         {
             await ConnectAsync().ConfigureAwait(false);
 
-            var item = new RedisCacheItem(ModifyKey(key), RedisValue.Null, null);
-            RedisCommand command = item.ToGetCommand();
-            RedisResult dataFromRedis = await _storage.ScriptEvaluateAsync(command.Script, command.Keys).ConfigureAwait(false);
+            RedisCommand command = new RedisCacheItem(ModifyKey(key), RedisValue.Null, null).ToGetCommand();
+            RedisResult redisResult = await _database.ScriptEvaluateAsync(command.Script, command.Keys).ConfigureAwait(false);
             bool found = false;
             T value = default(T);
 
-            if (!dataFromRedis.IsNull)
+            if (!redisResult.IsNull)
             {
-                value = (T)RedisValueHelper.ConvertToObject((RedisValue)dataFromRedis, typeof(T), _serializer);
+                value = (T)RedisTypeConverter.ToObject<T>(redisResult, _serializer);
                 found = true;
             }
 
@@ -77,31 +75,35 @@
         public void Remove(string key)
         {
             Connect();
-            _storage.KeyDelete(ModifyKey(key));
+            _database.KeyDelete(ModifyKey(key));
         }
 
         public async Task RemoveAsync(string key)
         {
             await ConnectAsync().ConfigureAwait(false);
-            await _storage.KeyDeleteAsync(ModifyKey(key)).ConfigureAwait(false);
+            await _database.KeyDeleteAsync(ModifyKey(key)).ConfigureAwait(false);
         }
 
         public void Set<T>(string key, T value, CacheItemOptions options)
         {
-            var item = new RedisCacheItem(ModifyKey(key), value, options);
-            RedisCommand command = item.ToSetCommand();
-
             Connect();
-            _storage.ScriptEvaluate(command.Script, command.Keys, command.Values);
+
+            RedisKey redisKey = ModifyKey(key);
+            RedisValue redisValue = RedisTypeConverter.ToRedisValue(value, _serializer);
+            RedisCommand command = new RedisCacheItem(redisKey, redisValue, options).ToSetCommand();
+
+            _database.ScriptEvaluate(command.Script, command.Keys, command.Values);
         }
 
         public async Task SetAsync<T>(string key, T value, CacheItemOptions options)
         {
-            var item = new RedisCacheItem(ModifyKey(key), value, options);
-            RedisCommand command = item.ToSetCommand();
-
             await ConnectAsync().ConfigureAwait(false);
-            await _storage.ScriptEvaluateAsync(command.Script, command.Keys, command.Values).ConfigureAwait(false);
+
+            RedisKey redisKey = ModifyKey(key);
+            RedisValue redisValue = RedisTypeConverter.ToRedisValue(value, _serializer);
+            RedisCommand command = new RedisCacheItem(redisKey, redisValue, options).ToSetCommand();
+
+            await _database.ScriptEvaluateAsync(command.Script, command.Keys, command.Values).ConfigureAwait(false);
         }
 
 #pragma warning disable S2589 // Boolean expressions should not be gratuitous
@@ -120,7 +122,7 @@
                 if (_connection == null)
                 {
                     _connection = ConnectionMultiplexer.Connect(_redisConnectionOptions);
-                    _storage = _connection.GetDatabase();
+                    _database = _connection.GetDatabase();
                 }
             }
             finally
@@ -143,7 +145,7 @@
                 if (_connection == null)
                 {
                     _connection = await ConnectionMultiplexer.ConnectAsync(_redisConnectionOptions).ConfigureAwait(false);
-                    _storage = _connection.GetDatabase();
+                    _database = _connection.GetDatabase();
                 }
             }
             finally
@@ -155,7 +157,7 @@
 #pragma warning restore S2589 // Boolean expressions should not be gratuitous
 
         private string ModifyKey(string key)
-            => string.IsNullOrEmpty(_applicationName) ? key : $"{_applicationName}:{key}";
+            => $"{_applicationName}:{key}";
 
         public void Dispose()
         {

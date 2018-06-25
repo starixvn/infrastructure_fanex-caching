@@ -5,7 +5,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal class MemoryCacheItem : CacheItem
+    internal class MemoryCacheItem
     {
         private readonly DateTimeOffset? _absoluteExpiration;
 
@@ -18,12 +18,21 @@
             object value,
             MemoryCacheItemOptions options,
             DateTimeOffset createdTime)
-            : base(key, value, options)
         {
+            Key = key;
+            Value = value;
+            Options = options;
+            LastAccess = createdTime;
+
             _absoluteExpiration = options.CalculateAbsoluteExpiration(createdTime);
             _postEvictionCallbacks = options.PostEvictionCallbacks;
-            LastAccess = createdTime;
         }
+
+        public string Key { get; }
+
+        public object Value { get; }
+
+        public MemoryCacheItemOptions Options { get; }
 
         public DateTimeOffset LastAccess { get; private set; }
 

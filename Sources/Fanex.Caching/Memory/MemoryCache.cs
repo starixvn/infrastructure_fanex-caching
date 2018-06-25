@@ -45,23 +45,6 @@
             return Task.FromResult(new Tuple<bool, T>(found, value));
         }
 
-        public void Remove(string key)
-        {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentException("Key must not be null or empty.", nameof(key));
-            }
-
-            MemoryStorage.Remove(key);
-        }
-
-        public Task RemoveAsync(string key)
-        {
-            Remove(key);
-
-            return Task.CompletedTask;
-        }
-
         public void Set<T>(string key, T value, CacheItemOptions options)
             => SetInternal(key, value, options);
 
@@ -107,6 +90,23 @@
         public Task SetAsync<T>(string key, T value, MemoryCacheItemOptions options)
         {
             Set(key, value, options);
+
+            return Task.CompletedTask;
+        }
+
+        public void Remove(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ArgumentException("Key must not be null or empty.", nameof(key));
+            }
+
+            MemoryStorage.Remove(key);
+        }
+
+        public Task RemoveAsync(string key)
+        {
+            Remove(key);
 
             return Task.CompletedTask;
         }

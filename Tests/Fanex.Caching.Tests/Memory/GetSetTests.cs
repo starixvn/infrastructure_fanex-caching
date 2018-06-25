@@ -334,6 +334,48 @@
             }
         }
 
+        [Fact]
+        public void SetGetOneSpecificKeyAreThreadSafe()
+        {
+            // Arrange.
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+            var key = _fixture.Create<string>();
+
+            // Act.
+            var firstTask = Task.Run(() => SetOneSpecificKey(key, cancellationToken), cancellationToken);
+            var secondTask = Task.Run(() => GetOneSpecificKey(key, cancellationToken), cancellationToken);
+            var thirdTask = Task.Run(() => cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(50)), cancellationToken);
+
+            Task.WaitAll(firstTask, secondTask, thirdTask);
+            cancellationTokenSource.Dispose();
+
+            // Assert.
+            Assert.Equal(TaskStatus.RanToCompletion, firstTask.Status);
+            Assert.Equal(TaskStatus.RanToCompletion, secondTask.Status);
+            Assert.Equal(TaskStatus.RanToCompletion, thirdTask.Status);
+        }
+
+        private void SetOneSpecificKey(string key, CancellationToken cancellationToken)
+        {
+            var cacheOptions = new MemoryCacheItemOptions();
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var value = _fixture.Create<object>();
+
+                _storage.Set(key, value, cacheOptions);
+            }
+        }
+
+        private void GetOneSpecificKey(string key, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                _storage.TryGet(key, out _);
+            }
+        }
+
         public void Dispose()
             => _storage.Dispose();
     }
