@@ -81,33 +81,13 @@
         }
 
         [Fact]
-        public void OffExpirationClearsAbsoluteExpirationValue()
+        public void UseDefaultExpirationSetsDefaultValueToRelativeExpiration()
         {
             // Act.
-            _cacheItemOptions.OffExpiration();
+            _cacheItemOptions.UseDefaultExpiration();
 
             // Assert.
-            Assert.Null(_cacheItemOptions.AbsoluteExpiration);
-        }
-
-        [Fact]
-        public void OffExpirationClearsRelativeExpirationValue()
-        {
-            // Act.
-            _cacheItemOptions.OffExpiration();
-
-            // Assert.
-            Assert.Null(_cacheItemOptions.RelativeExpiration);
-        }
-
-        [Fact]
-        public void OffExpirationClearsSlidingExpirationValue()
-        {
-            // Act.
-            _cacheItemOptions.OffExpiration();
-
-            // Assert.
-            Assert.Null(_cacheItemOptions.SlidingExpiration);
+            Assert.Equal(CacheItemOptions.DefaultRelativeExpiration, _cacheItemOptions.RelativeExpiration);
         }
     }
 }

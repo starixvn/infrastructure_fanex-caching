@@ -4,30 +4,30 @@
     {
         public const string GetValue =
             @"local cachingData = redis.call('HGET', KEYS[1], 'data')
-              local slidingExpiration = redis.call('HGET', KEYS[1], 'sliding-expiration')
+              local slidingTime = redis.call('HGET', KEYS[1], 'slidingTime')
 
-              if slidingExpiration ~= false then
-                  redis.call('EXPIRE', KEYS[1], slidingExpiration)
+              if slidingTime ~= false then
+                  redis.call('PEXPIRE', KEYS[1], slidingTime)
               end
 
               return cachingData";
 
         public const string SetValueWithAbsoluteExpiration =
             @"redis.call('HMSET', KEYS[1], 'data', ARGV[1])
-              redis.call('EXPIREAT', KEYS[1], ARGV[2])
+              redis.call('PEXPIREAT', KEYS[1], ARGV[2])
 
               return 1";
 
         public const string SetValueWithRelativeExpiration =
             @"redis.call('HMSET', KEYS[1], 'data', ARGV[1])
-              redis.call('EXPIRE', KEYS[1], ARGV[2])
+              redis.call('PEXPIRE', KEYS[1], ARGV[2])
 
               return 1";
 
         public const string SetValueWithSlidingExpiration =
             @"redis.call('HMSET', KEYS[1], 'data', ARGV[1])
-              redis.call('HMSET', KEYS[1], 'sliding-expiration', ARGV[2])
-              redis.call('EXPIRE', KEYS[1], ARGV[2])
+              redis.call('HMSET', KEYS[1], 'slidingTime', ARGV[2])
+              redis.call('PEXPIRE', KEYS[1], ARGV[2])
 
               return 1";
 

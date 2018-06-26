@@ -26,11 +26,6 @@
 
         public RedisCommand ToSetCommand()
         {
-            if (Options.AbsoluteExpiration.HasValue)
-            {
-                return ToSetCommandWithAbsoluteExpiration();
-            }
-
             if (Options.RelativeExpiration.HasValue)
             {
                 return ToSetCommandWithRelativeExpiration();
@@ -39,6 +34,11 @@
             if (Options.SlidingExpiration.HasValue)
             {
                 return ToSetCommandWithSlidingExpiration();
+            }
+
+            if (Options.AbsoluteExpiration.HasValue)
+            {
+                return ToSetCommandWithAbsoluteExpiration();
             }
 
             return ToSetCommandWithoutExpiration();
@@ -52,7 +52,7 @@
                 Values = new[]
                 {
                     Value,
-                    Options.AbsoluteExpiration?.ToUnixTimeSeconds()
+                    Options.AbsoluteExpiration?.ToUnixTimeMilliseconds()
                 }
             };
 
@@ -64,7 +64,7 @@
                 Values = new[]
                 {
                     Value,
-                    Options.RelativeExpiration?.TotalSeconds
+                    Options.RelativeExpiration?.TotalMilliseconds
                 }
             };
 
@@ -76,7 +76,7 @@
                 Values = new[]
                 {
                     Value,
-                    Options.SlidingExpiration?.TotalSeconds
+                    Options.SlidingExpiration?.TotalMilliseconds
                 }
             };
 

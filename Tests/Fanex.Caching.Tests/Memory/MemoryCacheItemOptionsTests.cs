@@ -59,7 +59,7 @@
         }
 
         [Fact]
-        public void CalculateAbsoluteExpirationReturnsSumOfCheckingTimeAndRelativeExpiration()
+        public void CalculateAbsoluteExpirationFromRelativeExpiration()
         {
             // Arrange.
             DateTimeOffset checkingTime = _clock.UtcNow;
@@ -75,7 +75,7 @@
         }
 
         [Fact]
-        public void CalculateAbsoluteExpirationPrioritizesAbsoluteExpiration()
+        public void CalculateAbsoluteExpirationPrioritizesRelativeExpiration()
         {
             // Arrange.
             DateTimeOffset checkingTime = _clock.UtcNow;
@@ -90,7 +90,7 @@
             DateTimeOffset? result = _options.CalculateAbsoluteExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(absoluteExpiration, result.Value);
+            Assert.Equal(checkingTime + relativeExpiration, result.Value);
         }
 
         [Fact]
@@ -99,13 +99,26 @@
             // Arrange.
             DateTimeOffset checkingTime = _clock.UtcNow;
 
-            _options.OffExpiration();
-
             // Act.
             DateTimeOffset? result = _options.CalculateAbsoluteExpiration(checkingTime);
 
             // Assert.
             Assert.Null(result);
+        }
+
+        [Fact]
+        public void CalculateAbsoluteExpirationFromDefaultExpiration()
+        {
+            // Arrange.
+            DateTimeOffset checkingTime = _clock.UtcNow;
+
+            _options.UseDefaultExpiration();
+
+            // Act.
+            DateTimeOffset? result = _options.CalculateAbsoluteExpiration(checkingTime);
+
+            // Assert.
+            Assert.Equal(checkingTime + CacheItemOptions.DefaultRelativeExpiration, result.Value);
         }
 
         [Fact]

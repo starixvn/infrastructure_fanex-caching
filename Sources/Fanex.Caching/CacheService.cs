@@ -45,7 +45,10 @@
             if (!found && factory != null)
             {
                 value = factory();
-                CacheStorage.Set(key, value, new CacheItemOptions());
+                CacheStorage.Set(
+                    key,
+                    value,
+                    new CacheItemOptions().UseDefaultExpiration());
             }
 
             return value;
@@ -72,7 +75,12 @@
             if (!found.Item1 && factory != null)
             {
                 value = factory();
-                await CacheStorage.SetAsync(key, value, new CacheItemOptions()).ConfigureAwait(false);
+                await CacheStorage
+                    .SetAsync(
+                        key,
+                        value,
+                        new CacheItemOptions().UseDefaultExpiration())
+                    .ConfigureAwait(false);
             }
             else
             {
@@ -107,13 +115,13 @@
             => CacheStorage.RemoveAsync(key);
 
         public void Set<T>(string key, T value)
-            => CacheStorage.Set(key, value, new CacheItemOptions());
+            => CacheStorage.Set(key, value, new CacheItemOptions().UseDefaultExpiration());
 
         public void Set<T>(string key, T value, CacheItemOptions options)
             => CacheStorage.Set(key, value, options);
 
         public Task SetAsync<T>(string key, T value)
-            => CacheStorage.SetAsync(key, value, new CacheItemOptions());
+            => CacheStorage.SetAsync(key, value, new CacheItemOptions().UseDefaultExpiration());
 
         public Task SetAsync<T>(string key, T value, CacheItemOptions options)
             => CacheStorage.SetAsync(key, value, options);

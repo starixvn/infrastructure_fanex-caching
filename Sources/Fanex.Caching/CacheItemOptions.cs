@@ -9,7 +9,6 @@
         public DateTimeOffset? AbsoluteExpiration { get; set; }
 
         public TimeSpan? RelativeExpiration { get; set; }
-            = DefaultRelativeExpiration;
 
         public TimeSpan? SlidingExpiration { get; set; }
 
@@ -50,11 +49,9 @@
             return this;
         }
 
-        public CacheItemOptions OffExpiration()
+        public CacheItemOptions UseDefaultExpiration()
         {
-            AbsoluteExpiration = null;
-            RelativeExpiration = null;
-            SlidingExpiration = null;
+            RelativeExpiration = DefaultRelativeExpiration;
 
             return this;
         }

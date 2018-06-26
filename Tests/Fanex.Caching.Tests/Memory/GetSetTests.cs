@@ -240,7 +240,7 @@
 
             // Assert.
             Assert.True(_callbackInvoked.Wait(_callbackWaitingTime));
-            Assert.True(_storage.TryGet(_existingKey, out object result));
+            Assert.True(_storage.TryGet(_existingKey, out _));
         }
 
 #pragma warning disable S2952 // Classes should "Dispose" of members from the classes' own "Dispose" methods
