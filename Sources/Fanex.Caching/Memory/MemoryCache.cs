@@ -5,8 +5,20 @@
 
     public sealed class MemoryCache : ICache
     {
-        public MemoryCache(MemoryCacheOptions options = null)
-            => MemoryStorage = new MemoryStorage(options ?? new MemoryCacheOptions());
+        internal MemoryCache()
+            : this(new MemoryCacheOptions())
+        {
+        }
+
+        public MemoryCache(MemoryCacheOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            MemoryStorage = new MemoryStorage(options);
+        }
 
         internal IMemoryStorage MemoryStorage { get; private set; }
 

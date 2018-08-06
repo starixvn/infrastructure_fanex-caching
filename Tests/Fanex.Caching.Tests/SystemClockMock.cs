@@ -1,7 +1,6 @@
 ﻿namespace Fanex.Caching.Tests
 {
     using System;
-    using Fanex.Caching.Memory;
 
     internal class SystemClockMock : ISystemClock
     {

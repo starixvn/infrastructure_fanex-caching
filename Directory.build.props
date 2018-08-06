@@ -1,8 +1,6 @@
 <Project>
     <PropertyGroup>
         <Authors>R&amp;D Team</Authors>
-        <Company>Nexcel Solutions</Company>
-        <Copyright>2018 Nexdev</Copyright>
         <PackageProjectUrl>https://gitlab.nexcel.vn/infrastructure/fanex-caching</PackageProjectUrl>
         <RepositoryUrl>https://gitlab.nexcel.vn/infrastructure/fanex-caching</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -10,7 +8,7 @@
         <PackageIconUrl>https://gitlab.nexcel.vn/uploads/-/system/project/avatar/696/new-idea.png</PackageIconUrl>
         <DefaultLanguage>en-US</DefaultLanguage>
         <IncludeSymbols>false</IncludeSymbols>
-        <Version>2.2.0-beta1</Version>
+        <Version>2.2.0-beta2</Version>
     </PropertyGroup>
     <PropertyGroup>
         <NoWarn>AD0001,SA1302</NoWarn>

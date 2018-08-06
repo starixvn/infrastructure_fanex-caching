@@ -1,4 +1,4 @@
-﻿namespace Fanex.Caching.Memory
+﻿namespace Fanex.Caching
 {
     using System;
 

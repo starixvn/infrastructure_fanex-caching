@@ -25,6 +25,16 @@
             _cache.Set(_existingKey, _existingValue, _cacheOptions);
         }
 
+        [Fact]
+        public void NewInstanceWithNullOptionsThrowsArgumentNullException()
+        {
+            // Act.
+            Exception exception = Record.Exception(() => new MemoryCache(null));
+
+            // Assert.
+            Assert.IsType<ArgumentNullException>(exception);
+        }
+
         [Theory]
         [InlineData("")]
         [InlineData(null)]
