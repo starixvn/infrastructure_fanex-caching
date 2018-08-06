@@ -75,12 +75,31 @@
         }
 
         [Fact]
-        public void CalculateAbsoluteExpirationPrioritizesRelativeExpiration()
+        public void CalculateAbsoluteExpirationPrioritizesSoonerAbsoluteExpiration()
         {
             // Arrange.
             DateTimeOffset checkingTime = _clock.UtcNow;
-            TimeSpan relativeExpiration = TimeSpan.FromMinutes(1);
+            TimeSpan relativeExpiration = TimeSpan.FromSeconds(6);
             DateTimeOffset absoluteExpiration = checkingTime + TimeSpan.FromSeconds(5);
+
+            _options
+                .SetAbsoluteExpiration(absoluteExpiration)
+                .SetAbsoluteExpiration(relativeExpiration);
+
+            // Act.
+            DateTimeOffset? result = _options.CalculateAbsoluteExpiration(checkingTime);
+
+            // Assert.
+            Assert.Equal(absoluteExpiration, result.Value);
+        }
+
+        [Fact]
+        public void CalculateAbsoluteExpirationPrioritizesSoonerRelativeExpiration()
+        {
+            // Arrange.
+            DateTimeOffset checkingTime = _clock.UtcNow;
+            TimeSpan relativeExpiration = TimeSpan.FromSeconds(1);
+            DateTimeOffset absoluteExpiration = checkingTime + TimeSpan.FromSeconds(2);
 
             _options
                 .SetAbsoluteExpiration(relativeExpiration)

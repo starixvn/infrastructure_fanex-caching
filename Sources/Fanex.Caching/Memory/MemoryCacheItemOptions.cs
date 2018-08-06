@@ -67,16 +67,22 @@
 
         internal DateTimeOffset? CalculateAbsoluteExpiration(DateTimeOffset now)
         {
+            if (RelativeExpiration.HasValue && AbsoluteExpiration.HasValue)
+            {
+                if (AbsoluteExpiration.Value <= now + RelativeExpiration.Value)
+                {
+                    return AbsoluteExpiration.Value;
+                }
+                return now + RelativeExpiration.Value;
+            }
             if (RelativeExpiration.HasValue)
             {
-                return now + RelativeExpiration;
-            }
-
+                return now + RelativeExpiration.Value;
+            }
             if (AbsoluteExpiration.HasValue)
             {
-                return AbsoluteExpiration;
-            }
-
+                return AbsoluteExpiration.Value;
+            }
             return null;
         }
     }
