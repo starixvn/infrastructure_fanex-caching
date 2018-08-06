@@ -10,7 +10,6 @@
     {
         private readonly ConcurrentDictionary<string, MemoryCacheItem> _items;
         private readonly MemoryCacheOptions _options;
-        private readonly ISystemClock _clock;
 
         private DateTimeOffset _lastExpirationScan;
         private bool _disposed;
@@ -19,8 +18,7 @@
         {
             _items = new ConcurrentDictionary<string, MemoryCacheItem>();
             _options = options;
-            _clock = _options.Clock ?? new SystemClock();
-            _lastExpirationScan = _clock.UtcNow;
+            _lastExpirationScan = _options.Clock.UtcNow;
 
             if (_options.CompactOnMemoryPressure)
             {
@@ -42,7 +40,7 @@
         public bool TryGet(string key, out object value)
         {
             var found = false;
-            var now = _clock.UtcNow;
+            var now = _options.Clock.UtcNow;
 
             CheckDisposed();
             value = null;
@@ -83,7 +81,7 @@
         {
             CheckDisposed();
 
-            DateTimeOffset utcNow = _clock.UtcNow;
+            DateTimeOffset utcNow = _options.Clock.UtcNow;
             var item = new MemoryCacheItem(key, value, options, utcNow);
 
             if (_items.TryGetValue(key, out MemoryCacheItem previousItem))
@@ -140,7 +138,7 @@
 
         private void StartScanForExpiredItems()
         {
-            DateTimeOffset now = _clock.UtcNow;
+            DateTimeOffset now = _options.Clock.UtcNow;
 
             if (_options.ExpirationScanFrequency < now - _lastExpirationScan)
             {
@@ -152,7 +150,7 @@
 
         private static void ScanForExpiredItems(MemoryStorage cache)
         {
-            DateTimeOffset now = cache._clock.UtcNow;
+            DateTimeOffset now = cache._options.Clock.UtcNow;
 
             foreach (MemoryCacheItem item in cache._items.Values)
             {
@@ -207,7 +205,7 @@
             ref List<MemoryCacheItem> normalPriorityItems,
             ref List<MemoryCacheItem> highPriorityItems)
         {
-            DateTimeOffset now = _clock.UtcNow;
+            DateTimeOffset now = _options.Clock.UtcNow;
 
             foreach (var item in _items.Values)
             {

@@ -7,6 +7,7 @@
         private double _compactionPercentage = 0.1;
 
         public ISystemClock Clock { get; set; }
+            = new SystemClock();
 
         public bool CompactOnMemoryPressure { get; set; }
             = true;

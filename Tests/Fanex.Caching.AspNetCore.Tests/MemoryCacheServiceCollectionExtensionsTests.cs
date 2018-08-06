@@ -107,13 +107,27 @@
             // Act.
             _services.AddMemoryCache(configuration);
 
-            var provider = _services.BuildServiceProvider();
-            var options = provider.GetService<MemoryCacheOptions>();
-
             // Assert.
+            var options = _services.BuildServiceProvider().GetService<MemoryCacheOptions>();
+
             Assert.NotNull(options);
             Assert.True(options.CompactOnMemoryPressure);
             Assert.Equal(TimeSpan.FromSeconds(30), options.ExpirationScanFrequency);
+        }
+
+        [Fact]
+        public void AddMemoryCacheWithConfigurationSectionDoesNoteOverwriteClock()
+        {
+            // Arrange.
+            var configuration = ReadConfiguration();
+
+            // Act.
+            _services.AddMemoryCache(configuration);
+
+            // Assert.
+            var options = _services.BuildServiceProvider().GetService<MemoryCacheOptions>();
+
+            Assert.NotNull(options.Clock);
         }
 
         private static IConfigurationSection ReadConfiguration()
