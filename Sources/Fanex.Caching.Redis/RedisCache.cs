@@ -60,7 +60,7 @@
                 throw new ArgumentNullException(nameof(options));
             }
 
-            RedisStorage.Set<T>(key, value, options);
+            RedisStorage.Set(key, value, options);
         }
 
         public Task SetAsync<T>(string key, T value, CacheItemOptions options)
@@ -80,7 +80,7 @@
                 throw new ArgumentNullException(nameof(options));
             }
 
-            return RedisStorage.SetAsync<T>(key, value, options);
+            return RedisStorage.SetAsync(key, value, options);
         }
 
         public void Remove(string key)

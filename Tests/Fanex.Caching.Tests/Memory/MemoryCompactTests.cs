@@ -25,38 +25,6 @@
         }
 
         [Fact]
-        public void NegativeCompactionPercentageThrowsArgumentOutOfRangeException()
-        {
-            // Arrange.
-            var negativeCompactionPercentage = -0.1;
-
-            // Act.
-            Exception exception = Record.Exception(() => new MemoryCacheOptions
-            {
-                CompactionPercentage = negativeCompactionPercentage
-            });
-
-            // Assert.
-            Assert.IsType<ArgumentOutOfRangeException>(exception);
-        }
-
-        [Fact]
-        public void GreaterThanOneCompactionPercentageThrowsArgumentOutOfRangeException()
-        {
-            // Arrange.
-            var outOfRangeCompactionPercentage = 1.1;
-
-            // Act.
-            Exception exception = Record.Exception(() => new MemoryCacheOptions
-            {
-                CompactionPercentage = outOfRangeCompactionPercentage
-            });
-
-            // Assert.
-            Assert.IsType<ArgumentOutOfRangeException>(exception);
-        }
-
-        [Fact]
         public void Compact100PercentClearsAll()
         {
             // Act.
@@ -70,9 +38,9 @@
         public void Compact100PercentClearsAllExcludeItemsWithNeverRemovePriority()
         {
             // Arrange.
-            int numberOfNeverRemoveKeys = 2;
+            var numberOfNeverRemoveKeys = 2;
             var neverRemovePolicy = new MemoryCacheItemOptions().SetCachePriority(CachePriority.NeverRemove);
-            string[] neverRemoveKeys = InitializeCache(numberOfNeverRemoveKeys, neverRemovePolicy);
+            var neverRemoveKeys = InitializeCache(numberOfNeverRemoveKeys, neverRemovePolicy);
 
             // Act.
             _storage.Compact(1.0);
@@ -80,7 +48,7 @@
             // Assert.
             Assert.Equal(numberOfNeverRemoveKeys, _storage.Count);
 
-            foreach (string key in neverRemoveKeys)
+            foreach (var key in neverRemoveKeys)
             {
                 Assert.True(_storage.TryGet(key, out _));
             }
@@ -90,9 +58,9 @@
         public void CompactPrioritizesLowPriorityItems()
         {
             // Arrange.
-            int numberOfLowPriorityKeys = 2;
+            var numberOfLowPriorityKeys = 2;
             var lowPriorityPolicy = new MemoryCacheItemOptions().SetCachePriority(CachePriority.Low);
-            string[] lowPriorityKeys = InitializeCache(numberOfLowPriorityKeys, lowPriorityPolicy);
+            var lowPriorityKeys = InitializeCache(numberOfLowPriorityKeys, lowPriorityPolicy);
 
             // Act.
             _storage.Compact(0.5);
@@ -100,7 +68,7 @@
             // Assert.
             Assert.Equal(NumberOfPreInitializedKeys, _storage.Count);
 
-            foreach (string key in lowPriorityKeys)
+            foreach (var key in lowPriorityKeys)
             {
                 Assert.False(_storage.TryGet(key, out _));
             }
@@ -110,9 +78,9 @@
         public void CompactDisordersHighPriorityItems()
         {
             // Arrange.
-            int numberOfHighPriorityKeys = 2;
+            var numberOfHighPriorityKeys = 2;
             var highPriorityPolicy = new MemoryCacheItemOptions().SetCachePriority(CachePriority.High);
-            string[] highPriorityKeys = InitializeCache(numberOfHighPriorityKeys, highPriorityPolicy);
+            var highPriorityKeys = InitializeCache(numberOfHighPriorityKeys, highPriorityPolicy);
 
             // Act.
             _storage.Compact(0.5);
@@ -120,7 +88,7 @@
             // Assert.
             Assert.Equal(numberOfHighPriorityKeys, _storage.Count);
 
-            foreach (string key in highPriorityKeys)
+            foreach (var key in highPriorityKeys)
             {
                 Assert.True(_storage.TryGet(key, out _));
             }
@@ -130,13 +98,11 @@
         public void CompactPrioritizesExpiredItems()
         {
             // Arrange.
-            int numberOfExpiredKeys = 2;
-            var expiredPolicy = new MemoryCacheItemOptions();
-
-            expiredPolicy
+            var numberOfExpiredKeys = 2;
+            var expiredPolicy = new MemoryCacheItemOptions()
                 .SetCachePriority(CachePriority.High)
                 .SetAbsoluteExpiration(TimeSpan.FromSeconds(1));
-            string[] expiredKeys = InitializeCache(numberOfExpiredKeys, expiredPolicy);
+            var expiredKeys = InitializeCache(numberOfExpiredKeys, expiredPolicy);
 
             // Act.
             _clock.Add(TimeSpan.FromSeconds(5));
@@ -145,7 +111,7 @@
             // Assert.
             Assert.Equal(NumberOfPreInitializedKeys, _storage.Count);
 
-            foreach (string key in expiredKeys)
+            foreach (var key in expiredKeys)
             {
                 Assert.False(_storage.TryGet(key, out _));
             }
@@ -155,8 +121,8 @@
         public void CompactPrioritizesLRU()
         {
             // Arrange.
-            int numberOfNewKeys = 2;
-            string[] newKeys = InitializeCache(numberOfNewKeys, _cachingOptions);
+            var numberOfNewKeys = 2;
+            var newKeys = InitializeCache(numberOfNewKeys, _cachingOptions);
 
             // Act.
             _storage.Compact(0.90);
@@ -169,7 +135,7 @@
         public void CompactOnMemoryPressureTriggersDoMemoryPreassureCollection()
         {
             // Arrange.
-            int numberOfKeys = 4;
+            var numberOfKeys = 4;
             var storageOptions = new MemoryCacheOptions
             {
                 CompactOnMemoryPressure = true,
@@ -192,8 +158,8 @@
         public void DoMemoryPreassureCollectionTriesToSatisfyRemovalCountTarget()
         {
             // Arrange.
-            int numberOfKeys = 4;
-            double compactPercentage = 0.5;
+            var numberOfKeys = 4;
+            var compactPercentage = 0.5;
             var storageOptions = new MemoryCacheOptions
             {
                 CompactOnMemoryPressure = true,
@@ -239,7 +205,7 @@
 
             var createdKeys = new string[numberOfItem];
 
-            for (int index = 0; index < numberOfItem; index++)
+            for (var index = 0; index < numberOfItem; index++)
             {
                 createdKeys[index] = _fixture.Create<string>();
 

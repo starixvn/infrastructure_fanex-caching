@@ -27,7 +27,7 @@
 
         public async Task<T> GetAsync<T>(string key)
         {
-            Tuple<bool, T> result = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
+            var result = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
             return result != null ? result.Item2 : default(T);
         }
@@ -40,7 +40,7 @@
 
         public T GetOrSet<T>(string key, Func<T> factory)
         {
-            bool found = CacheStorage.TryGet(key, out T value);
+            var found = CacheStorage.TryGet(key, out T value);
 
             if (!found && factory != null)
             {
@@ -56,7 +56,7 @@
 
         public T GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)
         {
-            bool found = CacheStorage.TryGet(key, out T value);
+            var found = CacheStorage.TryGet(key, out T value);
 
             if (!found && factory != null)
             {
@@ -70,7 +70,7 @@
         public async Task<T> GetOrSetAsync<T>(string key, Func<T> factory)
         {
             T value;
-            Tuple<bool, T> found = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
+            var found = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
             if (!found.Item1 && factory != null)
             {
@@ -93,7 +93,7 @@
         public async Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)
         {
             T value;
-            Tuple<bool, T> found = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
+            var found = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
             if (!found.Item1 && factory != null)
             {

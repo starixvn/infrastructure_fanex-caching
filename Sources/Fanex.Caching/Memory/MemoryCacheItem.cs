@@ -65,7 +65,7 @@
 
             if (callbackRegistrations != null)
             {
-                foreach (PostEvictionCallbackRegistration registration in callbackRegistrations)
+                foreach (var registration in callbackRegistrations)
                 {
                     try
                     {

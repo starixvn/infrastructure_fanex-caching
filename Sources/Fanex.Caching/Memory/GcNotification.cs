@@ -17,7 +17,7 @@
 
         ~GcNotification()
         {
-            bool reRegister = true;
+            var reRegister = true;
 
             try
             {

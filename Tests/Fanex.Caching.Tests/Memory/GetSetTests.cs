@@ -52,36 +52,13 @@
         }
 
         [Fact]
-        public void ContainReturnsTrueForExistingKey()
-        {
-            // Act.
-            bool found = _storage.Contain(_existingKey);
-
-            // Assert.
-            Assert.True(found);
-        }
-
-        [Fact]
-        public void ContainReturnsFalseForMissingKey()
-        {
-            // Arrange.
-            var missingKey = _fixture.Create<string>();
-
-            // Act.
-            bool found = _storage.Contain(missingKey);
-
-            // Assert.
-            Assert.False(found);
-        }
-
-        [Fact]
         public void TryGetMissingKeyReturnsFalse()
         {
             // Arrange.
             var missingKey = _fixture.Create<string>();
 
             // Act.
-            bool found = _storage.TryGet(missingKey, out _);
+            var found = _storage.TryGet(missingKey, out _);
 
             // Assert.
             Assert.False(found);
@@ -101,13 +78,22 @@
         }
 
         [Fact]
-        public void TryGetReturnsObjectStoredBySet()
+        public void TryGetReturnsTrueForExistingKey()
         {
             // Act.
-            bool found = _storage.TryGet(_existingKey, out object value);
+            var found = _storage.TryGet(_existingKey, out _);
 
             // Assert.
             Assert.True(found);
+        }
+
+        [Fact]
+        public void TryGetReturnsObjectStoredBySet()
+        {
+            // Act.
+            _storage.TryGet(_existingKey, out object value);
+
+            // Assert.
             Assert.Same(_existingValue, value);
         }
 
@@ -118,7 +104,7 @@
             var caseSensitiveKey = _existingKey.ToUpperInvariant();
 
             // Act.
-            bool found = _storage.TryGet(caseSensitiveKey, out _);
+            var found = _storage.TryGet(caseSensitiveKey, out _);
 
             // Assert.
             Assert.False(found);
@@ -128,7 +114,7 @@
         public void SetAlwaysOverwritesExistingObject()
         {
             // Arrange.
-            var newValue = new object();
+            var newValue = _fixture.Create<object>();
 
             // Act.
             _storage.Set(_existingKey, newValue, _cachingOptions);
@@ -155,7 +141,7 @@
         public void SetOverwritesKeyWithReplacedReason()
         {
             // Arrange.
-            var newValue = _fixture.Create<string>();
+            var newValue = _fixture.Create<object>();
 
             // Act.
             _storage.Set(_existingKey, newValue, new MemoryCacheItemOptions());
@@ -169,10 +155,8 @@
         public void SetExistingKeyWithValueBeingExpiredRemovesOldValue()
         {
             // Arrange.
-            var newValue = new object();
-            var expiredPolicy = new MemoryCacheItemOptions();
-
-            expiredPolicy.SetAbsoluteExpiration(_clock.UtcNow);
+            var newValue = _fixture.Create<object>();
+            var expiredPolicy = new MemoryCacheItemOptions().SetAbsoluteExpiration(_clock.UtcNow);
 
             // Act.
             _storage.Set(_existingKey, newValue, expiredPolicy);
@@ -186,9 +170,7 @@
         {
             // Arrange.
             var newValue = _fixture.Create<object>();
-            var expiredPolicy = new MemoryCacheItemOptions();
-
-            expiredPolicy.SetAbsoluteExpiration(_clock.UtcNow);
+            var expiredPolicy = new MemoryCacheItemOptions().SetAbsoluteExpiration(_clock.UtcNow);
 
             // Act.
             _storage.Set(_existingKey, newValue, expiredPolicy);
@@ -252,7 +234,7 @@
             _storage.Dispose();
 
             // Act.
-            Exception exception = Record.Exception(() => _storage.TryGet(_existingKey, out _));
+            var exception = Record.Exception(() => _storage.TryGet(_existingKey, out _));
 
             // Assert.
             Assert.IsType<ObjectDisposedException>(exception);
@@ -267,20 +249,7 @@
             _storage.Dispose();
 
             // Act.
-            Exception exception = Record.Exception(() => _storage.Set(_existingKey, newValue, _cachingOptions));
-
-            // Assert.
-            Assert.IsType<ObjectDisposedException>(exception);
-        }
-
-        [Fact]
-        public void ObjectDisposedExceptionIsThrownIfTContainIsCalledAfterDisposingStorage()
-        {
-            // Arrange.
-            _storage.Dispose();
-
-            // Act.
-            Exception exception = Record.Exception(() => _storage.Contain(_existingKey));
+            var exception = Record.Exception(() => _storage.Set(_existingKey, newValue, _cachingOptions));
 
             // Assert.
             Assert.IsType<ObjectDisposedException>(exception);

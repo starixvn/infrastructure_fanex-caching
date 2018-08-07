@@ -20,7 +20,7 @@
             _cache = new MemoryCache();
             _existingKey = _fixture.Create<string>();
             _existingValue = _fixture.Create<object>();
-            _cacheOptions = new MemoryCacheItemOptions();
+            _cacheOptions = new MemoryCacheItemOptions().UseDefaultExpiration();
 
             _cache.Set(_existingKey, _existingValue, _cacheOptions);
         }
@@ -29,7 +29,7 @@
         public void NewInstanceWithNullOptionsThrowsArgumentNullException()
         {
             // Act.
-            Exception exception = Record.Exception(() => new MemoryCache(null));
+            var exception = Record.Exception(() => new MemoryCache(null));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -41,7 +41,7 @@
         public void ContainReturnsFalseIfPassingKeyIsNullOrEmpty(string key)
         {
             // Act.
-            bool found = _cache.Contain(key);
+            var found = _cache.Contain(key);
 
             // Assert.
             Assert.False(found);
@@ -54,7 +54,7 @@
             var nonexistingKey = _fixture.Create<string>();
 
             // Act.
-            bool found = _cache.Contain(nonexistingKey);
+            var found = _cache.Contain(nonexistingKey);
 
             // Assert.
             Assert.False(found);
@@ -64,7 +64,7 @@
         public void ContainReturnsTrueForExistingKey()
         {
             // Act.
-            bool found = _cache.Contain(_existingKey);
+            var found = _cache.Contain(_existingKey);
 
             // Assert.
             Assert.True(found);
@@ -76,7 +76,7 @@
         public async Task ContainAsyncReturnsFalseIfPassingKeyIsNullOrEmpty(string key)
         {
             // Act.
-            bool found = await _cache.ContainAsync(key);
+            var found = await _cache.ContainAsync(key);
 
             // Assert.
             Assert.False(found);
@@ -89,7 +89,7 @@
             var nonexistingKey = _fixture.Create<string>();
 
             // Act.
-            bool found = await _cache.ContainAsync(nonexistingKey);
+            var found = await _cache.ContainAsync(nonexistingKey);
 
             // Assert.
             Assert.False(found);
@@ -99,7 +99,7 @@
         public async Task ContainAsyncReturnsTrueForExistingKey()
         {
             // Act.
-            bool found = await _cache.ContainAsync(_existingKey);
+            var found = await _cache.ContainAsync(_existingKey);
 
             // Assert.
             Assert.True(found);
@@ -111,7 +111,7 @@
         public void TryGetNullOrEmptyKeyThrowsArgumentException(string key)
         {
             // Act.
-            Exception exception = Record.Exception(() => _cache.TryGet<object>(key, out _));
+            var exception = Record.Exception(() => _cache.TryGet<object>(key, out _));
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -124,7 +124,7 @@
             var nonexistingKey = _fixture.Create<string>();
 
             // Act.
-            bool found = _cache.TryGet(nonexistingKey, out object _);
+            var found = _cache.TryGet(nonexistingKey, out object _);
 
             // Assert.
             Assert.False(found);
@@ -149,7 +149,7 @@
         public void TryGetExistingKeyReturnsTrue()
         {
             // Act.
-            bool found = _cache.TryGet(_existingKey, out object _);
+            var found = _cache.TryGet(_existingKey, out object _);
 
             // Assert.
             Assert.True(found);
@@ -183,7 +183,7 @@
         public async Task TryGetAsyncNullOrEmptyKeyThrowsArgumentException(string key)
         {
             // Act.
-            Exception exception = await Record.ExceptionAsync(() => _cache.TryGetAsync<object>(key));
+            var exception = await Record.ExceptionAsync(() => _cache.TryGetAsync<object>(key));
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -196,7 +196,7 @@
             var nonexistingKey = _fixture.Create<string>();
 
             // Act.
-            Tuple<bool, object> result = await _cache.TryGetAsync<object>(nonexistingKey);
+            var result = await _cache.TryGetAsync<object>(nonexistingKey);
 
             // Assert.
             Assert.False(result.Item1);
@@ -209,7 +209,7 @@
             var nonexistingKey = _fixture.Create<string>();
 
             // Act.
-            Tuple<bool, object> result = await _cache.TryGetAsync<object>(nonexistingKey);
+            var result = await _cache.TryGetAsync<object>(nonexistingKey);
 
             // Assert.
             var expectedValue = default(object);
@@ -221,7 +221,7 @@
         public async Task TryGetAsyncExistingKeyReturnsTrueAsFirstResult()
         {
             // Act.
-            Tuple<bool, object> result = await _cache.TryGetAsync<object>(_existingKey);
+            var result = await _cache.TryGetAsync<object>(_existingKey);
 
             // Assert.
             Assert.True(result.Item1);
@@ -231,7 +231,7 @@
         public async Task TryGetAsyncExistingKeyWithCorrectValueTypeReturnsCachedObjectAsSecondResult()
         {
             // Act.
-            Tuple<bool, object> result = await _cache.TryGetAsync<object>(_existingKey);
+            var result = await _cache.TryGetAsync<object>(_existingKey);
 
             // Assert.
             Assert.Same(_existingValue, result.Item2);
@@ -241,7 +241,7 @@
         public async Task TryGetAsyncExistingKeyWithIncorrectValueTypeReturnsDefaultValueOfTypeAsSecondResult()
         {
             // Act.
-            Tuple<bool, int> result = await _cache.TryGetAsync<int>(_existingKey);
+            var result = await _cache.TryGetAsync<int>(_existingKey);
 
             // Assert.
             var expectedValue = default(int);
@@ -255,7 +255,7 @@
         public void RemoveNullOrEmptyKeyThrowsArgumentException(string key)
         {
             // Act.
-            Exception exception = Record.Exception(() => _cache.Remove(key));
+            var exception = Record.Exception(() => _cache.Remove(key));
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -291,7 +291,7 @@
         public async Task RemoveAsyncNullOrEmptyKeyThrowsArgumentException(string key)
         {
             // Act.
-            Exception exception = await Record.ExceptionAsync(() => _cache.RemoveAsync(key));
+            var exception = await Record.ExceptionAsync(() => _cache.RemoveAsync(key));
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -331,7 +331,7 @@
             var cacheOptions = new CacheItemOptions();
 
             // Act.
-            Exception exception = Record.Exception(() => _cache.Set(key, value, cacheOptions));
+            var exception = Record.Exception(() => _cache.Set(key, value, cacheOptions));
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -345,7 +345,7 @@
             var cacheOptions = new CacheItemOptions();
 
             // Act.
-            Exception exception = Record.Exception(() => _cache.Set<object>(key, null, cacheOptions));
+            var exception = Record.Exception(() => _cache.Set<object>(key, null, cacheOptions));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -360,7 +360,7 @@
             CacheItemOptions cacheOptions = null;
 
             // Act.
-            Exception exception = Record.Exception(() => _cache.Set(key, value, cacheOptions));
+            var exception = Record.Exception(() => _cache.Set(key, value, cacheOptions));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -406,7 +406,7 @@
             var cacheOptions = new CacheItemOptions();
 
             // Act.
-            Exception exception = await Record.ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions));
+            var exception = await Record.ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions));
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -420,7 +420,7 @@
             var cacheOptions = new CacheItemOptions();
 
             // Act.
-            Exception exception = await Record.ExceptionAsync(() => _cache.SetAsync<object>(key, null, cacheOptions));
+            var exception = await Record.ExceptionAsync(() => _cache.SetAsync<object>(key, null, cacheOptions));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -435,7 +435,7 @@
             CacheItemOptions cacheOptions = null;
 
             // Act.
-            Exception exception = await Record.ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions));
+            var exception = await Record.ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);

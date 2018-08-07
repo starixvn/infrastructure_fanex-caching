@@ -35,7 +35,7 @@
                 throw new ArgumentException("Key must not be null or empty.", nameof(key));
             }
 
-            bool found = MemoryStorage.TryGet(key, out object result);
+            var found = MemoryStorage.TryGet(key, out object result);
 
             if ((result != null) && (result is T))
             {
@@ -52,7 +52,7 @@
 
         public Task<Tuple<bool, T>> TryGetAsync<T>(string key)
         {
-            bool found = TryGet(key, out T value);
+            var found = TryGet(key, out T value);
 
             return Task.FromResult(new Tuple<bool, T>(found, value));
         }

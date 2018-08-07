@@ -26,7 +26,7 @@
                 throw new ArgumentOutOfRangeException(
                     nameof(relative),
                     relative,
-                    "The relative expiration value must be positive.");
+                    "The relative expiration value must not be zero.");
             }
 
             RelativeExpiration = relative;
@@ -41,7 +41,7 @@
                 throw new ArgumentOutOfRangeException(
                     nameof(offset),
                     offset,
-                    "The sliding expiration value must be positive.");
+                    "The sliding expiration value must not be zero.");
             }
 
             SlidingExpiration = offset;
@@ -54,6 +54,56 @@
             RelativeExpiration = DefaultRelativeExpiration;
 
             return this;
+        }
+
+        public TimeSpan? CalculateRelativeExpiration(DateTimeOffset now)
+        {
+            if (RelativeExpiration.HasValue && AbsoluteExpiration.HasValue)
+            {
+                if (now + RelativeExpiration.Value <= AbsoluteExpiration.Value)
+                {
+                    return RelativeExpiration.Value;
+                }
+
+                return AbsoluteExpiration.Value - now;
+            }
+
+            if (RelativeExpiration.HasValue)
+            {
+                return RelativeExpiration.Value;
+            }
+
+            if (AbsoluteExpiration.HasValue)
+            {
+                return AbsoluteExpiration.Value - now;
+            }
+
+            return null;
+        }
+
+        public DateTimeOffset? CalculateAbsoluteExpiration(DateTimeOffset now)
+        {
+            if (RelativeExpiration.HasValue && AbsoluteExpiration.HasValue)
+            {
+                if (AbsoluteExpiration.Value <= now + RelativeExpiration.Value)
+                {
+                    return AbsoluteExpiration.Value;
+                }
+
+                return now + RelativeExpiration.Value;
+            }
+
+            if (RelativeExpiration.HasValue)
+            {
+                return now + RelativeExpiration.Value;
+            }
+
+            if (AbsoluteExpiration.HasValue)
+            {
+                return AbsoluteExpiration.Value;
+            }
+
+            return null;
         }
     }
 }

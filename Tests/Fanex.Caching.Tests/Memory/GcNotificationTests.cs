@@ -95,7 +95,7 @@
         public void RetryInvokingCallbackIfExceptionWasThrownAtPreviousCall()
         {
             // Arrange.
-            int invocationCount = 0;
+            var invocationCount = 0;
 
             InvokeInItsOwnScope(() =>
             {

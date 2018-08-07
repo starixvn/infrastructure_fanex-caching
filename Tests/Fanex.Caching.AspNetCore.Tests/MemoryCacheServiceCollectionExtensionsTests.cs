@@ -19,7 +19,7 @@
         public void CallAddMemoryCacheOnNullServiceCollectionThrowsArgumentNullException()
         {
             // Act.
-            Exception exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null));
+            var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -66,7 +66,7 @@
             var configuration = ReadConfiguration();
 
             // Act.
-            Exception exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, configuration));
+            var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, configuration));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -79,7 +79,7 @@
             IConfigurationSection configuration = null;
 
             // Act.
-            Exception exception = Record.Exception(() => _services.AddMemoryCache(configuration));
+            var exception = Record.Exception(() => _services.AddMemoryCache(configuration));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -143,7 +143,7 @@
         public void CallAddMemoryCacheWithOptionAccessorOnNullServiceCollectionThrowsArgumentNullException()
         {
             // Act.
-            Exception exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, _ => { }));
+            var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, _ => { }));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -156,7 +156,7 @@
             Action<MemoryCacheOptions> setupAction = null;
 
             // Act.
-            Exception exception = Record.Exception(() => _services.AddMemoryCache(setupAction));
+            var exception = Record.Exception(() => _services.AddMemoryCache(setupAction));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);

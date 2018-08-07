@@ -71,7 +71,7 @@
                 });
 
             // Act.
-            object result = _cacheService.Get<object>(_testingKey);
+            var result = _cacheService.Get<object>(_testingKey);
 
             // Assert.
             Assert.Null(result);
@@ -91,7 +91,7 @@
                 });
 
             // Act.
-            object result = _cacheService.Get<object>(_testingKey);
+            var result = _cacheService.Get<object>(_testingKey);
 
             // Assert.
             Assert.Same(_testingValue, result);
@@ -114,7 +114,7 @@
             _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(false, null));
 
             // Act.
-            object result = await _cacheService.GetAsync<object>(_testingKey);
+            var result = await _cacheService.GetAsync<object>(_testingKey);
 
             // Assert.
             Assert.Null(result);
@@ -167,7 +167,7 @@
                 });
 
             // Act.
-            object result = _cacheService.GetOrSet(_testingKey, _testingFactory, _testingCacheItemOptions);
+            var result = _cacheService.GetOrSet(_testingKey, _testingFactory, _testingCacheItemOptions);
 
             // Assert.
             Assert.Same(_testingValue, result);
@@ -187,7 +187,7 @@
                 });
 
             // Act.
-            object result = _cacheService.GetOrSet<object>(_testingKey, null, _testingCacheItemOptions);
+            var result = _cacheService.GetOrSet<object>(_testingKey, null, _testingCacheItemOptions);
 
             // Assert.
             Assert.Null(result);
@@ -209,7 +209,7 @@
                 });
 
             // Act.
-            object result = _cacheService.GetOrSet(_testingKey, _testingFactory, _testingCacheItemOptions);
+            var result = _cacheService.GetOrSet(_testingKey, _testingFactory, _testingCacheItemOptions);
 
             // Assert.
             _cacheStorage
@@ -236,7 +236,7 @@
                 });
 
             // Act.
-            object result = _cacheService.GetOrSet(_testingKey, _testingFactory);
+            var result = _cacheService.GetOrSet(_testingKey, _testingFactory);
 
             // Assert.
             Assert.Same(_testingValue, result);
@@ -276,7 +276,7 @@
             _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(true, _testingValue));
 
             // Act.
-            object result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions);
+            var result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions);
 
             // Assert.
             Assert.Same(_testingValue, result);
@@ -289,7 +289,7 @@
             _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(false, null));
 
             // Act.
-            object result = await _cacheService.GetOrSetAsync<object>(_testingKey, null, _testingCacheItemOptions);
+            var result = await _cacheService.GetOrSetAsync<object>(_testingKey, null, _testingCacheItemOptions);
 
             // Assert.
             Assert.Null(result);
@@ -304,7 +304,7 @@
             _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(false, null));
 
             // Act.
-            object result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions);
+            var result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions);
 
             // Assert.
             await _cacheStorage
@@ -324,7 +324,7 @@
             _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(true, _testingValue));
 
             // Act.
-            object result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory);
+            var result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory);
 
             // Assert.
             Assert.Same(_testingValue, result);

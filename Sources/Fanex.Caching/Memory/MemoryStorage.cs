@@ -9,7 +9,9 @@
     internal sealed class MemoryStorage : IMemoryStorage
     {
         private readonly ConcurrentDictionary<string, MemoryCacheItem> _items;
-        private readonly MemoryCacheOptions _options;
+        private readonly ISystemClock _clock;
+        private readonly TimeSpan _expirationScanFrequency;
+        private readonly double _compactionPercentage;
 
         private DateTimeOffset _lastExpirationScan;
         private bool _disposed;
@@ -17,10 +19,12 @@
         public MemoryStorage(MemoryCacheOptions options)
         {
             _items = new ConcurrentDictionary<string, MemoryCacheItem>();
-            _options = options;
-            _lastExpirationScan = _options.Clock.UtcNow;
+            _clock = options.Clock;
+            _expirationScanFrequency = options.ExpirationScanFrequency;
+            _lastExpirationScan = _clock.UtcNow;
+            _compactionPercentage = options.CompactionPercentage;
 
-            if (_options.CompactOnMemoryPressure)
+            if (options.CompactOnMemoryPressure)
             {
                 GcNotification.Register(DoMemoryPreassureCollection, this);
             }
@@ -31,16 +35,12 @@
         private ICollection<KeyValuePair<string, MemoryCacheItem>> Items => _items;
 
         public bool Contain(string key)
-        {
-            CheckDisposed();
-
-            return _items.TryGetValue(key, out _);
-        }
+            => TryGet(key, out _);
 
         public bool TryGet(string key, out object value)
         {
             var found = false;
-            var now = _options.Clock.UtcNow;
+            var now = _clock.UtcNow;
 
             CheckDisposed();
             value = null;
@@ -81,7 +81,7 @@
         {
             CheckDisposed();
 
-            DateTimeOffset utcNow = _options.Clock.UtcNow;
+            var utcNow = _clock.UtcNow;
             var item = new MemoryCacheItem(key, value, options, utcNow);
 
             if (_items.TryGetValue(key, out MemoryCacheItem previousItem))
@@ -138,9 +138,9 @@
 
         private void StartScanForExpiredItems()
         {
-            DateTimeOffset now = _options.Clock.UtcNow;
+            var now = _clock.UtcNow;
 
-            if (_options.ExpirationScanFrequency < now - _lastExpirationScan)
+            if (_expirationScanFrequency < now - _lastExpirationScan)
             {
                 _lastExpirationScan = now;
 
@@ -150,9 +150,9 @@
 
         private static void ScanForExpiredItems(MemoryStorage cache)
         {
-            DateTimeOffset now = cache._options.Clock.UtcNow;
+            var now = cache._clock.UtcNow;
 
-            foreach (MemoryCacheItem item in cache._items.Values)
+            foreach (var item in cache._items.Values)
             {
                 if (item.CheckExpired(now))
                 {
@@ -165,7 +165,7 @@
         {
             if (state is MemoryStorage storage && !storage._disposed)
             {
-                storage.Compact(storage._options.CompactionPercentage);
+                storage.Compact(storage._compactionPercentage);
 
                 return true;
             }
@@ -191,7 +191,7 @@
             ExpirePriorityBucket(removalCountTarget, expiredItems, normalPriorityItems);
             ExpirePriorityBucket(removalCountTarget, expiredItems, highPriorityItems);
 
-            foreach (MemoryCacheItem item in expiredItems)
+            foreach (var item in expiredItems)
             {
                 RemoveItem(item);
             }
@@ -205,7 +205,7 @@
             ref List<MemoryCacheItem> normalPriorityItems,
             ref List<MemoryCacheItem> highPriorityItems)
         {
-            DateTimeOffset now = _options.Clock.UtcNow;
+            var now = _clock.UtcNow;
 
             foreach (var item in _items.Values)
             {
@@ -257,7 +257,7 @@
                 return;
             }
 
-            IEnumerator<MemoryCacheItem> orderedPriorityItems = priorityItems.OrderBy(entry => entry.LastAccess).GetEnumerator();
+            var orderedPriorityItems = priorityItems.OrderBy(entry => entry.LastAccess).GetEnumerator();
 
             try
             {

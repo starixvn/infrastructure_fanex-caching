@@ -14,7 +14,7 @@
             CacheServiceManager.Reset();
 
             // Act
-            ICache currentCacheStorage = CacheServiceManager.CacheStorage;
+            var currentCacheStorage = CacheServiceManager.CacheStorage;
 
             // Assert.
             Assert.IsType<MemoryCache>(currentCacheStorage);
@@ -29,7 +29,7 @@
             CacheServiceManager.Reset();
 
             // Act
-            Exception exception = Record.Exception(() => CacheServiceManager.Use(cacheFactory));
+            var exception = Record.Exception(() => CacheServiceManager.Use(cacheFactory));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -39,13 +39,13 @@
         public void UseConfiguredCacheStorageFactoryToCreateStorage()
         {
             // Arrange.
-            ICache fakeCacheStorage = Substitute.For<ICache>();
+            var fakeCacheStorage = Substitute.For<ICache>();
 
             CacheServiceManager.Reset();
             CacheServiceManager.Use(() => fakeCacheStorage);
 
             // Act
-            ICache currentCacheStorage = CacheServiceManager.CacheStorage;
+            var currentCacheStorage = CacheServiceManager.CacheStorage;
 
             // Assert.
             Assert.Same(fakeCacheStorage, currentCacheStorage);
@@ -60,7 +60,7 @@
             CacheServiceManager.Reset();
 
             // Act
-            Exception exception = Record.Exception(() => CacheServiceManager.Use(cache));
+            var exception = Record.Exception(() => CacheServiceManager.Use(cache));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
