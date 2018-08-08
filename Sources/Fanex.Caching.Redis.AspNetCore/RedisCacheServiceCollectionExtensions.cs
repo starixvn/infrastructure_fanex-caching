@@ -4,6 +4,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
+    using StackExchange.Redis;
 
     public static class RedisCacheServiceCollectionExtensions
     {
@@ -35,10 +36,27 @@
             var options = new RedisCacheOptions();
 
             configuration.Bind(options);
+            ReadEndPoints(configuration, options);
+
             services.AddSingleton(options);
             services.AddRedisCache();
 
             return services;
+        }
+
+        private static void ReadEndPoints(IConfigurationSection configuration, RedisCacheOptions options)
+        {
+            var endPoints = configuration.GetSection("ConnectionOptions:EndPoints").Get<string[]>();
+
+            if (endPoints != null && endPoints.Length > 0)
+            {
+                options.ConnectionOptions = options.ConnectionOptions ?? new ConfigurationOptions();
+
+                foreach (var endPoint in endPoints)
+                {
+                    options.ConnectionOptions.EndPoints.Add(endPoint);
+                }
+            }
         }
 
         public static IServiceCollection AddRedisCache(this IServiceCollection services, Action<RedisCacheOptions> setupAction)

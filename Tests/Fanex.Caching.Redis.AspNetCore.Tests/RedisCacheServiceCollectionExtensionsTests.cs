@@ -19,7 +19,7 @@
         public void CallAddRedisCacheOnNullServiceCollectionThrowsArgumentNullException()
         {
             // Act.
-            Exception exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null));
+            var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -66,7 +66,7 @@
             var configuration = ReadConfiguration();
 
             // Act.
-            Exception exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null, configuration));
+            var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null, configuration));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -79,7 +79,7 @@
             IConfigurationSection configuration = null;
 
             // Act.
-            Exception exception = Record.Exception(() => _services.AddRedisCache(configuration));
+            var exception = Record.Exception(() => _services.AddRedisCache(configuration));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -107,18 +107,28 @@
             // Act.
             _services.AddRedisCache(configuration);
 
-            var provider = _services.BuildServiceProvider();
-            var options = provider.GetService<RedisCacheOptions>();
-
             // Assert.
-            var expectedHost = "127.0.0.1";
-            var expectedPort = 6379;
-            var expectedApplicationName = "Fanex.Caching.Redis";
+            var options = _services.BuildServiceProvider().GetService<RedisCacheOptions>();
+            var expectedApplicationName = "Fanex.Caching.Redis.AspNetCore.Tests";
 
             Assert.NotNull(options);
-            Assert.Equal(expectedHost, options.Host);
-            Assert.Equal(expectedPort, options.Port);
+            Assert.NotEmpty(options.ConnectionOptions.EndPoints);
             Assert.Equal(expectedApplicationName, options.ApplicationName);
+        }
+
+        [Fact]
+        public void AddRedisCacheWithConfigurationSectionDoesNoteOverwriteClock()
+        {
+            // Arrange.
+            var configuration = ReadConfiguration();
+
+            // Act.
+            _services.AddRedisCache(configuration);
+
+            // Assert.
+            var options = _services.BuildServiceProvider().GetService<RedisCacheOptions>();
+
+            Assert.NotNull(options.Clock);
         }
 
         private static IConfigurationSection ReadConfiguration()
@@ -134,7 +144,7 @@
         public void CallAddRedisCacheWithOptionAccessorOnNullServiceCollectionThrowsArgumentNullException()
         {
             // Act.
-            Exception exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null, _ => { }));
+            var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null, _ => { }));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -147,7 +157,7 @@
             Action<RedisCacheOptions> setupAction = null;
 
             // Act.
-            Exception exception = Record.Exception(() => _services.AddRedisCache(setupAction));
+            var exception = Record.Exception(() => _services.AddRedisCache(setupAction));
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);

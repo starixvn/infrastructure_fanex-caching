@@ -23,9 +23,14 @@
 
             Console.WriteLine("                       Using Redis Cache With Following Configurations");
             Console.WriteLine("------------------------------------------------------------------------------------------");
-            Console.WriteLine($"Host: {options.Host}");
-            Console.WriteLine($"Port: {options.Port}");
             Console.WriteLine($"ApplicationName: {options.ApplicationName}");
+            Console.WriteLine("End points:");
+
+            for (var counter = 0; counter < options.ConnectionOptions.EndPoints.Count; counter++)
+            {
+                Console.WriteLine($"#{counter + 1}: {options.ConnectionOptions.EndPoints[counter]}");
+            }
+
             Console.WriteLine();
 
             var key1 = "Key 1";

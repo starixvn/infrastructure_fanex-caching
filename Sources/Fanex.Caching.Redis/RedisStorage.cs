@@ -10,38 +10,47 @@
         private readonly SemaphoreSlim _connectionLock = new SemaphoreSlim(1, 1);
         private readonly ConfigurationOptions _redisConnectionOptions;
         private readonly ISerializer _serializer;
+        private readonly ISystemClock _clock;
         private readonly string _applicationName;
+
         private volatile ConnectionMultiplexer _connection;
         private IDatabase _database;
 
-        public RedisStorage(RedisCacheOptions options)
+        public RedisStorage(RedisCacheOptions storageOptions)
         {
-            _redisConnectionOptions = options.ToRedisConnectionOptions();
-            _serializer = options.Serializer;
-            _applicationName = options.ApplicationName;
+            _applicationName = storageOptions.ApplicationName;
+            _serializer = storageOptions.Serializer;
+            _clock = storageOptions.Clock;
+            _redisConnectionOptions = storageOptions.ToRedisConnectionOptions();
         }
 
         public bool Contain(string key)
         {
             Connect();
 
-            return _database.KeyExists(ModifyKey(key));
+            var command = RedisCommand.CreateGetCommand(ModifyKey(key));
+            var redisResult = _database.ScriptEvaluate(command.Script, command.Keys);
+
+            return !redisResult.IsNull;
         }
 
         public async Task<bool> ContainAsync(string key)
         {
             await ConnectAsync().ConfigureAwait(false);
 
-            return await _database.KeyExistsAsync(ModifyKey(key)).ConfigureAwait(false);
+            var command = RedisCommand.CreateGetCommand(ModifyKey(key));
+            var redisResult = await _database.ScriptEvaluateAsync(command.Script, command.Keys).ConfigureAwait(false);
+
+            return !redisResult.IsNull;
         }
 
         public bool TryGet<T>(string key, out T value)
         {
             Connect();
 
-            RedisCommand command = new RedisCacheItem(ModifyKey(key), RedisValue.Null, null).ToGetCommand();
-            RedisResult redisResult = _database.ScriptEvaluate(command.Script, command.Keys);
-            bool found = false;
+            var command = RedisCommand.CreateGetCommand(ModifyKey(key));
+            var redisResult = _database.ScriptEvaluate(command.Script, command.Keys);
+            var found = false;
 
             value = default(T);
 
@@ -58,10 +67,10 @@
         {
             await ConnectAsync().ConfigureAwait(false);
 
-            RedisCommand command = new RedisCacheItem(ModifyKey(key), RedisValue.Null, null).ToGetCommand();
-            RedisResult redisResult = await _database.ScriptEvaluateAsync(command.Script, command.Keys).ConfigureAwait(false);
-            bool found = false;
-            T value = default(T);
+            var command = RedisCommand.CreateGetCommand(ModifyKey(key));
+            var redisResult = await _database.ScriptEvaluateAsync(command.Script, command.Keys).ConfigureAwait(false);
+            var found = false;
+            var value = default(T);
 
             if (!redisResult.IsNull)
             {
@@ -88,9 +97,13 @@
         {
             Connect();
 
-            RedisKey redisKey = ModifyKey(key);
-            RedisValue redisValue = RedisTypeConverter.ToRedisValue(value, _serializer);
-            RedisCommand command = new RedisCacheItem(redisKey, redisValue, options).ToSetCommand();
+            var redisKey = ModifyKey(key);
+            var redisValue = RedisTypeConverter.ToRedisValue(value, _serializer);
+            var command = RedisCommand.CreateSetCommand(
+                redisKey,
+                redisValue,
+                options,
+                _clock.UtcNow);
 
             _database.ScriptEvaluate(command.Script, command.Keys, command.Values);
         }
@@ -101,7 +114,11 @@
 
             RedisKey redisKey = ModifyKey(key);
             RedisValue redisValue = RedisTypeConverter.ToRedisValue(value, _serializer);
-            RedisCommand command = new RedisCacheItem(redisKey, redisValue, options).ToSetCommand();
+            RedisCommand command = RedisCommand.CreateSetCommand(
+                redisKey,
+                redisValue,
+                options,
+                _clock.UtcNow);
 
             await _database.ScriptEvaluateAsync(command.Script, command.Keys, command.Values).ConfigureAwait(false);
         }
