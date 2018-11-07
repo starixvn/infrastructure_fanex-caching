@@ -28,7 +28,7 @@
         }
 
         [Fact]
-        public void ContainAlwaysCallCacheStorageContain()
+        public void ContainCallsContainOfCacheStorage()
         {
             // Act.
             _cacheService.Contain(_testingKey);
@@ -38,23 +38,26 @@
         }
 
         [Fact]
-        public async Task ContainAsyncAlwaysCallCacheStorageContainAsync()
+        public async Task ContainAsyncCallsContainAsyncOfCacheStorage()
         {
             // Act.
-            await _cacheService.ContainAsync(_testingKey);
+            await _cacheService.ContainAsync(_testingKey).ConfigureAwait(false);
 
             // Assert.
-            await _cacheStorage.Received().ContainAsync(Arg.Is(_testingKey));
+            await _cacheStorage
+                .Received()
+                .ContainAsync(Arg.Is(_testingKey))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public void GetAlwaysCallCacheStorageTryGet()
+        public void GetCallsTryGetOfCacheStorage()
         {
             // Act.
             _cacheService.Get<object>(_testingKey);
 
             // Assert.
-            _cacheStorage.Received().TryGet<object>(Arg.Is(_testingKey), out _);
+            _cacheStorage.Received().TryGet(Arg.Is(_testingKey), out object _);
         }
 
         [Fact]
@@ -62,7 +65,7 @@
         {
             // Arrange.
             _cacheStorage
-                .TryGet<object>(_testingKey, out _)
+                .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
                 {
                     parameters[1] = null;
@@ -82,7 +85,7 @@
         {
             // Arrange.
             _cacheStorage
-                .TryGet<object>(_testingKey, out _)
+                .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
                 {
                     parameters[1] = _testingValue;
@@ -98,23 +101,26 @@
         }
 
         [Fact]
-        public async Task GetAsyncAlwaysCallCacheStorageTryGetAsync()
+        public async Task GetAsyncCallsTryGetAsyncOfCacheStorage()
         {
             // Act.
-            await _cacheService.GetAsync<object>(_testingKey);
+            await _cacheService.GetAsync<object>(_testingKey).ConfigureAwait(false);
 
             // Assert.
-            await _cacheStorage.Received().TryGetAsync<object>(Arg.Is(_testingKey));
+            await _cacheStorage
+                .Received()
+                .TryGetAsync<object>(Arg.Is(_testingKey))
+                .ConfigureAwait(false);
         }
 
         [Fact]
         public async Task GetAsyncReturnsDefaultValueForMissingKey()
         {
             // Arrange.
-            _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(false, null));
+            _cacheStorage.TryGetAsync<object>(_testingKey).Returns((false, null));
 
             // Act.
-            var result = await _cacheService.GetAsync<object>(_testingKey);
+            var result = await _cacheService.GetAsync<object>(_testingKey).ConfigureAwait(false);
 
             // Assert.
             Assert.Null(result);
@@ -124,33 +130,36 @@
         public async Task GetAsyncExistingKeyReturnsCachedValue()
         {
             // Arrange.
-            _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(true, _testingValue));
+            _cacheStorage.TryGetAsync<object>(_testingKey).Returns((true, _testingValue));
 
             // Act.
-            var result = await _cacheService.GetAsync<object>(_testingKey);
+            var result = await _cacheService.GetAsync<object>(_testingKey).ConfigureAwait(false);
 
             // Assert.
             Assert.Same(_testingValue, result);
         }
 
         [Fact]
-        public void TryGetAlwaysCallCacheStorageTryGet()
+        public void TryGetCallsTryGetOfCacheStorage()
         {
             // Act.
-            _cacheService.TryGet<object>(_testingKey, out _);
+            _cacheService.TryGet(_testingKey, out object _);
 
             // Assert.
-            _cacheStorage.Received().TryGet<object>(Arg.Is(_testingKey), out _);
+            _cacheStorage.Received().TryGet(Arg.Is(_testingKey), out object _);
         }
 
         [Fact]
-        public async Task TryGetAsyncAlwaysCallCacheStorageTryGetAsync()
+        public async Task TryGetAsyncCallsTryGetAsyncOfCacheStorage()
         {
             // Act.
-            await _cacheService.TryGetAsync<object>(_testingKey);
+            await _cacheService.TryGetAsync<object>(_testingKey).ConfigureAwait(false);
 
             // Assert.
-            await _cacheStorage.Received().TryGetAsync<object>(Arg.Is(_testingKey));
+            await _cacheStorage
+                .Received()
+                .TryGetAsync<object>(Arg.Is(_testingKey))
+                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -158,7 +167,7 @@
         {
             // Arrange.
             _cacheStorage
-                .TryGet<object>(_testingKey, out _)
+                .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
                 {
                     parameters[1] = _testingValue;
@@ -178,7 +187,7 @@
         {
             // Arrange.
             _cacheStorage
-                .TryGet<object>(_testingKey, out _)
+                .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
                 {
                     parameters[1] = null;
@@ -200,7 +209,7 @@
             var newValue = _testingFactory();
 
             _cacheStorage
-                .TryGet<object>(_testingKey, out _)
+                .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
                 {
                     parameters[1] = null;
@@ -223,11 +232,11 @@
         }
 
         [Fact]
-        public void GetOrSetExistingKeyWithoutCacheItemOptionsReturnsCachedValue()
+        public void GetOrSetExistingKeyWithNoCacheItemOptionsReturnsCachedValue()
         {
             // Arrange.
             _cacheStorage
-                .TryGet<object>(_testingKey, out _)
+                .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
                 {
                     parameters[1] = _testingValue;
@@ -243,13 +252,13 @@
         }
 
         [Fact]
-        public void GetOrSetMissingKeyWithoutCacheItemOptionsCachesValueWithDefaultRelativeExpiration()
+        public void GetOrSetMissingKeyWithNoCacheItemOptionsStoresValueWithDefaultRelativeExpiration()
         {
             // Arrange.
             var newValue = _testingFactory();
 
             _cacheStorage
-                .TryGet<object>(_testingKey, out _)
+                .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
                 {
                     parameters[1] = null;
@@ -266,17 +275,19 @@
                 .Set(
                     Arg.Is(_testingKey),
                     Arg.Is(newValue),
-                    Arg.Is<CacheItemOptions>(testingOptions => testingOptions.RelativeExpiration == CacheItemOptions.DefaultRelativeExpiration));
+                    Arg.Is<CacheItemOptions>(testingOptions => IsUsingDefaultRelativeExpiration(testingOptions)));
         }
 
         [Fact]
         public async Task GetOrSetAsyncExistingKeyReturnsCachedValue()
         {
             // Arrange.
-            _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(true, _testingValue));
+            _cacheStorage.TryGetAsync<object>(_testingKey).Returns((true, _testingValue));
 
             // Act.
-            var result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions);
+            var result = await _cacheService
+                .GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions)
+                .ConfigureAwait(false);
 
             // Assert.
             Assert.Same(_testingValue, result);
@@ -286,10 +297,12 @@
         public async Task GetOrSetAsyncMissingKeyWithInvalidValueFactoryReturnsNull()
         {
             // Arrange.
-            _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(false, null));
+            _cacheStorage.TryGetAsync<object>(_testingKey).Returns((false, null));
 
             // Act.
-            var result = await _cacheService.GetOrSetAsync<object>(_testingKey, null, _testingCacheItemOptions);
+            var result = await _cacheService
+                .GetOrSetAsync<object>(_testingKey, null, _testingCacheItemOptions)
+                .ConfigureAwait(false);
 
             // Assert.
             Assert.Null(result);
@@ -301,45 +314,47 @@
             // Arrange.
             var newValue = _testingFactory();
 
-            _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(false, null));
+            _cacheStorage.TryGetAsync<object>(_testingKey).Returns((false, null));
 
             // Act.
-            var result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions);
+            var result = await _cacheService
+                .GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions)
+                .ConfigureAwait(false);
 
             // Assert.
             await _cacheStorage
                 .Received()
-                .SetAsync(
-                    Arg.Is(_testingKey),
-                    Arg.Is(newValue),
-                    Arg.Is(_testingCacheItemOptions));
+                .SetAsync(Arg.Is(_testingKey), Arg.Is(newValue), Arg.Is(_testingCacheItemOptions))
+                .ConfigureAwait(false);
 
             Assert.Same(newValue, result);
         }
 
         [Fact]
-        public async Task GetOrSetAsyncExistingKeyWithoutCacheItemOptionsReturnsCachedValue()
+        public async Task GetOrSetAsyncExistingKeyWithNoCacheItemOptionsReturnsCachedValue()
         {
             // Arrange.
-            _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(true, _testingValue));
+            _cacheStorage.TryGetAsync<object>(_testingKey).Returns((true, _testingValue));
 
             // Act.
-            var result = await _cacheService.GetOrSetAsync(_testingKey, _testingFactory);
+            var result = await _cacheService
+                .GetOrSetAsync(_testingKey, _testingFactory)
+                .ConfigureAwait(false);
 
             // Assert.
             Assert.Same(_testingValue, result);
         }
 
         [Fact]
-        public async Task GetOrSetAsyncMissingKeyWithoutCacheItemOptionsCachesValueWithDefaultRelativeExpiration()
+        public async Task GetOrSetAsyncMissingKeyWithNoCacheItemOptionsStoresValueWithDefaultRelativeExpiration()
         {
             // Arrange.
             var newValue = _testingFactory();
 
-            _cacheStorage.TryGetAsync<object>(_testingKey).Returns(new Tuple<bool, object>(false, null));
+            _cacheStorage.TryGetAsync<object>(_testingKey).Returns((false, null));
 
             // Act.
-            await _cacheService.GetOrSetAsync(_testingKey, _testingFactory);
+            await _cacheService.GetOrSetAsync(_testingKey, _testingFactory).ConfigureAwait(false);
 
             // Assert.
             await _cacheStorage
@@ -347,11 +362,12 @@
                 .SetAsync(
                     Arg.Is(_testingKey),
                     Arg.Is(newValue),
-                    Arg.Is<CacheItemOptions>(testingOptions => testingOptions.RelativeExpiration == CacheItemOptions.DefaultRelativeExpiration));
+                    Arg.Is<CacheItemOptions>(testingOptions => IsUsingDefaultRelativeExpiration(testingOptions)))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public void RemoveAlwaysCallCacheStorageRemove()
+        public void RemoveCallsRemoveOfCacheStorage()
         {
             // Act.
             _cacheService.Remove(_testingKey);
@@ -361,17 +377,20 @@
         }
 
         [Fact]
-        public async Task RemoveAsyncAlwaysCallCacheStorageRemoveAsync()
+        public async Task RemoveAsyncCallsRemoveAsyncOfCacheStorage()
         {
             // Act.
-            await _cacheService.RemoveAsync(_testingKey);
+            await _cacheService.RemoveAsync(_testingKey).ConfigureAwait(false);
 
             // Assert.
-            await _cacheStorage.Received().RemoveAsync(Arg.Is(_testingKey));
+            await _cacheStorage
+                .Received()
+                .RemoveAsync(Arg.Is(_testingKey))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public void SetAlwaysCallCacheStorageSet()
+        public void SetCallsSetOfCacheStorageSet()
         {
             // Act.
             _cacheService.Set(_testingKey, _testingValue, _testingCacheItemOptions);
@@ -386,7 +405,7 @@
         }
 
         [Fact]
-        public void SetWithoutCacheItemOptionsCachesValueWithDefaultRelativeExpiration()
+        public void SetWithNoCacheItemOptionsStoresValueWithDefaultRelativeExpiration()
         {
             // Act.
             _cacheService.Set(_testingKey, _testingValue);
@@ -397,14 +416,29 @@
                 .Set(
                     Arg.Is(_testingKey),
                     Arg.Is(_testingValue),
-                    Arg.Is<CacheItemOptions>(testingOptions => testingOptions.RelativeExpiration == CacheItemOptions.DefaultRelativeExpiration));
+                    Arg.Is<CacheItemOptions>(testingOptions => IsUsingDefaultRelativeExpiration(testingOptions)));
         }
 
         [Fact]
-        public async Task SetAsyncAlwaysCallCacheStorageSetAsync()
+        public async Task SetAsyncCallsSetAsyncOfCacheStorage()
         {
             // Act.
-            await _cacheService.SetAsync(_testingKey, _testingValue, _testingCacheItemOptions);
+            await _cacheService
+                .SetAsync(_testingKey, _testingValue, _testingCacheItemOptions)
+                .ConfigureAwait(false);
+
+            // Assert.
+            await _cacheStorage
+                .Received()
+                .SetAsync(Arg.Is(_testingKey), Arg.Is(_testingValue), Arg.Is(_testingCacheItemOptions))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task SetAsyncWithNoCacheItemOptionsStoresValueWithDefaultRelativeExpiration()
+        {
+            // Act.
+            await _cacheService.SetAsync(_testingKey, _testingValue).ConfigureAwait(false);
 
             // Assert.
             await _cacheStorage
@@ -412,22 +446,11 @@
                 .SetAsync(
                     Arg.Is(_testingKey),
                     Arg.Is(_testingValue),
-                    Arg.Is(_testingCacheItemOptions));
+                    Arg.Is<CacheItemOptions>(testingOptions => IsUsingDefaultRelativeExpiration(testingOptions)))
+                .ConfigureAwait(false);
         }
 
-        [Fact]
-        public async Task SetAsyncWithoutCacheItemOptionsCachesValueWithDefaultRelativeExpiration()
-        {
-            // Act.
-            await _cacheService.SetAsync(_testingKey, _testingValue);
-
-            // Assert.
-            await _cacheStorage
-                .Received()
-                .SetAsync(
-                    Arg.Is(_testingKey),
-                    Arg.Is(_testingValue),
-                    Arg.Is<CacheItemOptions>(testingOptions => testingOptions.RelativeExpiration == CacheItemOptions.DefaultRelativeExpiration));
-        }
+        private static bool IsUsingDefaultRelativeExpiration(CacheItemOptions options)
+            => options.RelativeExpiration == CacheItemOptions.DefaultRelativeExpiration;
     }
 }

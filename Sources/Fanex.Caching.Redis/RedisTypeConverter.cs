@@ -8,9 +8,7 @@
     {
         public static RedisValue ToRedisValue(object value, ISerializer serializer)
         {
-            var valueType = value.GetType();
-
-            if (typeof(byte[]) == valueType)
+            if (typeof(byte[]) == value.GetType())
             {
                 return (byte[])value;
             }
@@ -18,16 +16,16 @@
             return serializer.Serialize(value);
         }
 
-        public static object ToObject<T>(RedisResult value, ISerializer serializer)
+        public static T ToObject<T>(RedisResult value, ISerializer serializer)
         {
-            var valueType = typeof(T);
+            var binary = (byte[])value;
 
-            if (typeof(byte[]) == valueType)
+            if (binary is T resultInBinary)
             {
-                return (byte[])value;
+                return resultInBinary;
             }
 
-            return serializer.Deserialize<T>((byte[])value);
+            return serializer.Deserialize<T>(binary);
         }
     }
 }

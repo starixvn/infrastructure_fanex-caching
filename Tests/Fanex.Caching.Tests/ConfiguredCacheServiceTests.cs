@@ -57,17 +57,20 @@
         }
 
         [Fact]
-        public async Task ContainAsyncAlwaysCallsContainAsyncOfRegisteredCacheService()
+        public async Task ContainAsyncPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            await ConfiguredCacheService.ContainAsync(_testingKey);
+            await ConfiguredCacheService.ContainAsync(_testingKey).ConfigureAwait(false);
 
             // Assert.
-            await _cacheService.Received().ContainAsync(Arg.Is(_testingKey));
+            await _cacheService
+                .Received()
+                .ContainAsync(Arg.Is(_testingKey))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public void GetAlwaysCallsGetOfRegisteredCacheService()
+        public void GetPropagatesCallToRegisteredCacheService()
         {
             // Act.
             ConfiguredCacheService.Get<object>(_testingKey);
@@ -77,37 +80,43 @@
         }
 
         [Fact]
-        public async Task GetAsyncAlwaysCallsGetAsyncOfRegisteredCacheService()
+        public async Task GetAsyncPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            await ConfiguredCacheService.GetAsync<object>(_testingKey);
+            await ConfiguredCacheService.GetAsync<object>(_testingKey).ConfigureAwait(false);
 
             // Assert.
-            await _cacheService.Received().GetAsync<object>(Arg.Is(_testingKey));
+            await _cacheService
+                .Received()
+                .GetAsync<object>(Arg.Is(_testingKey))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public void TryGetAlwaysCallsTryGetOfRegisteredCacheService()
+        public void TryGetPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            ConfiguredCacheService.TryGet<object>(_testingKey, out _);
+            ConfiguredCacheService.TryGet(_testingKey, out object _);
 
             // Assert.
-            _cacheService.Received().TryGet<object>(Arg.Is(_testingKey), out _);
+            _cacheService.Received().TryGet(Arg.Is(_testingKey), out object _);
         }
 
         [Fact]
-        public async Task TryGetAsyncAlwaysCallsTryGetAsyncOfRegisteredCacheService()
+        public async Task TryGetAsyncPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            await ConfiguredCacheService.TryGetAsync<object>(_testingKey);
+            await ConfiguredCacheService.TryGetAsync<object>(_testingKey).ConfigureAwait(false);
 
             // Assert.
-            await _cacheService.Received().TryGetAsync<object>(Arg.Is(_testingKey));
+            await _cacheService
+                .Received()
+                .TryGetAsync<object>(Arg.Is(_testingKey))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public void GetOrSetAlwaysCallsGetOrSetOfRegisteredCacheService()
+        public void GetOrSetPropagatesCallToRegisteredCacheService()
         {
             // Act.
             ConfiguredCacheService.GetOrSet(_testingKey, _testingFactory, _testingCacheItemOptions);
@@ -122,7 +131,7 @@
         }
 
         [Fact]
-        public void GetOrSetNotTakingCacheItemOptionsAlwaysCallsGetOrSetNotTakingCacheItemOptionsOfRegisteredCacheService()
+        public void GetOrSetWithNoCacheItemOptionsPropagatesCallToRegisteredCacheService()
         {
             // Act.
             ConfiguredCacheService.GetOrSet(_testingKey, _testingFactory);
@@ -132,10 +141,12 @@
         }
 
         [Fact]
-        public async Task GetOrSetAsyncAlwaysCallsGetOrSetAsyncOfRegisteredCacheService()
+        public async Task GetOrSetAsyncPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            await ConfiguredCacheService.GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions);
+            await ConfiguredCacheService
+                .GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions)
+                .ConfigureAwait(false);
 
             // Assert.
             await _cacheService
@@ -143,21 +154,27 @@
                 .GetOrSetAsync(
                     Arg.Is(_testingKey),
                     Arg.Any<Func<object>>(),
-                    Arg.Is(_testingCacheItemOptions));
+                    Arg.Is(_testingCacheItemOptions))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task GetOrSetAsyncNotTakingCacheItemOptionsAlwaysCallsGetOrSetAsyncNotTakingCacheItemOptionsOfRegisteredCacheService()
+        public async Task GetOrSetAsyncWithNoCacheItemOptionsPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            await ConfiguredCacheService.GetOrSetAsync(_testingKey, _testingFactory);
+            await ConfiguredCacheService
+                .GetOrSetAsync(_testingKey, _testingFactory)
+                .ConfigureAwait(false);
 
             // Assert.
-            await _cacheService.Received().GetOrSetAsync(Arg.Is(_testingKey), Arg.Any<Func<object>>());
+            await _cacheService
+                .Received()
+                .GetOrSetAsync(Arg.Is(_testingKey), Arg.Any<Func<object>>())
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public void RemoveAlwaysCallsRemoveOfRegisteredCacheService()
+        public void RemovePropagatesCallToRegisteredCacheService()
         {
             // Act.
             ConfiguredCacheService.Remove(_testingKey);
@@ -167,17 +184,20 @@
         }
 
         [Fact]
-        public async Task RemoveAsyncAlwaysCallsRemoveAsyncOfRegisteredCacheService()
+        public async Task RemoveAsyncPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            await ConfiguredCacheService.RemoveAsync(_testingKey);
+            await ConfiguredCacheService.RemoveAsync(_testingKey).ConfigureAwait(false);
 
             // Assert.
-            await _cacheService.Received().RemoveAsync(Arg.Is(_testingKey));
+            await _cacheService
+                .Received()
+                .RemoveAsync(Arg.Is(_testingKey))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public void SetAlwaysCallsSetOfRegisteredCacheService()
+        public void SetPropagatesCallToRegisteredCacheService()
         {
             // Act.
             ConfiguredCacheService.Set(_testingKey, _testingValue, _testingCacheItemOptions);
@@ -192,7 +212,7 @@
         }
 
         [Fact]
-        public void SetNotTakingCacheItemOptionsAlwaysCallsSetNotTakingCacheItemOptionsOfRegisteredCacheService()
+        public void SetWithNoCacheItemOptionsPropagatesCallToRegisteredCacheService()
         {
             // Act.
             ConfiguredCacheService.Set(_testingKey, _testingValue);
@@ -202,10 +222,12 @@
         }
 
         [Fact]
-        public async Task SetAsyncAlwaysCallsSetAsyncOfRegisteredCacheService()
+        public async Task SetAsyncPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            await ConfiguredCacheService.SetAsync(_testingKey, _testingValue, _testingCacheItemOptions);
+            await ConfiguredCacheService
+                .SetAsync(_testingKey, _testingValue, _testingCacheItemOptions)
+                .ConfigureAwait(false);
 
             // Assert.
             await _cacheService
@@ -213,17 +235,21 @@
                 .SetAsync(
                     Arg.Is(_testingKey),
                     Arg.Is(_testingValue),
-                    Arg.Is(_testingCacheItemOptions));
+                    Arg.Is(_testingCacheItemOptions))
+                .ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task SetAsyncNotTakingCacheItemOptionsAlwaysCallsSetAsyncNotTakingCacheItemOptionsOfRegisteredCacheService()
+        public async Task SetAsyncWithNoCacheItemOptionsPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            await ConfiguredCacheService.SetAsync(_testingKey, _testingValue);
+            await ConfiguredCacheService.SetAsync(_testingKey, _testingValue).ConfigureAwait(false);
 
             // Assert.
-            await _cacheService.Received().SetAsync(Arg.Is(_testingKey), Arg.Is(_testingValue));
+            await _cacheService
+                .Received()
+                .SetAsync(Arg.Is(_testingKey), Arg.Is(_testingValue))
+                .ConfigureAwait(false);
         }
     }
 }

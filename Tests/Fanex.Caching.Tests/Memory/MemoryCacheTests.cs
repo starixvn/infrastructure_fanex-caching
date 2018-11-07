@@ -12,17 +12,17 @@
         private readonly MemoryCache _cache;
         private readonly string _existingKey;
         private readonly object _existingValue;
-        private readonly MemoryCacheItemOptions _cacheOptions;
 
         public MemoryCacheTests()
         {
+            var cacheOptions = new MemoryCacheItemOptions().UseDefaultExpiration();
+
             _fixture = new Fixture();
             _cache = new MemoryCache();
             _existingKey = _fixture.Create<string>();
             _existingValue = _fixture.Create<object>();
-            _cacheOptions = new MemoryCacheItemOptions().UseDefaultExpiration();
 
-            _cache.Set(_existingKey, _existingValue, _cacheOptions);
+            _cache.Set(_existingKey, _existingValue, cacheOptions);
         }
 
         [Fact]
@@ -38,7 +38,7 @@
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void ContainReturnsFalseIfPassingKeyIsNullOrEmpty(string key)
+        public void ContainReturnsFalseForNullOrEmptyKey(string key)
         {
             // Act.
             var found = _cache.Contain(key);
@@ -48,13 +48,13 @@
         }
 
         [Fact]
-        public void ContainReturnsFalseForNonexistingKey()
+        public void ContainReturnsFalseForUnexistingKey()
         {
             // Arrange.
-            var nonexistingKey = _fixture.Create<string>();
+            var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            var found = _cache.Contain(nonexistingKey);
+            var found = _cache.Contain(unexistingKey);
 
             // Assert.
             Assert.False(found);
@@ -73,23 +73,23 @@
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public async Task ContainAsyncReturnsFalseIfPassingKeyIsNullOrEmpty(string key)
+        public async Task ContainAsyncReturnsFalseForNullOrEmptyKey(string key)
         {
             // Act.
-            var found = await _cache.ContainAsync(key);
+            var found = await _cache.ContainAsync(key).ConfigureAwait(false);
 
             // Assert.
             Assert.False(found);
         }
 
         [Fact]
-        public async Task ContainAsyncReturnsFalseForNonexistingKey()
+        public async Task ContainAsyncReturnsFalseForUnexistingKey()
         {
             // Arrange.
-            var nonexistingKey = _fixture.Create<string>();
+            var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            var found = await _cache.ContainAsync(nonexistingKey);
+            var found = await _cache.ContainAsync(unexistingKey).ConfigureAwait(false);
 
             // Assert.
             Assert.False(found);
@@ -99,7 +99,7 @@
         public async Task ContainAsyncReturnsTrueForExistingKey()
         {
             // Act.
-            var found = await _cache.ContainAsync(_existingKey);
+            var found = await _cache.ContainAsync(_existingKey).ConfigureAwait(false);
 
             // Assert.
             Assert.True(found);
@@ -111,7 +111,7 @@
         public void TryGetNullOrEmptyKeyThrowsArgumentException(string key)
         {
             // Act.
-            var exception = Record.Exception(() => _cache.TryGet<object>(key, out _));
+            var exception = Record.Exception(() => _cache.TryGet(key, out object _));
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -121,28 +121,28 @@
         public void TryGetUnexistingKeyReturnsFalse()
         {
             // Arrange.
-            var nonexistingKey = _fixture.Create<string>();
+            var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            var found = _cache.TryGet(nonexistingKey, out object _);
+            var found = _cache.TryGet(unexistingKey, out object _);
 
             // Assert.
             Assert.False(found);
         }
 
         [Fact]
-        public void TryGetUnexistingKeyTakesDefaultValueOfTypeAsOutputParameter()
+        public void TryGetUnexistingKeyTakesDefaultValueAsOutputParameter()
         {
             // Arrange.
-            var nonexistingKey = _fixture.Create<string>();
+            var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            _cache.TryGet(nonexistingKey, out object value);
+            _cache.TryGet(unexistingKey, out object actualValue);
 
             // Assert.
             var expectedValue = default(object);
 
-            Assert.Equal(expectedValue, value);
+            Assert.Equal(expectedValue, actualValue);
         }
 
         [Fact]
@@ -156,25 +156,25 @@
         }
 
         [Fact]
-        public void TryGetExistingKeyWithCorrectValueTypeHasCachedObjectAsOutputParameter()
+        public void TryGetExistingKeySetsCachedObjectAsOutputParameter()
         {
             // Act.
-            _cache.TryGet(_existingKey, out object value);
+            _cache.TryGet(_existingKey, out object actualValue);
 
             // Assert.
-            Assert.Same(_existingValue, value);
+            Assert.Same(_existingValue, actualValue);
         }
 
         [Fact]
-        public void TryGetExistingKeyWithIncorrectValueTypeTakesDefaultValueOfTypeAsOutputParameter()
+        public void TryGetWithIncorrectValueTypeTakesDefaultValueAsOutputParameter()
         {
             // Act.
-            _cache.TryGet(_existingKey, out int value);
+            _cache.TryGet(_existingKey, out int actualValue);
 
             // Assert.
             var expectedValue = default(int);
 
-            Assert.Equal(expectedValue, value);
+            Assert.Equal(expectedValue, actualValue);
         }
 
         [Theory]
@@ -183,7 +183,9 @@
         public async Task TryGetAsyncNullOrEmptyKeyThrowsArgumentException(string key)
         {
             // Act.
-            var exception = await Record.ExceptionAsync(() => _cache.TryGetAsync<object>(key));
+            var exception = await Record
+                .ExceptionAsync(() => _cache.TryGetAsync<object>(key))
+                .ConfigureAwait(false);
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -193,132 +195,60 @@
         public async Task TryGetAsyncUnexistingKeyReturnsFalseAsFirstResult()
         {
             // Arrange.
-            var nonexistingKey = _fixture.Create<string>();
+            var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            var result = await _cache.TryGetAsync<object>(nonexistingKey);
+            var (found, _) = await _cache.TryGetAsync<object>(unexistingKey).ConfigureAwait(false);
 
             // Assert.
-            Assert.False(result.Item1);
+            Assert.False(found);
         }
 
         [Fact]
-        public async Task TryGetAsyncUnexistingKeyReturnsDefaultValueOfTypeAsSecondResult()
+        public async Task TryGetAsyncUnexistingKeyReturnsDefaultValueAsSecondResult()
         {
             // Arrange.
-            var nonexistingKey = _fixture.Create<string>();
+            var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            var result = await _cache.TryGetAsync<object>(nonexistingKey);
+            var (_, actualValue) = await _cache.TryGetAsync<object>(unexistingKey).ConfigureAwait(false);
 
             // Assert.
             var expectedValue = default(object);
 
-            Assert.Equal(expectedValue, result.Item2);
+            Assert.Equal(expectedValue, actualValue);
         }
 
         [Fact]
         public async Task TryGetAsyncExistingKeyReturnsTrueAsFirstResult()
         {
             // Act.
-            var result = await _cache.TryGetAsync<object>(_existingKey);
+            var (found, _) = await _cache.TryGetAsync<object>(_existingKey).ConfigureAwait(false);
 
             // Assert.
-            Assert.True(result.Item1);
+            Assert.True(found);
         }
 
         [Fact]
-        public async Task TryGetAsyncExistingKeyWithCorrectValueTypeReturnsCachedObjectAsSecondResult()
+        public async Task TryGetAsyncExistingKeyReturnsCachedObjectAsSecondResult()
         {
             // Act.
-            var result = await _cache.TryGetAsync<object>(_existingKey);
+            var (_, actualValue) = await _cache.TryGetAsync<object>(_existingKey).ConfigureAwait(false);
 
             // Assert.
-            Assert.Same(_existingValue, result.Item2);
+            Assert.Same(_existingValue, actualValue);
         }
 
         [Fact]
-        public async Task TryGetAsyncExistingKeyWithIncorrectValueTypeReturnsDefaultValueOfTypeAsSecondResult()
+        public async Task TryGetAsyncWithIncorrectValueTypeReturnsDefaultValueAsSecondResult()
         {
             // Act.
-            var result = await _cache.TryGetAsync<int>(_existingKey);
+            var (_, actualValue) = await _cache.TryGetAsync<int>(_existingKey).ConfigureAwait(false);
 
             // Assert.
             var expectedValue = default(int);
 
-            Assert.Equal(expectedValue, result.Item2);
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        public void RemoveNullOrEmptyKeyThrowsArgumentException(string key)
-        {
-            // Act.
-            var exception = Record.Exception(() => _cache.Remove(key));
-
-            // Assert.
-            Assert.IsType<ArgumentException>(exception);
-        }
-
-        [Fact]
-        public void RemoveUnexistingKeyDoesNoChangeCacheStorage()
-        {
-            // Arrange.
-            var nonexistingKey = _fixture.Create<string>();
-            var numberOfExistingKeys = _cache.MemoryStorage.Count;
-
-            // Act.
-            _cache.Remove(nonexistingKey);
-
-            // Assert.
-            Assert.Equal(numberOfExistingKeys, _cache.MemoryStorage.Count);
-        }
-
-        [Fact]
-        public void RemoveExistingKeyRemoveItOutOfCacheStroage()
-        {
-            // Act.
-            _cache.Remove(_existingKey);
-
-            // Assert.
-            Assert.False(_cache.TryGet<object>(_existingKey, out _));
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        public async Task RemoveAsyncNullOrEmptyKeyThrowsArgumentException(string key)
-        {
-            // Act.
-            var exception = await Record.ExceptionAsync(() => _cache.RemoveAsync(key));
-
-            // Assert.
-            Assert.IsType<ArgumentException>(exception);
-        }
-
-        [Fact]
-        public async Task RemoveAsyncUnexistingKeyDoesNoChangeCacheStorage()
-        {
-            // Arrange.
-            var nonexistingKey = _fixture.Create<string>();
-            var numberOfExistingKeys = _cache.MemoryStorage.Count;
-
-            // Act.
-            await _cache.RemoveAsync(nonexistingKey);
-
-            // Assert.
-            Assert.Equal(numberOfExistingKeys, _cache.MemoryStorage.Count);
-        }
-
-        [Fact]
-        public async Task RemoveAsyncExistingKeyRemoveItOutOfCacheStroage()
-        {
-            // Act.
-            await _cache.RemoveAsync(_existingKey);
-
-            // Assert.
-            Assert.False(_cache.TryGet<object>(_existingKey, out _));
+            Assert.Equal(expectedValue, actualValue);
         }
 
         [Theory]
@@ -367,7 +297,7 @@
         }
 
         [Fact]
-        public void SetTakesCacheItemOptions()
+        public void SetWithCacheItemOptionsSavesObjectToStorage()
         {
             // Arrange.
             var key = _fixture.Create<string>();
@@ -378,11 +308,13 @@
             _cache.Set(key, value, cacheOptions);
 
             // Assert.
-            Assert.True(_cache.TryGet<object>(key, out _));
+            var found = _cache.TryGet(key, out object _);
+
+            Assert.True(found);
         }
 
         [Fact]
-        public void SetTakesMemoryCacheItemOptions()
+        public void SetWithMemoryCacheItemOptionsSavesObjectToStorage()
         {
             // Arrange.
             var key = _fixture.Create<string>();
@@ -393,7 +325,9 @@
             _cache.Set(key, value, cacheOptions);
 
             // Assert.
-            Assert.True(_cache.TryGet<object>(key, out _));
+            var found = _cache.TryGet(key, out object _);
+
+            Assert.True(found);
         }
 
         [Theory]
@@ -406,7 +340,9 @@
             var cacheOptions = new CacheItemOptions();
 
             // Act.
-            var exception = await Record.ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions));
+            var exception = await Record
+                .ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions))
+                .ConfigureAwait(false);
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -420,7 +356,9 @@
             var cacheOptions = new CacheItemOptions();
 
             // Act.
-            var exception = await Record.ExceptionAsync(() => _cache.SetAsync<object>(key, null, cacheOptions));
+            var exception = await Record
+                .ExceptionAsync(() => _cache.SetAsync<object>(key, null, cacheOptions))
+                .ConfigureAwait(false);
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -435,7 +373,9 @@
             CacheItemOptions cacheOptions = null;
 
             // Act.
-            var exception = await Record.ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions));
+            var exception = await Record
+                .ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions))
+                .ConfigureAwait(false);
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -450,10 +390,12 @@
             var cacheOptions = new CacheItemOptions();
 
             // Act.
-            await _cache.SetAsync(key, value, cacheOptions);
+            await _cache.SetAsync(key, value, cacheOptions).ConfigureAwait(false);
 
             // Assert.
-            Assert.True(_cache.TryGet<object>(key, out _));
+            var (found, _) = await _cache.TryGetAsync<object>(key).ConfigureAwait(false);
+
+            Assert.True(found);
         }
 
         [Fact]
@@ -465,10 +407,88 @@
             var cacheOptions = new MemoryCacheItemOptions();
 
             // Act.
-            await _cache.SetAsync(key, value, cacheOptions);
+            await _cache.SetAsync(key, value, cacheOptions).ConfigureAwait(false);
 
             // Assert.
-            Assert.True(_cache.TryGet<object>(key, out _));
+            var (found, _) = await _cache.TryGetAsync<object>(key).ConfigureAwait(false);
+
+            Assert.True(found);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void RemoveNullOrEmptyKeyThrowsArgumentException(string key)
+        {
+            // Act.
+            var exception = Record.Exception(() => _cache.Remove(key));
+
+            // Assert.
+            Assert.IsType<ArgumentException>(exception);
+        }
+
+        [Fact]
+        public void RemoveUnexistingKeyDoesNoChangeCacheStorage()
+        {
+            // Arrange.
+            var unexistingKey = _fixture.Create<string>();
+            var numberOfExistingKeys = _cache.MemoryStorage.Count;
+
+            // Act.
+            _cache.Remove(unexistingKey);
+
+            // Assert.
+            Assert.Equal(numberOfExistingKeys, _cache.MemoryStorage.Count);
+        }
+
+        [Fact]
+        public void RemoveExistingKeyRemoveItOutOfCacheStorage()
+        {
+            // Act.
+            _cache.Remove(_existingKey);
+
+            // Assert.
+            var found = _cache.TryGet(_existingKey, out object _);
+
+            Assert.False(found);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task RemoveAsyncNullOrEmptyKeyThrowsArgumentException(string key)
+        {
+            // Act.
+            var exception = await Record.ExceptionAsync(() => _cache.RemoveAsync(key)).ConfigureAwait(false);
+
+            // Assert.
+            Assert.IsType<ArgumentException>(exception);
+        }
+
+        [Fact]
+        public async Task RemoveAsyncUnexistingKeyDoesNoChangeCacheStorage()
+        {
+            // Arrange.
+            var unexistingKey = _fixture.Create<string>();
+            var numberOfExistingKeys = _cache.MemoryStorage.Count;
+
+            // Act.
+            await _cache.RemoveAsync(unexistingKey).ConfigureAwait(false);
+
+            // Assert.
+            Assert.Equal(numberOfExistingKeys, _cache.MemoryStorage.Count);
+        }
+
+        [Fact]
+        public async Task RemoveAsyncExistingKeyRemoveItOutOfCacheStorage()
+        {
+            // Act.
+            await _cache.RemoveAsync(_existingKey).ConfigureAwait(false);
+
+            // Assert.
+            var (found, _) = await _cache.TryGetAsync<object>(_existingKey).ConfigureAwait(false);
+
+            Assert.False(found);
         }
 
         public void Dispose()

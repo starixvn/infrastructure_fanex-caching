@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		Directory.build.props = Directory.build.props
 		Fanex.Caching.ruleset = Fanex.Caching.ruleset
+		SonarQube.Analysis.xml = SonarQube.Analysis.xml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Caching.AspNetCore", "Sources\Fanex.Caching.AspNetCore\Fanex.Caching.AspNetCore.csproj", "{4BB18032-A0CD-4F02-8ACC-3A9A4AE5A825}"
@@ -36,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Caching.Redis.AspNetC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Caching.Redis.AspNetCore.Tests", "Tests\Fanex.Caching.Redis.AspNetCore.Tests\Fanex.Caching.Redis.AspNetCore.Tests.csproj", "{5E4E9045-BD3A-42C2-A144-9C2FC4D4E380}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Caching.Redis.Example", "Examples\Fanex.Caching.Redis.Example\Fanex.Caching.Redis.Example.csproj", "{500953E7-1BAE-4992-96FD-F899391A6054}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fanex.Caching.Redis.Example", "Examples\Fanex.Caching.Redis.Example\Fanex.Caching.Redis.Example.csproj", "{500953E7-1BAE-4992-96FD-F899391A6054}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

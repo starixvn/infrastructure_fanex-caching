@@ -21,7 +21,7 @@
         }
 
         [Fact]
-        public void ConfigureCacheStorageFactoryThrowsArgumentNullExceptionIfTakingNullAsParameter()
+        public void ConfigureNullAsCacheStorageFactoryThrowsArgumentNullException()
         {
             // Arrange.
             Func<ICache> cacheFactory = null;
@@ -52,7 +52,7 @@
         }
 
         [Fact]
-        public void ConfigureCacheStorageThrowsArgumentNullExceptionIfTakingNullAsParameter()
+        public void ConfigureNullAsCacheStorageThrowsArgumentNullException()
         {
             // Arrange.
             ICache cache = null;

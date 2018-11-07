@@ -36,7 +36,7 @@
         }
 
         [Fact]
-        public void CallbackWillNotBeInvokedIfReturnsFalseAtThePreviousInvocation()
+        public void CallbackWillNotBeInvokedIfItReturnsFalseAtThePreviousInvocation()
         {
             // Arrange.
             InvokeInItsOwnScope(() =>

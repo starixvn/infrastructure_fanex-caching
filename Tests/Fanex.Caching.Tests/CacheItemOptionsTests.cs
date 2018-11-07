@@ -104,7 +104,7 @@
             var result = _options.CalculateRelativeExpiration(_clock.UtcNow);
 
             // Assert.
-            Assert.Equal(relativeExpiration, result.Value);
+            Assert.Equal(relativeExpiration, result);
         }
 
         [Fact]
@@ -121,7 +121,7 @@
             var result = _options.CalculateRelativeExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(timeGap, result.Value);
+            Assert.Equal(timeGap, result);
         }
 
         [Fact]
@@ -130,18 +130,20 @@
             // Arrange.
             var checkingTime = _clock.UtcNow;
             var timeGap = _fixture.Create<TimeSpan>();
-            var absoluteExpiration = checkingTime + timeGap;
-            var relativeExpiration = _fixture.Create<TimeSpan>() + timeGap;
+            var soonerAbsoluteExpiration = checkingTime + timeGap;
+            var laterRelativeExpiration = _fixture.Create<TimeSpan>() + timeGap;
 
             _options
-                .SetAbsoluteExpiration(absoluteExpiration)
-                .SetAbsoluteExpiration(relativeExpiration);
+                .SetAbsoluteExpiration(soonerAbsoluteExpiration)
+                .SetAbsoluteExpiration(laterRelativeExpiration);
 
             // Act.
             var result = _options.CalculateRelativeExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(timeGap, result.Value);
+            var expectedRelativeExpiration = soonerAbsoluteExpiration - checkingTime;
+
+            Assert.Equal(expectedRelativeExpiration, result);
         }
 
         [Fact]
@@ -149,19 +151,19 @@
         {
             // Arrange.
             var checkingTime = _clock.UtcNow;
-            var relativeExpiration = _fixture.Create<TimeSpan>();
-            var timeGap = _fixture.Create<TimeSpan>();
-            var absoluteExpiration = checkingTime + relativeExpiration + timeGap;
+            var soonerRelativeExpiration = _fixture.Create<TimeSpan>();
+            var littleBitMoreTimePassed = _fixture.Create<TimeSpan>();
+            var laterAbsoluteExpiration = checkingTime + soonerRelativeExpiration + littleBitMoreTimePassed;
 
             _options
-                .SetAbsoluteExpiration(absoluteExpiration)
-                .SetAbsoluteExpiration(relativeExpiration);
+                .SetAbsoluteExpiration(laterAbsoluteExpiration)
+                .SetAbsoluteExpiration(soonerRelativeExpiration);
 
             // Act.
             var result = _options.CalculateRelativeExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(relativeExpiration, result.Value);
+            Assert.Equal(soonerRelativeExpiration, result);
         }
 
         [Fact]
@@ -189,7 +191,7 @@
             var result = _options.CalculateRelativeExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(CacheItemOptions.DefaultRelativeExpiration, result.Value);
+            Assert.Equal(CacheItemOptions.DefaultRelativeExpiration, result);
         }
 
         [Fact]
@@ -205,7 +207,7 @@
             var result = _options.CalculateAbsoluteExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(expirationTime, result.Value);
+            Assert.Equal(expirationTime, result);
         }
 
         [Fact]
@@ -221,7 +223,7 @@
             var result = _options.CalculateAbsoluteExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(checkingTime + relativeExpiration, result.Value);
+            Assert.Equal(checkingTime + relativeExpiration, result);
         }
 
         [Fact]
@@ -230,18 +232,18 @@
             // Arrange.
             var checkingTime = _clock.UtcNow;
             var timeGap = _fixture.Create<TimeSpan>();
-            var relativeExpiration = _fixture.Create<TimeSpan>() + timeGap;
-            var absoluteExpiration = checkingTime + timeGap;
+            var laterRelativeExpiration = _fixture.Create<TimeSpan>() + timeGap;
+            var soonerAbsoluteExpiration = checkingTime + timeGap;
 
             _options
-                .SetAbsoluteExpiration(relativeExpiration)
-                .SetAbsoluteExpiration(absoluteExpiration);
+                .SetAbsoluteExpiration(laterRelativeExpiration)
+                .SetAbsoluteExpiration(soonerAbsoluteExpiration);
 
             // Act.
             var result = _options.CalculateAbsoluteExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(absoluteExpiration, result.Value);
+            Assert.Equal(soonerAbsoluteExpiration, result);
         }
 
         [Fact]
@@ -249,19 +251,21 @@
         {
             // Arrange.
             var checkingTime = _clock.UtcNow;
-            var relativeExpiration = _fixture.Create<TimeSpan>();
-            var timeGap = _fixture.Create<TimeSpan>();
-            var absoluteExpiration = checkingTime + relativeExpiration + timeGap;
+            var soonerRelativeExpiration = _fixture.Create<TimeSpan>();
+            var litteBitMoreTimePassed = _fixture.Create<TimeSpan>();
+            var laterAbsoluteExpiration = checkingTime + soonerRelativeExpiration + litteBitMoreTimePassed;
 
             _options
-                .SetAbsoluteExpiration(relativeExpiration)
-                .SetAbsoluteExpiration(absoluteExpiration);
+                .SetAbsoluteExpiration(soonerRelativeExpiration)
+                .SetAbsoluteExpiration(laterAbsoluteExpiration);
 
             // Act.
             var result = _options.CalculateAbsoluteExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(checkingTime + relativeExpiration, result.Value);
+            var expectedAbsoluteExpiration = checkingTime + soonerRelativeExpiration;
+
+            Assert.Equal(expectedAbsoluteExpiration, result);
         }
 
         [Fact]
@@ -289,7 +293,7 @@
             var result = _options.CalculateAbsoluteExpiration(checkingTime);
 
             // Assert.
-            Assert.Equal(checkingTime + CacheItemOptions.DefaultRelativeExpiration, result.Value);
+            Assert.Equal(checkingTime + CacheItemOptions.DefaultRelativeExpiration, result);
         }
     }
 }

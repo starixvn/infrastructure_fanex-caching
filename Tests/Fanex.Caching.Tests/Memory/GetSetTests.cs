@@ -12,20 +12,20 @@
     {
         private readonly Fixture _fixture;
         private readonly SystemClockMock _clock;
-        private readonly MemoryStorage _storage;
-        private readonly MemoryCacheItemOptions _cachingOptions;
-        private readonly ManualResetEventSlim _callbackInvoked;
+        private readonly MemoryCacheItemOptions _cacheOptions;
         private readonly TimeSpan _callbackWaitingTime;
         private readonly string _existingKey;
         private readonly object _existingValue;
 
+        private MemoryStorage _storage;
+        private ManualResetEventSlim _callbackInvoked;
         private EvictionReason _callbackReason;
 
         public GetSetTests()
         {
             _fixture = new Fixture();
             _clock = new SystemClockMock();
-            _cachingOptions = new MemoryCacheItemOptions();
+            _cacheOptions = new MemoryCacheItemOptions();
             _storage = new MemoryStorage(new MemoryCacheOptions
             {
                 Clock = _clock
@@ -36,7 +36,7 @@
             _existingValue = _fixture.Create<object>();
 
             _fixture.Customizations.Add(new RandomNumericSequenceGenerator(0, 10));
-            _cachingOptions.RegisterPostEvictionCallback(
+            _cacheOptions.RegisterPostEvictionCallback(
                 (key, value, reason, state) =>
                 {
                     var callbackInvoked = (ManualResetEventSlim)state;
@@ -48,7 +48,7 @@
                     callbackInvoked.Set();
                 },
                 _callbackInvoked);
-            _storage.Set(_existingKey, _existingValue, _cachingOptions);
+            _storage.Set(_existingKey, _existingValue, _cacheOptions);
         }
 
         [Fact]
@@ -71,14 +71,14 @@
             var missingKey = _fixture.Create<string>();
 
             // Act.
-            _storage.TryGet(missingKey, out object value);
+            _storage.TryGet(missingKey, out object actualValue);
 
             // Assert.
-            Assert.Null(value);
+            Assert.Null(actualValue);
         }
 
         [Fact]
-        public void TryGetReturnsTrueForExistingKey()
+        public void TryGetExistingKeyReturnsTrue()
         {
             // Act.
             var found = _storage.TryGet(_existingKey, out _);
@@ -91,10 +91,10 @@
         public void TryGetReturnsObjectStoredBySet()
         {
             // Act.
-            _storage.TryGet(_existingKey, out object value);
+            _storage.TryGet(_existingKey, out object actualValue);
 
             // Assert.
-            Assert.Same(_existingValue, value);
+            Assert.Same(_existingValue, actualValue);
         }
 
         [Fact]
@@ -117,11 +117,11 @@
             var newValue = _fixture.Create<object>();
 
             // Act.
-            _storage.Set(_existingKey, newValue, _cachingOptions);
+            _storage.Set(_existingKey, newValue, _cacheOptions);
 
             // Assert.
-            _storage.TryGet(_existingKey, out object value);
-            Assert.Same(newValue, value);
+            _storage.TryGet(_existingKey, out object actualValue);
+            Assert.Same(newValue, actualValue);
         }
 
         [Fact]
@@ -129,9 +129,10 @@
         {
             // Arrange.
             var newValue = _fixture.Create<object>();
+            var newCacheOptions = new MemoryCacheItemOptions();
 
             // Act.
-            _storage.Set(_existingKey, newValue, new MemoryCacheItemOptions());
+            _storage.Set(_existingKey, newValue, newCacheOptions);
 
             // Assert.
             Assert.True(_callbackInvoked.Wait(_callbackWaitingTime));
@@ -142,9 +143,10 @@
         {
             // Arrange.
             var newValue = _fixture.Create<object>();
+            var newCacheOptions = new MemoryCacheItemOptions();
 
             // Act.
-            _storage.Set(_existingKey, newValue, new MemoryCacheItemOptions());
+            _storage.Set(_existingKey, newValue, newCacheOptions);
 
             // Assert.
             Assert.True(_callbackInvoked.Wait(_callbackWaitingTime));
@@ -162,7 +164,9 @@
             _storage.Set(_existingKey, newValue, expiredPolicy);
 
             // Assert.
-            Assert.False(_storage.TryGet(_existingKey, out _));
+            var found = _storage.TryGet(_existingKey, out _);
+
+            Assert.False(found);
         }
 
         [Fact]
@@ -186,7 +190,9 @@
             _storage.Remove(_existingKey);
 
             // Assert.
-            Assert.False(_storage.TryGet(_existingKey, out _));
+            var found = _storage.TryGet(_existingKey, out _);
+
+            Assert.False(found);
         }
 
         [Fact]
@@ -198,31 +204,6 @@
             // Assert.
             Assert.True(_callbackInvoked.Wait(_callbackWaitingTime));
             Assert.Equal(EvictionReason.Removed, _callbackReason);
-        }
-
-        [Fact]
-        public void RemoveRemovesOldObjectThenCallbackReAddsNewObject()
-        {
-            // Arrange.
-            var newValue = _fixture.Create<object>();
-
-            _cachingOptions.RegisterPostEvictionCallback(
-                (key, value, reason, state) =>
-                {
-                    var callbackInvoked = (ManualResetEventSlim)state;
-
-                    _storage.Set(key, newValue, new MemoryCacheItemOptions());
-                    callbackInvoked.Set();
-                },
-                _callbackInvoked);
-            _storage.Set(_existingKey, _existingValue, _cachingOptions);
-
-            // Act.
-            _storage.Remove(_existingKey);
-
-            // Assert.
-            Assert.True(_callbackInvoked.Wait(_callbackWaitingTime));
-            Assert.True(_storage.TryGet(_existingKey, out _));
         }
 
 #pragma warning disable S2952 // Classes should "Dispose" of members from the classes' own "Dispose" methods
@@ -249,7 +230,7 @@
             _storage.Dispose();
 
             // Act.
-            var exception = Record.Exception(() => _storage.Set(_existingKey, newValue, _cachingOptions));
+            var exception = Record.Exception(() => _storage.Set(_existingKey, newValue, _cacheOptions));
 
             // Assert.
             Assert.IsType<ObjectDisposedException>(exception);
@@ -346,6 +327,11 @@
         }
 
         public void Dispose()
-            => _storage.Dispose();
+        {
+            _storage.Dispose();
+            _storage = null;
+            _callbackInvoked.Dispose();
+            _callbackInvoked = null;
+        }
     }
 }

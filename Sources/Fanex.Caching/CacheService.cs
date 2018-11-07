@@ -27,15 +27,15 @@
 
         public async Task<T> GetAsync<T>(string key)
         {
-            var result = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
+            var (_, value) = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
-            return result != null ? result.Item2 : default(T);
+            return value;
         }
 
         public bool TryGet<T>(string key, out T value)
             => CacheStorage.TryGet(key, out value);
 
-        public Task<Tuple<bool, T>> TryGetAsync<T>(string key)
+        public Task<(bool, T)> TryGetAsync<T>(string key)
             => CacheStorage.TryGetAsync<T>(key);
 
         public T GetOrSet<T>(string key, Func<T> factory)
@@ -44,11 +44,10 @@
 
             if (!found && factory != null)
             {
+                var options = new CacheItemOptions().UseDefaultExpiration();
+
                 value = factory();
-                CacheStorage.Set(
-                    key,
-                    value,
-                    new CacheItemOptions().UseDefaultExpiration());
+                CacheStorage.Set(key, value, options);
             }
 
             return value;
@@ -69,22 +68,14 @@
 
         public async Task<T> GetOrSetAsync<T>(string key, Func<T> factory)
         {
-            T value;
-            var found = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
+            var (found, value) = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
-            if (!found.Item1 && factory != null)
+            if (!found && factory != null)
             {
+                var options = new CacheItemOptions().UseDefaultExpiration();
+
                 value = factory();
-                await CacheStorage
-                    .SetAsync(
-                        key,
-                        value,
-                        new CacheItemOptions().UseDefaultExpiration())
-                    .ConfigureAwait(false);
-            }
-            else
-            {
-                value = found.Item2;
+                await CacheStorage.SetAsync(key, value, options).ConfigureAwait(false);
             }
 
             return value;
@@ -92,17 +83,12 @@
 
         public async Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)
         {
-            T value;
-            var found = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
+            var (found, value) = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
-            if (!found.Item1 && factory != null)
+            if (!found && factory != null)
             {
                 value = factory();
                 await CacheStorage.SetAsync(key, value, options).ConfigureAwait(false);
-            }
-            else
-            {
-                value = found.Item2;
             }
 
             return value;
@@ -115,13 +101,21 @@
             => CacheStorage.RemoveAsync(key);
 
         public void Set<T>(string key, T value)
-            => CacheStorage.Set(key, value, new CacheItemOptions().UseDefaultExpiration());
+        {
+            var options = new CacheItemOptions().UseDefaultExpiration();
+
+            CacheStorage.Set(key, value, options);
+        }
 
         public void Set<T>(string key, T value, CacheItemOptions options)
             => CacheStorage.Set(key, value, options);
 
         public Task SetAsync<T>(string key, T value)
-            => CacheStorage.SetAsync(key, value, new CacheItemOptions().UseDefaultExpiration());
+        {
+            var options = new CacheItemOptions().UseDefaultExpiration();
+
+            return CacheStorage.SetAsync(key, value, options);
+        }
 
         public Task SetAsync<T>(string key, T value, CacheItemOptions options)
             => CacheStorage.SetAsync(key, value, options);

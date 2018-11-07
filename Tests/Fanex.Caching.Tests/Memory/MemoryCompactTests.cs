@@ -11,7 +11,7 @@
 
         private readonly Fixture _fixture;
         private readonly SystemClockMock _clock;
-        private readonly MemoryCacheItemOptions _cachingOptions;
+        private readonly MemoryCacheItemOptions _cacheOptions;
 
         private MemoryStorage _storage;
 
@@ -19,9 +19,9 @@
         {
             _fixture = new Fixture();
             _clock = new SystemClockMock();
-            _cachingOptions = new MemoryCacheItemOptions();
+            _cacheOptions = new MemoryCacheItemOptions();
 
-            InitializeCache(NumberOfPreInitializedKeys, _cachingOptions);
+            InitializeCache(NumberOfPreInitializedKeys, _cacheOptions);
         }
 
         [Fact]
@@ -50,7 +50,9 @@
 
             foreach (var key in neverRemoveKeys)
             {
-                Assert.True(_storage.TryGet(key, out _));
+                var found = _storage.TryGet(key, out _);
+
+                Assert.True(found);
             }
         }
 
@@ -70,7 +72,9 @@
 
             foreach (var key in lowPriorityKeys)
             {
-                Assert.False(_storage.TryGet(key, out _));
+                var found = _storage.TryGet(key, out _);
+
+                Assert.False(found);
             }
         }
 
@@ -90,7 +94,9 @@
 
             foreach (var key in highPriorityKeys)
             {
-                Assert.True(_storage.TryGet(key, out _));
+                var found = _storage.TryGet(key, out _);
+
+                Assert.True(found);
             }
         }
 
@@ -113,7 +119,9 @@
 
             foreach (var key in expiredKeys)
             {
-                Assert.False(_storage.TryGet(key, out _));
+                var found = _storage.TryGet(key, out _);
+
+                Assert.False(found);
             }
         }
 
@@ -122,13 +130,15 @@
         {
             // Arrange.
             var numberOfNewKeys = 2;
-            var newKeys = InitializeCache(numberOfNewKeys, _cachingOptions);
+            var newKeys = InitializeCache(numberOfNewKeys, _cacheOptions);
 
             // Act.
             _storage.Compact(0.90);
 
             // Assert.
-            Assert.True(_storage.TryGet(newKeys[numberOfNewKeys - 1], out _));
+            var found = _storage.TryGet(newKeys[numberOfNewKeys - 1], out _);
+
+            Assert.True(found);
         }
 
         [Fact]
@@ -145,7 +155,7 @@
 
             _storage = new MemoryStorage(storageOptions);
 
-            InitializeCache(numberOfKeys, _cachingOptions);
+            InitializeCache(numberOfKeys, _cacheOptions);
 
             // Act.
             TriggerGargabeCollectionInItsOwnScope();
@@ -169,7 +179,7 @@
 
             _storage = new MemoryStorage(storageOptions);
 
-            InitializeCache(numberOfKeys, _cachingOptions);
+            InitializeCache(numberOfKeys, _cacheOptions);
 
             // Act.
             TriggerGargabeCollectionInItsOwnScope();

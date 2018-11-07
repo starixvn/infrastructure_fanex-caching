@@ -43,18 +43,18 @@
             }
             else
             {
-                value = default(T);
+                value = default;
                 found = false;
             }
 
             return found;
         }
 
-        public Task<Tuple<bool, T>> TryGetAsync<T>(string key)
+        public Task<(bool, T)> TryGetAsync<T>(string key)
         {
             var found = TryGet(key, out T value);
 
-            return Task.FromResult(new Tuple<bool, T>(found, value));
+            return Task.FromResult((found, value));
         }
 
         public void Set<T>(string key, T value, CacheItemOptions options)
@@ -94,14 +94,14 @@
 
         public Task SetAsync<T>(string key, T value, CacheItemOptions options)
         {
-            Set(key, value, options);
+            SetInternal(key, value, options);
 
             return Task.CompletedTask;
         }
 
         public Task SetAsync<T>(string key, T value, MemoryCacheItemOptions options)
         {
-            Set(key, value, options);
+            SetInternal(key, value, options);
 
             return Task.CompletedTask;
         }

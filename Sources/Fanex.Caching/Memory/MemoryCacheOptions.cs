@@ -11,15 +11,7 @@
         public ISystemClock Clock
         {
             get => _clock;
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value), $"{nameof(Clock)} is required.");
-                }
-
-                _clock = value;
-            }
+            set => _clock = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public bool CompactOnMemoryPressure { get; set; }

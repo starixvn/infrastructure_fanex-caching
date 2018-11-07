@@ -7,8 +7,9 @@
         <PackageReleaseNotes>https://gitlab.nexcel.vn/infrastructure/fanex-caching/milestones/1</PackageReleaseNotes>
         <PackageIconUrl>https://gitlab.nexcel.vn/uploads/-/system/project/avatar/696/new-idea.png</PackageIconUrl>
         <DefaultLanguage>en-US</DefaultLanguage>
+        <LangVersion>latest</LangVersion>
         <IncludeSymbols>false</IncludeSymbols>
-        <Version>2.2.0-beta2</Version>
+        <Version>2.2.0-rc1</Version>
     </PropertyGroup>
     <PropertyGroup>
         <NoWarn>AD0001,SA1302</NoWarn>
@@ -16,10 +17,10 @@
         <CodeAnalysisRuleSet>$(SolutionDir)\Fanex.Caching.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="7.2.0.5463">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="7.8.0.7320">
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
+        <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta009">
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
     </ItemGroup>

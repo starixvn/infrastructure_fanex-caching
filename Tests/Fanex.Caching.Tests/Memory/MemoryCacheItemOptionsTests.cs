@@ -37,7 +37,7 @@
 
             // Assert.
             Assert.Equal(1, _options.PostEvictionCallbacks.Count);
-            Assert.Same(state, _options.PostEvictionCallbacks[0]?.State);
+            Assert.Same(state, _options.PostEvictionCallbacks[0].State);
         }
 
         [Fact]

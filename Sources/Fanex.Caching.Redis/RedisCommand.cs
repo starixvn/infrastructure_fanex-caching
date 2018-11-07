@@ -22,7 +22,7 @@
         public RedisValue[] Values { get; }
 
         public static RedisCommand CreateGetCommand(RedisKey key)
-            => new RedisCommand(RedisScripts.GetValue, key, RedisValue.Null);
+            => new RedisCommand(RedisScripts.GetValue, key, null);
 
         public static RedisCommand CreateSetCommand(
             RedisKey key,
@@ -31,33 +31,34 @@
             DateTimeOffset createdTime)
         {
             var timeToLive = options.CalculateRelativeExpiration(createdTime);
+            var timeToSlide = options.SlidingExpiration;
 
-            if (options.SlidingExpiration.HasValue && timeToLive.HasValue)
+            if (timeToLive.HasValue)
             {
+                if (timeToSlide.HasValue && timeToLive > timeToSlide)
+                {
+                    return new RedisCommand(
+                        RedisScripts.SetValueWithSlidingAndRelativeExpiration,
+                        key,
+                        value,
+                        CalculateTotalMilliseconds(timeToSlide.Value),
+                        CalculateTotalMilliseconds(timeToLive.Value));
+                }
+
                 return new RedisCommand(
-                    RedisScripts.SetValueWithSlidingAndRelativeExpiration,
+                    RedisScripts.SetValueWithRelativeExpiration,
                     key,
                     value,
-                    options.SlidingExpiration.Value.TotalMilliseconds,
-                    timeToLive.Value.TotalMilliseconds);
+                    CalculateTotalMilliseconds(timeToLive.Value));
             }
 
-            if (options.SlidingExpiration.HasValue)
+            if (timeToSlide.HasValue)
             {
                 return new RedisCommand(
                     RedisScripts.SetValueWithSlidingExpiration,
                     key,
                     value,
-                    options.SlidingExpiration.Value.TotalMilliseconds);
-            }
-
-            if (timeToLive.HasValue)
-            {
-                return new RedisCommand(
-                    RedisScripts.SetValueWithRelativeExpiration,
-                    key,
-                    value,
-                    timeToLive.Value.TotalMilliseconds);
+                    CalculateTotalMilliseconds(timeToSlide.Value));
             }
 
             return new RedisCommand(
@@ -65,5 +66,8 @@
                 key,
                 value);
         }
+
+        private static long CalculateTotalMilliseconds(TimeSpan expiration)
+            => expiration.Ticks / TimeSpan.TicksPerMillisecond;
     }
 }

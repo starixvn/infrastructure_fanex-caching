@@ -18,7 +18,7 @@
             {
                 if (_currentInstance == null)
                 {
-                    _currentInstance = new CacheService(CacheServiceManager.CacheStorage);
+                    _currentInstance = new CacheService();
                 }
 
                 return _currentInstance;
@@ -43,7 +43,7 @@
         public static bool TryGet<T>(string key, out T value)
             => CurrentInstance.TryGet(key, out value);
 
-        public static Task<Tuple<bool, T>> TryGetAsync<T>(string key)
+        public static Task<(bool, T)> TryGetAsync<T>(string key)
             => CurrentInstance.TryGetAsync<T>(key);
 
         public static T GetOrSet<T>(string key, Func<T> factory)

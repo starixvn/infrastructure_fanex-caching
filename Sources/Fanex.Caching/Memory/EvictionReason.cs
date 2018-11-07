@@ -6,7 +6,6 @@
         Removed,
         Replaced,
         Expired,
-        TokenExpired,
         Capacity
     }
 }

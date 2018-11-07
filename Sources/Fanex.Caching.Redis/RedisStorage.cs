@@ -28,8 +28,9 @@
         {
             Connect();
 
-            var command = RedisCommand.CreateGetCommand(ModifyKey(key));
-            var redisResult = _database.ScriptEvaluate(command.Script, command.Keys);
+            var redisKey = ModifyKey(key);
+            var redisCommand = RedisCommand.CreateGetCommand(redisKey);
+            var redisResult = EvaluateCommand(redisCommand);
 
             return !redisResult.IsNull;
         }
@@ -38,8 +39,9 @@
         {
             await ConnectAsync().ConfigureAwait(false);
 
-            var command = RedisCommand.CreateGetCommand(ModifyKey(key));
-            var redisResult = await _database.ScriptEvaluateAsync(command.Script, command.Keys).ConfigureAwait(false);
+            var redisKey = ModifyKey(key);
+            var redisCommand = RedisCommand.CreateGetCommand(redisKey);
+            var redisResult = await EvaluateCommandAsync(redisCommand).ConfigureAwait(false);
 
             return !redisResult.IsNull;
         }
@@ -48,49 +50,55 @@
         {
             Connect();
 
-            var command = RedisCommand.CreateGetCommand(ModifyKey(key));
-            var redisResult = _database.ScriptEvaluate(command.Script, command.Keys);
+            var redisKey = ModifyKey(key);
+            var redisCommand = RedisCommand.CreateGetCommand(redisKey);
+            var redisResult = EvaluateCommand(redisCommand);
             var found = false;
 
-            value = default(T);
+            value = default;
 
             if (!redisResult.IsNull)
             {
-                value = (T)RedisTypeConverter.ToObject<T>(redisResult, _serializer);
+                value = RedisTypeConverter.ToObject<T>(redisResult, _serializer);
                 found = true;
             }
 
             return found;
         }
 
-        public async Task<Tuple<bool, T>> TryGetAsync<T>(string key)
+        public async Task<(bool, T)> TryGetAsync<T>(string key)
         {
             await ConnectAsync().ConfigureAwait(false);
 
-            var command = RedisCommand.CreateGetCommand(ModifyKey(key));
-            var redisResult = await _database.ScriptEvaluateAsync(command.Script, command.Keys).ConfigureAwait(false);
+            var redisKey = ModifyKey(key);
+            var redisCommand = RedisCommand.CreateGetCommand(redisKey);
+            var redisResult = await EvaluateCommandAsync(redisCommand).ConfigureAwait(false);
             var found = false;
             var value = default(T);
 
             if (!redisResult.IsNull)
             {
-                value = (T)RedisTypeConverter.ToObject<T>(redisResult, _serializer);
+                value = RedisTypeConverter.ToObject<T>(redisResult, _serializer);
                 found = true;
             }
 
-            return new Tuple<bool, T>(found, value);
+            return (found, value);
         }
 
         public void Remove(string key)
         {
+            var redisKey = ModifyKey(key);
+
             Connect();
-            _database.KeyDelete(ModifyKey(key));
+            _database.KeyDelete(redisKey);
         }
 
         public async Task RemoveAsync(string key)
         {
+            var redisKey = ModifyKey(key);
+
             await ConnectAsync().ConfigureAwait(false);
-            await _database.KeyDeleteAsync(ModifyKey(key)).ConfigureAwait(false);
+            await _database.KeyDeleteAsync(redisKey).ConfigureAwait(false);
         }
 
         public void Set<T>(string key, T value, CacheItemOptions options)
@@ -99,35 +107,41 @@
 
             var redisKey = ModifyKey(key);
             var redisValue = RedisTypeConverter.ToRedisValue(value, _serializer);
-            var command = RedisCommand.CreateSetCommand(
+            var redisCommand = RedisCommand.CreateSetCommand(
                 redisKey,
                 redisValue,
                 options,
                 _clock.UtcNow);
 
-            _database.ScriptEvaluate(command.Script, command.Keys, command.Values);
+            EvaluateCommand(redisCommand);
         }
 
         public async Task SetAsync<T>(string key, T value, CacheItemOptions options)
         {
             await ConnectAsync().ConfigureAwait(false);
 
-            RedisKey redisKey = ModifyKey(key);
-            RedisValue redisValue = RedisTypeConverter.ToRedisValue(value, _serializer);
-            RedisCommand command = RedisCommand.CreateSetCommand(
+            var redisKey = ModifyKey(key);
+            var redisValue = RedisTypeConverter.ToRedisValue(value, _serializer);
+            var redisCommand = RedisCommand.CreateSetCommand(
                 redisKey,
                 redisValue,
                 options,
                 _clock.UtcNow);
 
-            await _database.ScriptEvaluateAsync(command.Script, command.Keys, command.Values).ConfigureAwait(false);
+            await EvaluateCommandAsync(redisCommand).ConfigureAwait(false);
         }
+
+        private RedisResult EvaluateCommand(RedisCommand redisCommand)
+            => _database.ScriptEvaluate(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+
+        private Task<RedisResult> EvaluateCommandAsync(RedisCommand redisCommand)
+            => _database.ScriptEvaluateAsync(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
 
 #pragma warning disable S2589 // Boolean expressions should not be gratuitous
 
         private void Connect()
         {
-            if (_connection != null)
+            if (_database != null)
             {
                 return;
             }
@@ -136,7 +150,7 @@
 
             try
             {
-                if (_connection == null)
+                if (_database == null)
                 {
                     _connection = ConnectionMultiplexer.Connect(_redisConnectionOptions);
                     _database = _connection.GetDatabase();
@@ -150,7 +164,7 @@
 
         private async Task ConnectAsync()
         {
-            if (_connection != null)
+            if (_database != null)
             {
                 return;
             }
@@ -159,7 +173,7 @@
 
             try
             {
-                if (_connection == null)
+                if (_database == null)
                 {
                     _connection = await ConnectionMultiplexer.ConnectAsync(_redisConnectionOptions).ConfigureAwait(false);
                     _database = _connection.GetDatabase();
@@ -174,7 +188,7 @@
 #pragma warning restore S2589 // Boolean expressions should not be gratuitous
 
         private string ModifyKey(string key)
-            => $"{_applicationName}:{key}";
+            => $"{{{_applicationName}}}:{{{key}}}";
 
         public void Dispose()
         {

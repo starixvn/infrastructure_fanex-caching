@@ -33,7 +33,7 @@
             return RedisStorage.TryGet(key, out value);
         }
 
-        public Task<Tuple<bool, T>> TryGetAsync<T>(string key)
+        public Task<(bool, T)> TryGetAsync<T>(string key)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -45,25 +45,19 @@
 
         public void Set<T>(string key, T value, CacheItemOptions options)
         {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentException("Key must not be null or empty.", nameof(key));
-            }
-
-            if (ReferenceEquals(value, null))
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+            VerifyParametersOfSet(key, value, options);
 
             RedisStorage.Set(key, value, options);
         }
 
         public Task SetAsync<T>(string key, T value, CacheItemOptions options)
+        {
+            VerifyParametersOfSet(key, value, options);
+
+            return RedisStorage.SetAsync(key, value, options);
+        }
+
+        private static void VerifyParametersOfSet<T>(string key, T value, CacheItemOptions options)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -79,8 +73,6 @@
             {
                 throw new ArgumentNullException(nameof(options));
             }
-
-            return RedisStorage.SetAsync(key, value, options);
         }
 
         public void Remove(string key)
