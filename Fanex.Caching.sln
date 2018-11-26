@@ -17,7 +17,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4C7EB43B-C55A-44DA-8EBF-F65E9204288B}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.build.props = Directory.build.props
-		Fanex.Caching.ruleset = Fanex.Caching.ruleset
 		README.md = README.md
 		SonarQube.Analysis.xml = SonarQube.Analysis.xml
 	EndProjectSection

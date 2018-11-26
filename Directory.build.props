@@ -1,26 +1,26 @@
 <Project>
     <PropertyGroup>
         <Authors>R&amp;D Team</Authors>
-        <PackageProjectUrl>https://gitlab.nexcel.vn/infrastructure/fanex-caching</PackageProjectUrl>
-        <RepositoryUrl>https://gitlab.nexcel.vn/infrastructure/fanex-caching</RepositoryUrl>
+        <PackageProjectUrl>https://gitlab.nexdev.net/infrastructure/fanex-caching</PackageProjectUrl>
+        <RepositoryUrl>https://gitlab.nexdev.net/infrastructure/fanex-caching</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageReleaseNotes>https://gitlab.nexcel.vn/infrastructure/fanex-caching/milestones/1</PackageReleaseNotes>
-        <PackageIconUrl>https://gitlab.nexcel.vn/uploads/-/system/project/avatar/696/new-idea.png</PackageIconUrl>
+        <PackageReleaseNotes>https://gitlab.nexdev.net/infrastructure/fanex-caching/milestones/1</PackageReleaseNotes>
+        <PackageIconUrl>https://gitlab.nexdev.net/uploads/-/system/project/avatar/696/new-idea.png</PackageIconUrl>
         <DefaultLanguage>en-US</DefaultLanguage>
         <LangVersion>latest</LangVersion>
         <IncludeSymbols>false</IncludeSymbols>
-        <Version>2.2.0-rc1</Version>
+        <Version>2.2.0</Version>
     </PropertyGroup>
     <PropertyGroup>
-        <NoWarn>AD0001,SA1302</NoWarn>
+        <NoWarn>AD0001,S1192,SA1302</NoWarn>
         <Features>IOperation</Features>
-        <CodeAnalysisRuleSet>$(SolutionDir)\Fanex.Caching.ruleset</CodeAnalysisRuleSet>
+        <CodeAnalysisRuleSet>$(SolutionDir)\.sonarlint\Fanex.CachingCSharp.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="7.8.0.7320">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="7.11.0.8083">
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta009">
+        <PackageReference Include="StyleCop.Analyzers" Version="1.1.1-rc.114">
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
     </ItemGroup>

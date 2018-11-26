@@ -26,7 +26,7 @@
 
             if (options.CompactOnMemoryPressure)
             {
-                GcNotification.Register(DoMemoryPreassureCollection, this);
+                RegisterMemoryPreassureCollection();
             }
         }
 
@@ -135,6 +135,9 @@
                 item.InvokeEvictionCallbacks();
             }
         }
+
+        private void RegisterMemoryPreassureCollection()
+            => GcNotification.Register(DoMemoryPreassureCollection, this);
 
         private void StartScanForExpiredItems()
         {

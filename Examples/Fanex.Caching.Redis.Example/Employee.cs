@@ -1,4 +1,6 @@
-﻿namespace Fanex.Caching.Redis.Example
+﻿#pragma warning disable S109 // Magic numbers should not be used
+
+namespace Fanex.Caching.Redis.Example
 {
     public class Employee
     {
