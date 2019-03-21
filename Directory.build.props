@@ -9,7 +9,7 @@
         <DefaultLanguage>en-US</DefaultLanguage>
         <LangVersion>latest</LangVersion>
         <IncludeSymbols>false</IncludeSymbols>
-        <Version>2.2.0</Version>
+        <Version>2.2.1</Version>
     </PropertyGroup>
     <PropertyGroup>
         <NoWarn>AD0001,S1192,SA1302</NoWarn>
