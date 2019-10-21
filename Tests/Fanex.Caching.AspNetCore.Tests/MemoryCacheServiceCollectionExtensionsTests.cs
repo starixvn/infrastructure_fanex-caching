@@ -26,7 +26,7 @@
         }
 
         [Fact]
-        public void AddMemoryCacheRegisterMemoryCacheAsSingleton()
+        public void AddMemoryCacheRegistersMemoryCacheAsSingleton()
         {
             // Act.
             _services.AddMemoryCache();
@@ -38,7 +38,7 @@
         }
 
         [Fact]
-        public void AddMemoryCacheRegisterCacheServiceAsSingleton()
+        public void AddMemoryCacheRegistersCacheServiceAsSingleton()
         {
             // Act.
             _services.AddMemoryCache();
@@ -116,7 +116,7 @@
         }
 
         [Fact]
-        public void AddMemoryCacheWithConfigurationSectionDoesNoteOverwriteClock()
+        public void AddMemoryCacheWithConfigurationSectionDoesNotOverwriteClock()
         {
             // Arrange.
             var configuration = ReadConfiguration();

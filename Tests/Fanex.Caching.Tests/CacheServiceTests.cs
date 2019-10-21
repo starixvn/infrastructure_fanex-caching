@@ -223,10 +223,7 @@
             // Assert.
             _cacheStorage
                 .Received()
-                .Set(
-                    Arg.Is(_testingKey),
-                    Arg.Is(newValue),
-                    Arg.Is(_testingCacheItemOptions));
+                .Set(Arg.Is(_testingKey), Arg.Is(newValue), Arg.Is(_testingCacheItemOptions));
 
             Assert.Same(newValue, result);
         }
@@ -398,10 +395,7 @@
             // Assert.
             _cacheStorage
                 .Received()
-                .Set(
-                    Arg.Is(_testingKey),
-                    Arg.Is(_testingValue),
-                    Arg.Is(_testingCacheItemOptions));
+                .Set(Arg.Is(_testingKey), Arg.Is(_testingValue), Arg.Is(_testingCacheItemOptions));
         }
 
         [Fact]

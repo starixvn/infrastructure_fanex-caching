@@ -17,7 +17,7 @@
 
         bool TryGet<T>(string key, out T value);
 
-        Task<(bool, T)> TryGetAsync<T>(string key);
+        Task<(bool found, T value)> TryGetAsync<T>(string key);
 
         T GetOrSet<T>(string key, Func<T> factory);
 

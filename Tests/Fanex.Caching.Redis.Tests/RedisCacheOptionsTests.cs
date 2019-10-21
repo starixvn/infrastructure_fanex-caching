@@ -20,7 +20,8 @@
         public void ParseRedisConfigurationOptionsFromConnectionString()
         {
             // Arrange.
-            var connectionString = "10.18.200.110:6379";
+            const string connectionString = "10.18.200.110:6379";
+
             var redisCacheOptions = new RedisCacheOptions
             {
                 ConnectionString = connectionString
@@ -41,13 +42,14 @@
         public void PrioritizeConnectionOptionsOverConnectionString()
         {
             // Arrange.
+            const string connectionString = "http://localhost:6379/";
+
             var connectionOptions = new ConfigurationOptions();
             var redisCacheOptions = new RedisCacheOptions
             {
+                ConnectionString = connectionString,
                 ConnectionOptions = connectionOptions
             };
-
-            connectionOptions.EndPoints.Add("http://localhost:6379/");
 
             // Act.
             var actualConfigurationOptions = redisCacheOptions.ToRedisConnectionOptions();

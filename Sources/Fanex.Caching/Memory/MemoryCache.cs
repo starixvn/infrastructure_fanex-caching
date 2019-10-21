@@ -37,7 +37,7 @@
 
             var found = MemoryStorage.TryGet(key, out object result);
 
-            if ((result != null) && (result is T))
+            if (result is T)
             {
                 value = (T)result;
             }
@@ -50,7 +50,7 @@
             return found;
         }
 
-        public Task<(bool, T)> TryGetAsync<T>(string key)
+        public Task<(bool found, T value)> TryGetAsync<T>(string key)
         {
             var found = TryGet(key, out T value);
 

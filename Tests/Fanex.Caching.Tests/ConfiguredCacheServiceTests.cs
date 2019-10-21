@@ -124,10 +124,7 @@
             // Assert.
             _cacheService
                 .Received()
-                .GetOrSet(
-                    Arg.Is(_testingKey),
-                    Arg.Any<Func<object>>(),
-                    Arg.Is(_testingCacheItemOptions));
+                .GetOrSet(Arg.Is(_testingKey), Arg.Any<Func<object>>(), Arg.Is(_testingCacheItemOptions));
         }
 
         [Fact]
@@ -151,10 +148,7 @@
             // Assert.
             await _cacheService
                 .Received()
-                .GetOrSetAsync(
-                    Arg.Is(_testingKey),
-                    Arg.Any<Func<object>>(),
-                    Arg.Is(_testingCacheItemOptions))
+                .GetOrSetAsync(Arg.Is(_testingKey), Arg.Any<Func<object>>(), Arg.Is(_testingCacheItemOptions))
                 .ConfigureAwait(false);
         }
 
@@ -205,10 +199,7 @@
             // Assert.
             _cacheService
                 .Received()
-                .Set(
-                    Arg.Is(_testingKey),
-                    Arg.Is(_testingValue),
-                    Arg.Is(_testingCacheItemOptions));
+                .Set(Arg.Is(_testingKey), Arg.Is(_testingValue), Arg.Is(_testingCacheItemOptions));
         }
 
         [Fact]
@@ -232,10 +223,7 @@
             // Assert.
             await _cacheService
                 .Received()
-                .SetAsync(
-                    Arg.Is(_testingKey),
-                    Arg.Is(_testingValue),
-                    Arg.Is(_testingCacheItemOptions))
+                .SetAsync(Arg.Is(_testingKey), Arg.Is(_testingValue), Arg.Is(_testingCacheItemOptions))
                 .ConfigureAwait(false);
         }
 

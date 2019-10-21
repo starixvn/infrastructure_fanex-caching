@@ -36,7 +36,9 @@
             _options.RegisterPostEvictionCallback(_fixture.Create<PostEvictionDelegate>(), state);
 
             // Assert.
-            Assert.Equal(1, _options.PostEvictionCallbacks.Count);
+            const int expectedNumberOfCallbacks = 1;
+
+            Assert.Equal(expectedNumberOfCallbacks, _options.PostEvictionCallbacks.Count);
             Assert.Same(state, _options.PostEvictionCallbacks[0].State);
         }
 
@@ -44,7 +46,7 @@
         public void SetCachePriorityTakesAnyDefinedCachePriority()
         {
             // Arrange.
-            var priority = CachePriority.High;
+            const CachePriority priority = CachePriority.High;
 
             // Act.
             _options.SetCachePriority(priority);

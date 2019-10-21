@@ -44,21 +44,6 @@
             return services;
         }
 
-        private static void ReadEndPoints(IConfigurationSection configuration, RedisCacheOptions options)
-        {
-            var endPoints = configuration.GetSection("ConnectionOptions:EndPoints").Get<string[]>();
-
-            if (endPoints != null && endPoints.Length > 0)
-            {
-                options.ConnectionOptions = options.ConnectionOptions ?? new ConfigurationOptions();
-
-                foreach (var endPoint in endPoints)
-                {
-                    options.ConnectionOptions.EndPoints.Add(endPoint);
-                }
-            }
-        }
-
         public static IServiceCollection AddRedisCache(this IServiceCollection services, Action<RedisCacheOptions> setupAction)
         {
             if (services == null)
@@ -75,6 +60,21 @@
             services.AddRedisCache();
 
             return services;
+        }
+
+        private static void ReadEndPoints(IConfigurationSection configuration, RedisCacheOptions options)
+        {
+            var endPoints = configuration.GetSection("ConnectionOptions:EndPoints").Get<string[]>();
+
+            if (endPoints != null && endPoints.Length > 0)
+            {
+                options.ConnectionOptions = options.ConnectionOptions ?? new ConfigurationOptions();
+
+                foreach (var endPoint in endPoints)
+                {
+                    options.ConnectionOptions.EndPoints.Add(endPoint);
+                }
+            }
         }
     }
 }

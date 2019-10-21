@@ -3,7 +3,6 @@
     using System;
     using System.IO;
     using System.Linq;
-    using Fanex.Caching.Redis;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Xunit;
@@ -26,7 +25,7 @@
         }
 
         [Fact]
-        public void AddRedisCacheRegisterRedisCacheAsSingleton()
+        public void AddRedisCacheRegistersRedisCacheAsSingleton()
         {
             // Act.
             _services.AddRedisCache();
@@ -38,7 +37,7 @@
         }
 
         [Fact]
-        public void AddRedisCacheRegisterCacheServiceAsSingleton()
+        public void AddRedisCacheRegistersCacheServiceAsSingleton()
         {
             // Act.
             _services.AddRedisCache();
@@ -108,8 +107,9 @@
             _services.AddRedisCache(configuration);
 
             // Assert.
+            const string expectedApplicationName = "Fanex.Caching.Redis.AspNetCore.Tests";
+
             var options = _services.BuildServiceProvider().GetService<RedisCacheOptions>();
-            var expectedApplicationName = "Fanex.Caching.Redis.AspNetCore.Tests";
 
             Assert.NotNull(options);
             Assert.NotEmpty(options.ConnectionOptions.EndPoints);
@@ -117,7 +117,7 @@
         }
 
         [Fact]
-        public void AddRedisCacheWithConfigurationSectionDoesNoteOverwriteClock()
+        public void AddRedisCacheWithConfigurationSectionDoesNotOverwriteClock()
         {
             // Arrange.
             var configuration = ReadConfiguration();

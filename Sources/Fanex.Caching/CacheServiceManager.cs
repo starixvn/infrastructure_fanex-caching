@@ -41,8 +41,13 @@
 
         internal static void Reset()
         {
-            _cacheStorage = null;
             _cacheStorageFactory = null;
+
+            if (_cacheStorage != null)
+            {
+                _cacheStorage.Dispose();
+                _cacheStorage = null;
+            }
         }
     }
 }

@@ -124,7 +124,7 @@
             var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            bool found = Cache.TryGet(unexistingKey, out string _);
+            var found = Cache.TryGet(unexistingKey, out string _);
 
             // Assert.
             Assert.False(found);
@@ -140,9 +140,7 @@
             Cache.TryGet(unexistingKey, out string actualValue);
 
             // Assert.
-            var expectedValue = default(string);
-
-            Assert.Equal(expectedValue, actualValue);
+            Assert.Equal(default, actualValue);
         }
 
         [Fact]
@@ -172,9 +170,7 @@
             Cache.TryGet(_existingKey, out int actualValue);
 
             // Assert.
-            var expectedValue = default(int);
-
-            Assert.Equal(expectedValue, actualValue);
+            Assert.Equal(default, actualValue);
         }
 
         [Theory]
@@ -214,9 +210,7 @@
             var (_, actualValue) = await Cache.TryGetAsync<string>(unexistingKey).ConfigureAwait(false);
 
             // Assert.
-            var expectedValue = default(string);
-
-            Assert.Equal(expectedValue, actualValue);
+            Assert.Equal(default, actualValue);
         }
 
         [Fact]
@@ -246,9 +240,7 @@
             var (_, actualValue) = await Cache.TryGetAsync<int>(_existingKey).ConfigureAwait(false);
 
             // Assert.
-            var expectedValue = default(int);
-
-            Assert.Equal(expectedValue, actualValue);
+            Assert.Equal(default, actualValue);
         }
 
         [Theory]

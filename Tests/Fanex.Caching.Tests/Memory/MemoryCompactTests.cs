@@ -8,18 +8,23 @@
     public sealed class MemoryCompactTests : IDisposable
     {
         private const int NumberOfPreInitializedKeys = 2;
+        private const double CompactionPercentage = 0.5;
 
         private readonly Fixture _fixture;
         private readonly SystemClockMock _clock;
         private readonly MemoryCacheItemOptions _cacheOptions;
-
-        private MemoryStorage _storage;
+        private readonly MemoryStorage _storage;
 
         public MemoryCompactTests()
         {
             _fixture = new Fixture();
             _clock = new SystemClockMock();
             _cacheOptions = new MemoryCacheItemOptions();
+            _storage = new MemoryStorage(new MemoryCacheOptions
+            {
+                Clock = _clock,
+                CompactionPercentage = CompactionPercentage
+            });
 
             InitializeCache(NumberOfPreInitializedKeys, _cacheOptions);
         }
@@ -27,8 +32,11 @@
         [Fact]
         public void Compact100PercentClearsAll()
         {
+            // Arrange.
+            const double fullCompactionPercentage = 1;
+
             // Act.
-            _storage.Compact(1.0);
+            _storage.Compact(fullCompactionPercentage);
 
             // Assert.
             Assert.Equal(0, _storage.Count);
@@ -38,12 +46,14 @@
         public void Compact100PercentClearsAllExcludeItemsWithNeverRemovePriority()
         {
             // Arrange.
-            var numberOfNeverRemoveKeys = 2;
+            const int numberOfNeverRemoveKeys = 2;
+            const double fullCompactionPercentage = 1;
+
             var neverRemovePolicy = new MemoryCacheItemOptions().SetCachePriority(CachePriority.NeverRemove);
             var neverRemoveKeys = InitializeCache(numberOfNeverRemoveKeys, neverRemovePolicy);
 
             // Act.
-            _storage.Compact(1.0);
+            _storage.Compact(fullCompactionPercentage);
 
             // Assert.
             Assert.Equal(numberOfNeverRemoveKeys, _storage.Count);
@@ -60,12 +70,13 @@
         public void CompactPrioritizesLowPriorityItems()
         {
             // Arrange.
-            var numberOfLowPriorityKeys = 2;
+            const int numberOfLowPriorityKeys = 2;
+
             var lowPriorityPolicy = new MemoryCacheItemOptions().SetCachePriority(CachePriority.Low);
             var lowPriorityKeys = InitializeCache(numberOfLowPriorityKeys, lowPriorityPolicy);
 
             // Act.
-            _storage.Compact(0.5);
+            _storage.Compact(CompactionPercentage);
 
             // Assert.
             Assert.Equal(NumberOfPreInitializedKeys, _storage.Count);
@@ -82,12 +93,13 @@
         public void CompactDisordersHighPriorityItems()
         {
             // Arrange.
-            var numberOfHighPriorityKeys = 2;
+            const int numberOfHighPriorityKeys = 2;
+
             var highPriorityPolicy = new MemoryCacheItemOptions().SetCachePriority(CachePriority.High);
             var highPriorityKeys = InitializeCache(numberOfHighPriorityKeys, highPriorityPolicy);
 
             // Act.
-            _storage.Compact(0.5);
+            _storage.Compact(CompactionPercentage);
 
             // Assert.
             Assert.Equal(numberOfHighPriorityKeys, _storage.Count);
@@ -104,15 +116,19 @@
         public void CompactPrioritizesExpiredItems()
         {
             // Arrange.
-            var numberOfExpiredKeys = 2;
+            const int numberOfExpiredKeys = 2;
+
+            var timeToLive = TimeSpan.FromSeconds(1);
             var expiredPolicy = new MemoryCacheItemOptions()
                 .SetCachePriority(CachePriority.High)
-                .SetAbsoluteExpiration(TimeSpan.FromSeconds(1));
+                .SetAbsoluteExpiration(timeToLive);
             var expiredKeys = InitializeCache(numberOfExpiredKeys, expiredPolicy);
 
             // Act.
-            _clock.Add(TimeSpan.FromSeconds(5));
-            _storage.Compact(0.5);
+            var timeToExpire = TimeSpan.FromSeconds(5);
+
+            _clock.Add(timeToExpire);
+            _storage.Compact(CompactionPercentage);
 
             // Assert.
             Assert.Equal(NumberOfPreInitializedKeys, _storage.Count);
@@ -129,14 +145,17 @@
         public void CompactPrioritizesLRU()
         {
             // Arrange.
-            var numberOfNewKeys = 2;
+            const int numberOfNewKeys = 8;
+            const double highCompactionPercentage = 0.9;
+
             var newKeys = InitializeCache(numberOfNewKeys, _cacheOptions);
 
             // Act.
-            _storage.Compact(0.90);
+            _storage.Compact(highCompactionPercentage);
 
             // Assert.
-            var found = _storage.TryGet(newKeys[numberOfNewKeys - 1], out _);
+            var lastAddedKey = newKeys[numberOfNewKeys - 1];
+            var found = _storage.TryGet(lastAddedKey, out _);
 
             Assert.True(found);
         }
@@ -145,56 +164,44 @@
         public void CompactOnMemoryPressureTriggersDoMemoryPreassureCollection()
         {
             // Arrange.
-            var numberOfKeys = 4;
-            var storageOptions = new MemoryCacheOptions
-            {
-                CompactOnMemoryPressure = true,
-                CompactionPercentage = 0.5,
-                Clock = _clock
-            };
+            const int numberOfNewKeys = 4;
 
-            _storage = new MemoryStorage(storageOptions);
-
-            InitializeCache(numberOfKeys, _cacheOptions);
+            InitializeCache(numberOfNewKeys, _cacheOptions);
 
             // Act.
             TriggerGargabeCollectionInItsOwnScope();
 
             // Assert.
-            Assert.True(numberOfKeys > _storage.Count);
+            var numberOfCachedKeys = numberOfNewKeys + NumberOfPreInitializedKeys;
+
+            Assert.True(numberOfCachedKeys > _storage.Count);
         }
 
         [Fact]
         public void DoMemoryPreassureCollectionTriesToSatisfyRemovalCountTarget()
         {
             // Arrange.
-            var numberOfKeys = 4;
-            var compactPercentage = 0.5;
-            var storageOptions = new MemoryCacheOptions
-            {
-                CompactOnMemoryPressure = true,
-                CompactionPercentage = compactPercentage,
-                Clock = _clock
-            };
+            const int numberOfNewKeys = 8;
 
-            _storage = new MemoryStorage(storageOptions);
-
-            InitializeCache(numberOfKeys, _cacheOptions);
+            InitializeCache(numberOfNewKeys, _cacheOptions);
 
             // Act.
             TriggerGargabeCollectionInItsOwnScope();
 
             // Assert.
-            int expectedCount = numberOfKeys - (int)(compactPercentage * numberOfKeys);
+            var numberOfCachedKeys = numberOfNewKeys + NumberOfPreInitializedKeys;
+            var expectedCount = numberOfCachedKeys - (int)(CompactionPercentage * numberOfCachedKeys);
 
-            Assert.True(expectedCount >= _storage.Count);
+            Assert.Equal(expectedCount, _storage.Count);
         }
 
 #pragma warning disable S1215 // "GC.Collect" should not be called
 
         private static void TriggerGargabeCollectionInItsOwnScope()
         {
-            GC.Collect(2, GCCollectionMode.Forced, true);
+            const int oldestGenerationBeCollected = 2;
+
+            GC.Collect(oldestGenerationBeCollected, GCCollectionMode.Forced, true);
             GC.WaitForPendingFinalizers();
         }
 
@@ -205,22 +212,14 @@
 
         private string[] InitializeCache(int numberOfItem, MemoryCacheItemOptions cacheOptions)
         {
-            if (_storage == null)
-            {
-                _storage = new MemoryStorage(new MemoryCacheOptions
-                {
-                    Clock = _clock
-                });
-            }
-
             var createdKeys = new string[numberOfItem];
+            var creationInterval = TimeSpan.FromSeconds(1);
 
             for (var index = 0; index < numberOfItem; index++)
             {
                 createdKeys[index] = _fixture.Create<string>();
-
                 _storage.Set(createdKeys[index], _fixture.Create<object>(), cacheOptions);
-                _clock.Add(TimeSpan.FromSeconds(1));
+                _clock.Add(creationInterval);
             }
 
             return createdKeys;

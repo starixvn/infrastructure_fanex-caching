@@ -35,7 +35,7 @@
         public bool TryGet<T>(string key, out T value)
             => CacheStorage.TryGet(key, out value);
 
-        public Task<(bool, T)> TryGetAsync<T>(string key)
+        public Task<(bool found, T value)> TryGetAsync<T>(string key)
             => CacheStorage.TryGetAsync<T>(key);
 
         public T GetOrSet<T>(string key, Func<T> factory)

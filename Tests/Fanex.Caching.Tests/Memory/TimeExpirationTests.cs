@@ -8,6 +8,10 @@
 
     public sealed class TimeExpirationTests : IDisposable
     {
+        private static readonly TimeSpan InitialExpiry = TimeSpan.FromMinutes(1);
+        private static readonly TimeSpan TimeToExpire = TimeSpan.FromMinutes(2);
+        private static readonly TimeSpan CallbackTimeout = TimeSpan.FromSeconds(30);
+
         private readonly Fixture _fixture;
         private readonly SystemClockMock _clock;
         private readonly MemoryCacheItemOptions _cacheOptions;
@@ -35,13 +39,15 @@
         public void RemoveObjectWhenAbsoluteExpirationMet()
         {
             // Arrange.
-            var absoluteExpiration = _clock.UtcNow + TimeSpan.FromMinutes(1);
+            var absoluteExpiration = _clock.UtcNow + InitialExpiry;
+            var absoluteExpirationPolicy = _cacheOptions.SetAbsoluteExpiration(absoluteExpiration);
 
-            _cacheOptions.SetAbsoluteExpiration(absoluteExpiration);
-            _storage.Set(_testingKey, _testingValue, _cacheOptions);
+            _storage.Set(_testingKey, _testingValue, absoluteExpirationPolicy);
+
+            // Act.
+            _clock.Add(TimeToExpire);
 
             // Assert.
-            _clock.Add(TimeSpan.FromMinutes(2));
             Assert.False(_storage.TryGet(_testingKey, out _));
         }
 
@@ -49,13 +55,14 @@
         public void RemoveObjectWhenRelativeExpirationMet()
         {
             // Arrange.
-            var relativeExpiration = TimeSpan.FromMinutes(1);
+            var relativeExpirationPolicy = _cacheOptions.SetAbsoluteExpiration(InitialExpiry);
 
-            _cacheOptions.SetAbsoluteExpiration(relativeExpiration);
-            _storage.Set(_testingKey, _testingValue, _cacheOptions);
+            _storage.Set(_testingKey, _testingValue, relativeExpirationPolicy);
+
+            // Act.
+            _clock.Add(TimeToExpire);
 
             // Assert.
-            _clock.Add(TimeSpan.FromMinutes(2));
             Assert.False(_storage.TryGet(_testingKey, out _));
         }
 
@@ -63,8 +70,6 @@
         public void KeysExpiresInBackground()
         {
             // Arrange.
-            var relativeExpiration = TimeSpan.FromMinutes(1);
-
             _cacheOptions
                 .RegisterPostEvictionCallback(
                     (key, value, reason, state) =>
@@ -79,7 +84,7 @@
                         localCallbackInvoked.Set();
                     },
                     _callbackInvoked)
-                .SetAbsoluteExpiration(relativeExpiration);
+                .SetAbsoluteExpiration(InitialExpiry);
             _storage.Set(_testingKey, _testingValue, _cacheOptions);
 
             // Ensure testing key was added successfully.
@@ -88,11 +93,11 @@
             // Act - Background expiration checks are triggered when TryGet is called no matter what the key is.
             var otherKey = _fixture.Create<string>();
 
-            _clock.Add(TimeSpan.FromMinutes(2));
+            _clock.Add(TimeToExpire);
             _storage.TryGet(otherKey, out _);
 
             // Assert.
-            Assert.True(_callbackInvoked.Wait(TimeSpan.FromSeconds(30)));
+            Assert.True(_callbackInvoked.Wait(CallbackTimeout));
             Assert.False(_storage.TryGet(_testingKey, out _));
         }
 
@@ -100,8 +105,6 @@
         public void ExpirationScanHideExceptionThrownInCallback()
         {
             // Arrange.
-            var relativeExpiration = TimeSpan.FromMinutes(2);
-
             _cacheOptions
                 .RegisterPostEvictionCallback(
                     (key, value, reason, state) =>
@@ -112,17 +115,17 @@
                         throw new InvalidOperationException();
                     },
                     _callbackInvoked)
-                .SetAbsoluteExpiration(relativeExpiration);
+                .SetAbsoluteExpiration(InitialExpiry);
             _storage.Set(_testingKey, _testingValue, _cacheOptions);
 
             // Act.
             var otherKey = _fixture.Create<string>();
 
-            _clock.Add(TimeSpan.FromMinutes(3));
+            _clock.Add(TimeToExpire);
             _storage.TryGet(otherKey, out _);
 
             // Assert.
-            Assert.True(_callbackInvoked.Wait(TimeSpan.FromSeconds(30)));
+            Assert.True(_callbackInvoked.Wait(CallbackTimeout));
             Assert.False(_storage.TryGet(_testingKey, out _));
         }
 
@@ -130,13 +133,14 @@
         public void KeyWithSlidingExpirationExpiresIfNotTouched()
         {
             // Arrange.
-            var slidingExpiration = TimeSpan.FromMinutes(1);
+            var sliddingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
 
-            _cacheOptions.SetSlidingExpiration(slidingExpiration);
-            _storage.Set(_testingKey, _testingValue, _cacheOptions);
+            _storage.Set(_testingKey, _testingValue, sliddingExpirationPolicy);
+
+            // Act.
+            _clock.Add(TimeToExpire);
 
             // Assert.
-            _clock.Add(TimeSpan.FromMinutes(2));
             Assert.False(_storage.TryGet(_testingKey, out _));
         }
 
@@ -144,17 +148,20 @@
         public void KeyWithSlidingExpirationRenewedOnceTouched()
         {
             // Arrange.
-            var slidingExpiration = TimeSpan.FromMinutes(1);
+            var sliddingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
 
-            _cacheOptions.SetSlidingExpiration(slidingExpiration);
-            _storage.Set(_testingKey, _testingValue, _cacheOptions);
+            _storage.Set(_testingKey, _testingValue, sliddingExpirationPolicy);
 
             // Act - after 10 seconds.
-            _clock.Add(TimeSpan.FromSeconds(10));
+            var firstTouchWhenKeyLivesWell = TimeSpan.FromSeconds(10);
+
+            _clock.Add(firstTouchWhenKeyLivesWell);
             _storage.TryGet(_testingKey, out _);
 
-            // Assert - after 1 minute from last touch.
-            _clock.Add(TimeSpan.FromSeconds(59));
+            // Assert - after nearly 1 minute from last touch.
+            var secondTouchWhenKeyNearlyExpired = TimeSpan.FromSeconds(59);
+
+            _clock.Add(secondTouchWhenKeyNearlyExpired);
             Assert.True(_storage.TryGet(_testingKey, out _));
         }
 
@@ -162,20 +169,24 @@
         public void SlidingExpirationRenewedByTouchingUntilAbsoluteExpirationMet()
         {
             // Arrange.
-            var slidingExpiration = TimeSpan.FromMinutes(1);
-            var relativeExpiration = TimeSpan.FromMinutes(2);
-
-            _cacheOptions
+            var slidingExpiration = InitialExpiry;
+            var relativeExpiration = InitialExpiry + TimeSpan.FromMinutes(1);
+            var mixedExpirationPolicy = _cacheOptions
                 .SetSlidingExpiration(slidingExpiration)
                 .SetAbsoluteExpiration(relativeExpiration);
-            _storage.Set(_testingKey, _testingValue, _cacheOptions);
+
+            _storage.Set(_testingKey, _testingValue, mixedExpirationPolicy);
 
             // Act - touch the key when the absolute expiration has not met.
-            _clock.Add(TimeSpan.FromSeconds(59));
+            var firstTouchWhenSlidingExpirationNearlyMet = TimeSpan.FromSeconds(59);
+
+            _clock.Add(firstTouchWhenSlidingExpirationNearlyMet);
             Assert.True(_storage.TryGet(_testingKey, out _));
 
             // Assert - after absolute timeout passed at 2 minutes and 1 second.
-            _clock.Add(TimeSpan.FromSeconds(61));
+            var secondTouchWhenAbsoluteExpirationOvers = TimeSpan.FromSeconds(62);
+
+            _clock.Add(secondTouchWhenAbsoluteExpirationOvers);
             Assert.False(_storage.TryGet(_testingKey, out _));
         }
 

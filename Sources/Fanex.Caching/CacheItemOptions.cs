@@ -26,7 +26,7 @@
                 throw new ArgumentOutOfRangeException(
                     nameof(relative),
                     relative,
-                    "The relative expiration value must not be zero.");
+                    $"The {nameof(relative)} expiration value must not be zero.");
             }
 
             RelativeExpiration = relative;

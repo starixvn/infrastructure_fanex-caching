@@ -30,9 +30,7 @@
             var anyString = _fixture.Create<string>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyString, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyString, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedString) = await Cache.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
@@ -47,9 +45,7 @@
             var anyBool = _fixture.Create<bool>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyBool, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyBool, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedBool) = await Cache.TryGetAsync<bool>(_testingKey).ConfigureAwait(false);
@@ -64,9 +60,7 @@
             var anyByte = _fixture.Create<byte>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyByte, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyByte, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedByte) = await Cache.TryGetAsync<byte>(_testingKey).ConfigureAwait(false);
@@ -81,9 +75,7 @@
             var anyShort = _fixture.Create<short>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyShort, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyShort, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedShort) = await Cache.TryGetAsync<short>(_testingKey).ConfigureAwait(false);
@@ -98,9 +90,7 @@
             var anyInt = _fixture.Create<int>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyInt, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyInt, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedInt) = await Cache.TryGetAsync<int>(_testingKey).ConfigureAwait(false);
@@ -115,9 +105,7 @@
             var anyLong = _fixture.Create<long>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyLong, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyLong, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedLong) = await Cache.TryGetAsync<long>(_testingKey).ConfigureAwait(false);
@@ -132,9 +120,7 @@
             var anyFloat = _fixture.Create<float>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyFloat, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyFloat, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedFloat) = await Cache.TryGetAsync<float>(_testingKey).ConfigureAwait(false);
@@ -149,9 +135,7 @@
             var anyDouble = _fixture.Create<double>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyDouble, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyDouble, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedDouble) = await Cache.TryGetAsync<double>(_testingKey).ConfigureAwait(false);
@@ -166,9 +150,7 @@
             var anyDecimal = _fixture.Create<decimal>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyDecimal, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyDecimal, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedDecimal) = await Cache.TryGetAsync<decimal>(_testingKey).ConfigureAwait(false);
@@ -183,9 +165,7 @@
             var anyNullableInt = _fixture.Create<int?>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyNullableInt, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyNullableInt, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedNullableInt) = await Cache.TryGetAsync<int?>(_testingKey).ConfigureAwait(false);
@@ -200,9 +180,7 @@
             var anyBinary = _fixture.Create<byte[]>();
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyBinary, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyBinary, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedBinary) = await Cache.TryGetAsync<byte[]>(_testingKey).ConfigureAwait(false);
@@ -220,9 +198,7 @@
             };
 
             // Act.
-            await Cache
-                .SetAsync(_testingKey, anyObject, _cacheOptions)
-                .ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyObject, _cacheOptions).ConfigureAwait(false);
 
             // Assert.
             var (_, cachedObject) = await Cache.TryGetAsync<Dictionary<string, string>>(_testingKey).ConfigureAwait(false);

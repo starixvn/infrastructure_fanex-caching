@@ -168,7 +168,7 @@
         }
 
         [Fact]
-        public void SetAndTryGetWorkWithCaseSensitiveKeys()
+        public void SetAndTryGetWorksWithCaseSensitiveKeys()
         {
             // Arrange.
             var caseSensitiveKey = _existingKey.ToUpperInvariant();
@@ -213,7 +213,7 @@
         }
 
         [Fact]
-        public async Task SetAsyncAndTryGetAsyncWorkWithCaseSensitiveKeys()
+        public async Task SetAsyncAndTryGetAsyncWorksWithCaseSensitiveKeys()
         {
             // Arrange.
             var caseSensitiveKey = _existingKey.ToUpperInvariant();

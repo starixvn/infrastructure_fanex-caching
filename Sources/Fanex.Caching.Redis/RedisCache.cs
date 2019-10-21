@@ -33,7 +33,7 @@
             return RedisStorage.TryGet(key, out value);
         }
 
-        public Task<(bool, T)> TryGetAsync<T>(string key)
+        public Task<(bool found, T value)> TryGetAsync<T>(string key)
         {
             if (string.IsNullOrEmpty(key))
             {

@@ -66,7 +66,7 @@
             return found;
         }
 
-        public async Task<(bool, T)> TryGetAsync<T>(string key)
+        public async Task<(bool found, T value)> TryGetAsync<T>(string key)
         {
             await ConnectAsync().ConfigureAwait(false);
 
