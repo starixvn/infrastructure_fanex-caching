@@ -23,6 +23,7 @@
             _storage = new MemoryStorage(new MemoryCacheOptions
             {
                 Clock = _clock,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(10),
                 CompactionPercentage = CompactionPercentage
             });
 
