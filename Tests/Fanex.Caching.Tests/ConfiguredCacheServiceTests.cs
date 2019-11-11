@@ -9,20 +9,20 @@
     public class ConfiguredCacheServiceTests
     {
         private readonly ICacheService _cacheService;
+        private readonly CacheItemOptions _testingCacheItemOptions;
         private readonly string _testingKey;
         private readonly object _testingValue;
-        private readonly CacheItemOptions _testingCacheItemOptions;
-        private readonly Func<object> _testingFactory;
+        private readonly object _newlyCreatedValue;
 
         public ConfiguredCacheServiceTests()
         {
             var fixture = new Fixture();
 
             _cacheService = Substitute.For<ICacheService>();
+            _testingCacheItemOptions = new CacheItemOptions();
             _testingKey = fixture.Create<string>();
             _testingValue = fixture.Create<object>();
-            _testingCacheItemOptions = fixture.Create<CacheItemOptions>();
-            _testingFactory = fixture.Create<Func<object>>();
+            _newlyCreatedValue = fixture.Create<object>();
 
             ConfiguredCacheService.Initialize(_cacheService);
         }
@@ -119,22 +119,24 @@
         public void GetOrSetPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            ConfiguredCacheService.GetOrSet(_testingKey, _testingFactory, _testingCacheItemOptions);
+            ConfiguredCacheService.GetOrSet(_testingKey, CreateValueFakely, _testingCacheItemOptions);
 
             // Assert.
             _cacheService
                 .Received()
-                .GetOrSet(Arg.Is(_testingKey), Arg.Any<Func<object>>(), Arg.Is(_testingCacheItemOptions));
+                .GetOrSet(Arg.Is(_testingKey), Arg.Is<Func<object>>(CreateValueFakely), Arg.Is(_testingCacheItemOptions));
         }
 
         [Fact]
         public void GetOrSetWithNoCacheItemOptionsPropagatesCallToRegisteredCacheService()
         {
             // Act.
-            ConfiguredCacheService.GetOrSet(_testingKey, _testingFactory);
+            ConfiguredCacheService.GetOrSet(_testingKey, CreateValueFakely);
 
             // Assert.
-            _cacheService.Received().GetOrSet(Arg.Is(_testingKey), Arg.Any<Func<object>>());
+            _cacheService
+                .Received()
+                .GetOrSet(Arg.Is(_testingKey), Arg.Is<Func<object>>(CreateValueFakely));
         }
 
         [Fact]
@@ -142,13 +144,13 @@
         {
             // Act.
             await ConfiguredCacheService
-                .GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions)
+                .GetOrSetAsync(_testingKey, CreateValueFakelyAsync, _testingCacheItemOptions)
                 .ConfigureAwait(false);
 
             // Assert.
             await _cacheService
                 .Received()
-                .GetOrSetAsync(Arg.Is(_testingKey), Arg.Any<Func<object>>(), Arg.Is(_testingCacheItemOptions))
+                .GetOrSetAsync(Arg.Is(_testingKey), Arg.Is<Func<Task<object>>>(CreateValueFakelyAsync), Arg.Is(_testingCacheItemOptions))
                 .ConfigureAwait(false);
         }
 
@@ -157,13 +159,13 @@
         {
             // Act.
             await ConfiguredCacheService
-                .GetOrSetAsync(_testingKey, _testingFactory)
+                .GetOrSetAsync(_testingKey, CreateValueFakelyAsync)
                 .ConfigureAwait(false);
 
             // Assert.
             await _cacheService
                 .Received()
-                .GetOrSetAsync(Arg.Is(_testingKey), Arg.Any<Func<object>>())
+                .GetOrSetAsync(Arg.Is(_testingKey), Arg.Is<Func<Task<object>>>(CreateValueFakelyAsync))
                 .ConfigureAwait(false);
         }
 
@@ -239,5 +241,11 @@
                 .SetAsync(Arg.Is(_testingKey), Arg.Is(_testingValue))
                 .ConfigureAwait(false);
         }
+
+        private object CreateValueFakely()
+            => _newlyCreatedValue;
+
+        private Task<object> CreateValueFakelyAsync()
+            => Task.FromResult(_newlyCreatedValue);
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace Fanex.Caching.Tests
 {
-    using System;
     using System.Threading.Tasks;
     using AutoFixture;
     using NSubstitute;
@@ -13,7 +12,7 @@
         private readonly CacheItemOptions _testingCacheItemOptions;
         private readonly string _testingKey;
         private readonly object _testingValue;
-        private readonly Func<object> _testingFactory;
+        private readonly object _newlyCreatedValue;
 
         public CacheServiceTests()
         {
@@ -21,10 +20,10 @@
 
             _cacheStorage = Substitute.For<ICache>();
             _cacheService = new CacheService(_cacheStorage);
-            _testingCacheItemOptions = fixture.Create<CacheItemOptions>();
+            _testingCacheItemOptions = new CacheItemOptions();
             _testingKey = fixture.Create<string>();
             _testingValue = fixture.Create<object>();
-            _testingFactory = fixture.Create<Func<object>>();
+            _newlyCreatedValue = fixture.Create<object>();
         }
 
         [Fact]
@@ -176,7 +175,7 @@
                 });
 
             // Act.
-            var result = _cacheService.GetOrSet(_testingKey, _testingFactory, _testingCacheItemOptions);
+            var result = _cacheService.GetOrSet(_testingKey, CreateValueFakely, _testingCacheItemOptions);
 
             // Assert.
             Assert.Same(_testingValue, result);
@@ -206,8 +205,6 @@
         public void GetOrSetMissingKeyStoresValueCreatedByFactoryThenReturnsIt()
         {
             // Arrange.
-            var newValue = _testingFactory();
-
             _cacheStorage
                 .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
@@ -218,14 +215,14 @@
                 });
 
             // Act.
-            var result = _cacheService.GetOrSet(_testingKey, _testingFactory, _testingCacheItemOptions);
+            var result = _cacheService.GetOrSet(_testingKey, CreateValueFakely, _testingCacheItemOptions);
 
             // Assert.
             _cacheStorage
                 .Received()
-                .Set(Arg.Is(_testingKey), Arg.Is(newValue), Arg.Is(_testingCacheItemOptions));
+                .Set(Arg.Is(_testingKey), Arg.Is(_newlyCreatedValue), Arg.Is(_testingCacheItemOptions));
 
-            Assert.Same(newValue, result);
+            Assert.Same(_newlyCreatedValue, result);
         }
 
         [Fact]
@@ -242,7 +239,7 @@
                 });
 
             // Act.
-            var result = _cacheService.GetOrSet(_testingKey, _testingFactory);
+            var result = _cacheService.GetOrSet(_testingKey, CreateValueFakely);
 
             // Assert.
             Assert.Same(_testingValue, result);
@@ -252,8 +249,6 @@
         public void GetOrSetMissingKeyWithNoCacheItemOptionsStoresValueWithDefaultRelativeExpiration()
         {
             // Arrange.
-            var newValue = _testingFactory();
-
             _cacheStorage
                 .TryGet(_testingKey, out object _)
                 .Returns(parameters =>
@@ -264,14 +259,14 @@
                 });
 
             // Act.
-            _cacheService.GetOrSet(_testingKey, _testingFactory);
+            _cacheService.GetOrSet(_testingKey, CreateValueFakely);
 
             // Assert.
             _cacheStorage
                 .Received()
                 .Set(
                     Arg.Is(_testingKey),
-                    Arg.Is(newValue),
+                    Arg.Is(_newlyCreatedValue),
                     Arg.Is<CacheItemOptions>(testingOptions => IsUsingDefaultRelativeExpiration(testingOptions)));
         }
 
@@ -283,7 +278,7 @@
 
             // Act.
             var result = await _cacheService
-                .GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions)
+                .GetOrSetAsync(_testingKey, CreateValueFakelyAsync, _testingCacheItemOptions)
                 .ConfigureAwait(false);
 
             // Assert.
@@ -309,22 +304,20 @@
         public async Task GetOrSetAsyncMissingKeyStoresValueCreatedByFactoryThenReturnsIt()
         {
             // Arrange.
-            var newValue = _testingFactory();
-
             _cacheStorage.TryGetAsync<object>(_testingKey).Returns((false, null));
 
             // Act.
             var result = await _cacheService
-                .GetOrSetAsync(_testingKey, _testingFactory, _testingCacheItemOptions)
+                .GetOrSetAsync(_testingKey, CreateValueFakelyAsync, _testingCacheItemOptions)
                 .ConfigureAwait(false);
 
             // Assert.
             await _cacheStorage
                 .Received()
-                .SetAsync(Arg.Is(_testingKey), Arg.Is(newValue), Arg.Is(_testingCacheItemOptions))
+                .SetAsync(Arg.Is(_testingKey), Arg.Is(_newlyCreatedValue), Arg.Is(_testingCacheItemOptions))
                 .ConfigureAwait(false);
 
-            Assert.Same(newValue, result);
+            Assert.Same(_newlyCreatedValue, result);
         }
 
         [Fact]
@@ -335,7 +328,7 @@
 
             // Act.
             var result = await _cacheService
-                .GetOrSetAsync(_testingKey, _testingFactory)
+                .GetOrSetAsync(_testingKey, CreateValueFakelyAsync)
                 .ConfigureAwait(false);
 
             // Assert.
@@ -346,19 +339,17 @@
         public async Task GetOrSetAsyncMissingKeyWithNoCacheItemOptionsStoresValueWithDefaultRelativeExpiration()
         {
             // Arrange.
-            var newValue = _testingFactory();
-
             _cacheStorage.TryGetAsync<object>(_testingKey).Returns((false, null));
 
             // Act.
-            await _cacheService.GetOrSetAsync(_testingKey, _testingFactory).ConfigureAwait(false);
+            await _cacheService.GetOrSetAsync(_testingKey, CreateValueFakelyAsync).ConfigureAwait(false);
 
             // Assert.
             await _cacheStorage
                 .Received()
                 .SetAsync(
                     Arg.Is(_testingKey),
-                    Arg.Is(newValue),
+                    Arg.Is(_newlyCreatedValue),
                     Arg.Is<CacheItemOptions>(testingOptions => IsUsingDefaultRelativeExpiration(testingOptions)))
                 .ConfigureAwait(false);
         }
@@ -446,5 +437,11 @@
 
         private static bool IsUsingDefaultRelativeExpiration(CacheItemOptions options)
             => options.RelativeExpiration == CacheItemOptions.DefaultRelativeExpiration;
+
+        private object CreateValueFakely()
+            => _newlyCreatedValue;
+
+        private Task<object> CreateValueFakelyAsync()
+            => Task.FromResult(_newlyCreatedValue);
     }
 }

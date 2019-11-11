@@ -52,10 +52,10 @@
         public static T GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options)
             => CurrentInstance.GetOrSet(key, factory, options);
 
-        public static Task<T> GetOrSetAsync<T>(string key, Func<T> factory)
+        public static Task<T> GetOrSetAsync<T>(string key, Func<Task<T>> factory)
             => CurrentInstance.GetOrSetAsync(key, factory);
 
-        public static Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options)
+        public static Task<T> GetOrSetAsync<T>(string key, Func<Task<T>> factory, CacheItemOptions options)
             => CurrentInstance.GetOrSetAsync(key, factory, options);
 
         public static void Remove(string key)

@@ -23,9 +23,9 @@
 
         T GetOrSet<T>(string key, Func<T> factory, CacheItemOptions options);
 
-        Task<T> GetOrSetAsync<T>(string key, Func<T> factory);
+        Task<T> GetOrSetAsync<T>(string key, Func<Task<T>> factory);
 
-        Task<T> GetOrSetAsync<T>(string key, Func<T> factory, CacheItemOptions options);
+        Task<T> GetOrSetAsync<T>(string key, Func<Task<T>> factory, CacheItemOptions options);
 
         void Remove(string key);
 
