@@ -193,7 +193,7 @@
         public void Dispose()
         {
             _connectionLock.Dispose();
-            _connection.Dispose();
+            _connection?.Dispose();
             _connection = null;
         }
     }
