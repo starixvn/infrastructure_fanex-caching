@@ -9,8 +9,8 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Sources\Fanex.Caching.Redis.AspNetCore\Fanex.Caching.Redis.AspNetCore.csproj" />
