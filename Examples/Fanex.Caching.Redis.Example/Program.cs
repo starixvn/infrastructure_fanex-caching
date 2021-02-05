@@ -6,8 +6,6 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
-#pragma warning disable S4055 // Literals should not be passed as localized parameters
-
     internal static class Program
     {
         private static void Main()

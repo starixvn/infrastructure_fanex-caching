@@ -10,6 +10,6 @@
         public DateTimeOffset UtcNow { get; private set; }
 
         public void Add(TimeSpan addedTime)
-            => UtcNow = UtcNow + addedTime;
+            => UtcNow += addedTime;
     }
 }

@@ -206,8 +206,6 @@
             Assert.Equal(EvictionReason.Removed, _callbackReason);
         }
 
-#pragma warning disable S2952 // Classes should "Dispose" of members from the classes' own "Dispose" methods
-
         [Fact]
         public void ObjectDisposedExceptionIsThrownIfTryGetIsCalledAfterDisposingStorage()
         {
@@ -235,8 +233,6 @@
             // Assert.
             Assert.IsType<ObjectDisposedException>(exception);
         }
-
-#pragma warning restore S2952 // Classes should "Dispose" of members from the classes' own "Dispose" methods
 
         [Fact]
         public void SetReplaceRemoveAreThreadSafe()

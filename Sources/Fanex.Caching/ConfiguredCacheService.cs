@@ -3,8 +3,6 @@
     using System;
     using System.Threading.Tasks;
 
-#pragma warning disable S1200 // Classes should not be coupled to too many other classes (Single Responsibility Principle)
-
     public static class ConfiguredCacheService
     {
         private static ICacheService _currentInstance;
@@ -16,10 +14,7 @@
         {
             get
             {
-                if (_currentInstance == null)
-                {
-                    _currentInstance = new CacheService();
-                }
+                _currentInstance ??= new CacheService();
 
                 return _currentInstance;
             }

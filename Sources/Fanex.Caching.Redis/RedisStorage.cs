@@ -170,8 +170,6 @@
         }
 
 
-#pragma warning disable S2589 // Boolean expressions should not be gratuitous
-
         private void Connect()
         {
             if (_database != null)
@@ -217,8 +215,6 @@
                 _connectionLock.Release();
             }
         }
-
-#pragma warning restore S2589 // Boolean expressions should not be gratuitous
 
         private string ModifyKey(string key)
             => $"{{{_applicationName}}}:{{{key}}}";

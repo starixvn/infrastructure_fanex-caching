@@ -2,10 +2,11 @@
   "ServerUri": "https://sonarqube.nexdev.net",
   "Organization": null,
   "ProjectKey": "Fanex.Caching",
+  "ProjectName": "R&D / Fanex Caching",
   "Profiles": {
     "CSharp": {
       "ProfileKey": "cs-sonar-way-80515",
-      "ProfileTimestamp": "2019-03-19T14:46:51+07:00"
+      "ProfileTimestamp": "2020-11-27T06:18:08Z"
     }
   }
 }
