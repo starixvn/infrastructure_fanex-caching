@@ -141,7 +141,7 @@
 
         private void Connect()
         {
-            if (_database != null)
+            if (_database != null && _connection.IsConnected)
             {
                 return;
             }
