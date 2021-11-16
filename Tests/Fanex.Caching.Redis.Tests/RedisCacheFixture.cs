@@ -8,7 +8,7 @@
         {
             CacheOptions = new RedisCacheOptions
             {
-                ConnectionString = "ha.nexdev.net:6379",
+                ConnectionString = "ha.nexdev.net:16339,password=foo1@bared,defaultDatabase=11",
                 ApplicationName = "Fanex.Caching.Redis.Tests"
             };
             Cache = new RedisCache(CacheOptions);

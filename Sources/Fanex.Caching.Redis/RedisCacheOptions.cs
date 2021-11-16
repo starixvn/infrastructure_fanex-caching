@@ -33,7 +33,10 @@
                 return ConnectionOptions;
             }
 
-            return ConfigurationOptions.Parse(ConnectionString, true);
+            var configuration = ConfigurationOptions.Parse(ConnectionString, true);
+            configuration.AbortOnConnectFail = false;
+
+            return configuration;
         }
     }
 }

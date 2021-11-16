@@ -1,6 +1,7 @@
 ﻿namespace Fanex.Caching.Redis
 {
     using System;
+    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
     using StackExchange.Redis;
@@ -137,13 +138,14 @@
             {
                 return _database.ScriptEvaluate(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
             }
-            catch (RedisServerException e)
+            catch (RedisServerException e) when (e.Message.Contains("READONLY"))
             {
-                if (e.Message.Contains("READONLY"))
-                {
-                    ForceReconnectAsync().ConfigureAwait(false);
-                }
-
+                ForceReconnectAsync().ConfigureAwait(false);
+                throw;
+            }
+            catch (Exception e) when (e is RedisConnectionException || e is SocketException)
+            {
+                ForceReconnectAsync().ConfigureAwait(false);
                 throw;
             }
         }
@@ -155,13 +157,14 @@
             {
                 return await _database.ScriptEvaluateAsync(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
             }
-            catch (RedisServerException e)
+            catch (RedisServerException e) when (e.Message.Contains("READONLY"))
             {
-                if (e.Message.Contains("READONLY"))
-                {
-                    await ForceReconnectAsync().ConfigureAwait(false);
-                }
-
+                ForceReconnectAsync().ConfigureAwait(false);
+                throw;
+            }
+            catch (Exception e) when (e is RedisConnectionException || e is SocketException)
+            {
+                ForceReconnectAsync().ConfigureAwait(false);
                 throw;
             }
         }
