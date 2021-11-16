@@ -5,7 +5,7 @@
     using System.Threading.Tasks;
     using StackExchange.Redis;
 
-    internal sealed class RedisStorage : IDisposable
+    internal sealed partial class RedisStorage : IDisposable
     {
         private readonly SemaphoreSlim _connectionLock = new SemaphoreSlim(1, 1);
         private readonly ConfigurationOptions _redisConnectionOptions;
@@ -132,16 +132,46 @@
         }
 
         private RedisResult EvaluateCommand(RedisCommand redisCommand)
-            => _database.ScriptEvaluate(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+        {
+            try
+            {
+                return _database.ScriptEvaluate(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+            }
+            catch (RedisServerException e)
+            {
+                if (e.Message.Contains("READONLY"))
+                {
+                    ForceReconnectAsync().ConfigureAwait(false);
+                }
 
-        private Task<RedisResult> EvaluateCommandAsync(RedisCommand redisCommand)
-            => _database.ScriptEvaluateAsync(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+                throw;
+            }
+        }
+
+
+        private async Task<RedisResult> EvaluateCommandAsync(RedisCommand redisCommand)
+        {
+            try
+            {
+                return await _database.ScriptEvaluateAsync(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+            }
+            catch (RedisServerException e)
+            {
+                if (e.Message.Contains("READONLY"))
+                {
+                    await ForceReconnectAsync().ConfigureAwait(false);
+                }
+
+                throw;
+            }
+        }
+
 
 #pragma warning disable S2589 // Boolean expressions should not be gratuitous
 
         private void Connect()
         {
-            if (_database != null && _connection.IsConnected)
+            if (_database != null)
             {
                 return;
             }
@@ -196,5 +226,6 @@
             _connection?.Dispose();
             _connection = null;
         }
+
     }
 }
