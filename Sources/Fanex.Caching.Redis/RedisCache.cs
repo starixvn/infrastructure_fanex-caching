@@ -2,6 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
+    using StackExchange.Redis;
 
     public sealed class RedisCache : ICache
     {
@@ -30,7 +31,15 @@
                 throw new ArgumentException("Key must not be null or empty.", nameof(key));
             }
 
-            return RedisStorage.TryGet(key, out value);
+            try
+            {
+                return RedisStorage.TryGet(key, out value);
+            }
+            catch (RedisTimeoutException e)
+            {
+                throw new Exception($"RedisTimeoutException on key: {key}", e);
+            }
+
         }
 
         public Task<(bool found, T value)> TryGetAsync<T>(string key)
@@ -40,7 +49,15 @@
                 throw new ArgumentException("Key must not be null or empty.", nameof(key));
             }
 
-            return RedisStorage.TryGetAsync<T>(key);
+            try
+            {
+                return RedisStorage.TryGetAsync<T>(key);
+            }
+            catch (RedisTimeoutException e)
+            {
+                throw new Exception($"RedisTimeoutException on key: {key}", e);
+            }
+
         }
 
         public void Set<T>(string key, T value, CacheItemOptions options)

@@ -1,11 +1,12 @@
 ﻿namespace Fanex.Caching.Redis
 {
     using System;
+    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
     using StackExchange.Redis;
 
-    internal sealed class RedisStorage : IDisposable
+    internal sealed partial class RedisStorage : IDisposable
     {
         private readonly SemaphoreSlim _connectionLock = new SemaphoreSlim(1, 1);
         private readonly ConfigurationOptions _redisConnectionOptions;
@@ -132,10 +133,42 @@
         }
 
         private RedisResult EvaluateCommand(RedisCommand redisCommand)
-            => _database.ScriptEvaluate(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+        {
+            try
+            {
+                return _database.ScriptEvaluate(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+            }
+            catch (RedisServerException e) when (e.Message.Contains("READONLY"))
+            {
+                ForceReconnectAsync().ConfigureAwait(false);
+                throw;
+            }
+            catch (Exception e) when (e is RedisConnectionException || e is SocketException)
+            {
+                ForceReconnectAsync().ConfigureAwait(false);
+                throw;
+            }
+        }
 
-        private Task<RedisResult> EvaluateCommandAsync(RedisCommand redisCommand)
-            => _database.ScriptEvaluateAsync(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+
+        private async Task<RedisResult> EvaluateCommandAsync(RedisCommand redisCommand)
+        {
+            try
+            {
+                return await _database.ScriptEvaluateAsync(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+            }
+            catch (RedisServerException e) when (e.Message.Contains("READONLY"))
+            {
+                ForceReconnectAsync().ConfigureAwait(false);
+                throw;
+            }
+            catch (Exception e) when (e is RedisConnectionException || e is SocketException)
+            {
+                ForceReconnectAsync().ConfigureAwait(false);
+                throw;
+            }
+        }
+
 
 #pragma warning disable S2589 // Boolean expressions should not be gratuitous
 
@@ -196,5 +229,6 @@
             _connection?.Dispose();
             _connection = null;
         }
+
     }
 }
