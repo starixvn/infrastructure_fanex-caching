@@ -5,8 +5,8 @@
         <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="MessagePack" Version="2.3.85" />
-        <PackageReference Include="StackExchange.Redis" Version="2.2.88" />
+        <PackageReference Include="MessagePack" Version="2.4.35" />
+        <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
