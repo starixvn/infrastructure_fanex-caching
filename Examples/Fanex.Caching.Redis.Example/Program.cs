@@ -5,6 +5,7 @@
     using System.Threading;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Newtonsoft.Json;
 
     internal static class Program
     {
@@ -67,13 +68,16 @@
             cacheService.Set(key3, value3, new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromSeconds(slidingTimeout)));
             Console.WriteLine("Sleep in 3 seconds");
             Thread.Sleep(sleepingIn3Seconds);
-            Console.WriteLine($"Touch '{key3}' and get its value as: {cacheService.Get<Employee>(key3)}");
+            Employee employee = cacheService.Get<Employee>(key3);
+            Console.WriteLine($"Touch '{key3}' and get its value as: {JsonConvert.SerializeObject(employee)}");
             Console.WriteLine("Sleep in another 4 seconds");
             Thread.Sleep(sleepingIn4Seconds);
-            Console.WriteLine($"'{key3}' is still alive with its value as: {cacheService.Get<Employee>(key3)}");
+            employee = cacheService.Get<Employee>(key3);
+            Console.WriteLine($"'{key3}' is still alive with its value as: {JsonConvert.SerializeObject(employee)}");
             Console.WriteLine("Sleep in another 6 seconds");
             Thread.Sleep(sleepingIn6Seconds);
-            Console.WriteLine($"'{key3}' is expired and value we get from cache is: {cacheService.Get<Employee>(key3)}");
+            employee = cacheService.Get<Employee>(key3);
+            Console.WriteLine($"'{key3}' is expired and value we get from cache is: {JsonConvert.SerializeObject(employee)}");
 
             Console.ReadLine();
         }

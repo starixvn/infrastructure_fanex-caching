@@ -12,7 +12,7 @@
         {
             try
             {
-                return MP.MessagePackSerializer.Deserialize<T>(binaryData);
+                return MP.MessagePackSerializer.Deserialize<T>(binaryData, ContractlessStandardResolver.Options);
             }
             catch
             {
