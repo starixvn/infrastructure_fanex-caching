@@ -136,7 +136,7 @@
         {
             try
             {
-                return _database.ScriptEvaluate(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+                return _database.ScriptEvaluate( redisCommand.Script, redisCommand.Keys, redisCommand.Values);
             }
             catch (RedisServerException e) when (e.Message.Contains("READONLY"))
             {

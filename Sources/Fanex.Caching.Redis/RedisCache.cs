@@ -21,8 +21,8 @@
         public bool Contain(string key)
             => !string.IsNullOrEmpty(key) && RedisStorage.Contain(key);
 
-        public Task<bool> ContainAsync(string key)
-            => string.IsNullOrEmpty(key) ? Task.FromResult(false) : RedisStorage.ContainAsync(key);
+        public async Task<bool> ContainAsync(string key)
+            => string.IsNullOrEmpty(key) ? await Task.FromResult(false) : await RedisStorage.ContainAsync(key);
 
         public bool TryGet<T>(string key, out T value)
         {
@@ -37,12 +37,12 @@
             }
             catch (RedisTimeoutException e)
             {
-                throw new Exception($"RedisTimeoutException on key: {key}", e);
+                throw new TimeoutException($"TryGet timeout on key: {key}", e);
             }
 
         }
 
-        public Task<(bool found, T value)> TryGetAsync<T>(string key)
+        public async Task<(bool found, T value)> TryGetAsync<T>(string key)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -51,11 +51,11 @@
 
             try
             {
-                return RedisStorage.TryGetAsync<T>(key);
+                return await RedisStorage.TryGetAsync<T>(key);
             }
             catch (RedisTimeoutException e)
             {
-                throw new Exception($"RedisTimeoutException on key: {key}", e);
+                throw new TimeoutException($"TryGetAsync timeout on key: {key}. Inner exception: " + e.Message, e);
             }
 
         }
@@ -64,14 +64,28 @@
         {
             VerifyParametersOfSet(key, value, options);
 
-            RedisStorage.Set(key, value, options);
+            try
+            {
+                RedisStorage.Set(key, value, options);
+            }
+            catch (RedisTimeoutException e)
+            {
+                throw new TimeoutException($"RedisStorage.Set timeout on key: {key}. Inner exception: " + e.Message, e);
+            }
         }
 
-        public Task SetAsync<T>(string key, T value, CacheItemOptions options)
+        public async Task SetAsync<T>(string key, T value, CacheItemOptions options)
         {
             VerifyParametersOfSet(key, value, options);
 
-            return RedisStorage.SetAsync(key, value, options);
+            try
+            {
+                await RedisStorage.SetAsync(key, value, options);
+            }
+            catch (RedisTimeoutException e)
+            {
+                throw new TimeoutException($"RedisStorage.Set timeout on key: {key}. Inner exception: " + e.Message, e);
+            }
         }
 
         private static void VerifyParametersOfSet<T>(string key, T value, CacheItemOptions options)
@@ -99,17 +113,31 @@
                 throw new ArgumentException("Key must not be null or empty.", nameof(key));
             }
 
-            RedisStorage.Remove(key);
+            try
+            {
+                RedisStorage.Remove(key);
+            }
+            catch (RedisTimeoutException e)
+            {
+                throw new TimeoutException($"RedisStorage.Set timeout on key: {key}. Inner exception: " + e.Message, e);
+            }
         }
 
-        public Task RemoveAsync(string key)
+        public async Task RemoveAsync(string key)
         {
             if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentException("Key must not be null or empty.", nameof(key));
             }
 
-            return RedisStorage.RemoveAsync(key);
+            try
+            {
+                await RedisStorage.RemoveAsync(key);
+            }
+            catch (RedisTimeoutException e)
+            {
+                throw new TimeoutException($"RedisStorage.Set timeout on key: {key}. Inner exception: " + e.Message, e);
+            }
         }
 
         public void Dispose()

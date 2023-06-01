@@ -6,7 +6,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="MessagePack" Version="2.4.35" />
-        <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
+        <PackageReference Include="StackExchange.Redis" Version="2.6.111" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
