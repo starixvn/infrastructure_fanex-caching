@@ -38,13 +38,13 @@
             var dateTimeToExpire = Clock.UtcNow + InitialExpiry;
             var absoluteExpirationPolicy = _cacheOptions.SetAbsoluteExpiration(dateTimeToExpire);
 
-            await Storage.SetAsync(_testingKey, _testingValue, absoluteExpirationPolicy).ConfigureAwait(false);
+            await Storage.SetAsync(_testingKey, _testingValue, absoluteExpirationPolicy);
 
             // Act.
-            await Task.Delay(NumberOfMillisecondsPassedForKeyToBeExpired).ConfigureAwait(false);
+            await Task.Delay(NumberOfMillisecondsPassedForKeyToBeExpired);
 
             // Assert.
-            var (found, _) = await Storage.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(_testingKey);
 
             Assert.False(found);
         }
@@ -55,13 +55,13 @@
             // Arrange.
             var relativeExpirationPolicy = _cacheOptions.SetAbsoluteExpiration(InitialExpiry);
 
-            await Storage.SetAsync(_testingKey, _testingValue, relativeExpirationPolicy).ConfigureAwait(false);
+            await Storage.SetAsync(_testingKey, _testingValue, relativeExpirationPolicy);
 
             // Act.
-            await Task.Delay(NumberOfMillisecondsPassedForKeyToBeExpired).ConfigureAwait(false);
+            await Task.Delay(NumberOfMillisecondsPassedForKeyToBeExpired);
 
             // Assert.
-            var (found, _) = await Storage.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(_testingKey);
 
             Assert.False(found);
         }
@@ -72,13 +72,13 @@
             // Arrange.
             var sliddingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
 
-            await Storage.SetAsync(_testingKey, _testingValue, sliddingExpirationPolicy).ConfigureAwait(false);
+            await Storage.SetAsync(_testingKey, _testingValue, sliddingExpirationPolicy);
 
             // Act.
-            await Task.Delay(NumberOfMillisecondsPassedForKeyToBeExpired).ConfigureAwait(false);
+            await Task.Delay(NumberOfMillisecondsPassedForKeyToBeExpired);
 
             // Assert.
-            var (found, _) = await Storage.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(_testingKey);
 
             Assert.False(found);
         }
@@ -90,20 +90,20 @@
             var timeToSlide = TimeSpan.FromMilliseconds(500);
             var sliddingExpirationPolicy = _cacheOptions.SetSlidingExpiration(timeToSlide);
 
-            await Storage.SetAsync(_testingKey, _testingValue, sliddingExpirationPolicy).ConfigureAwait(false);
+            await Storage.SetAsync(_testingKey, _testingValue, sliddingExpirationPolicy);
 
             // Act - after 200 milliseconds.
             const int numberOfMillisecondsPassedToMakeFirstTouch = 200;
 
-            await Task.Delay(numberOfMillisecondsPassedToMakeFirstTouch).ConfigureAwait(false);
-            await Storage.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            await Task.Delay(numberOfMillisecondsPassedToMakeFirstTouch);
+            await Storage.TryGetAsync<string>(_testingKey);
 
             // Assert - after 110 milliseconds from last touch, 510 milliseconds since moment the key was stored.
             const int numberOfMillisecondsPassedToMakeSecondTouch = 310;
 
-            await Task.Delay(numberOfMillisecondsPassedToMakeSecondTouch).ConfigureAwait(false);
+            await Task.Delay(numberOfMillisecondsPassedToMakeSecondTouch);
 
-            var (found, _) = await Storage.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(_testingKey);
 
             Assert.True(found);
         }
@@ -118,29 +118,29 @@
                 .SetSlidingExpiration(timeToSlide)
                 .SetAbsoluteExpiration(timeToLive);
 
-            await Storage.SetAsync(_testingKey, _testingValue, mixedExpirationPolicy).ConfigureAwait(false);
+            await Storage.SetAsync(_testingKey, _testingValue, mixedExpirationPolicy);
 
             // Act - touch the key when the sliding expiration has not met.
             const int numberOfMillisecondsWhenSlidingExpirationNearlyMet = 350;
 
-            await Task.Delay(numberOfMillisecondsWhenSlidingExpirationNearlyMet).ConfigureAwait(false);
+            await Task.Delay(numberOfMillisecondsWhenSlidingExpirationNearlyMet);
 
-            var (found, _) = await Storage.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(_testingKey);
 
             Assert.True(found);
 
             // Act - touch the key when the absolute expiration has not met.
             const int numberOfMillisecondsWhenAbsoluteExpirationStillNotMet = 200;
 
-            await Task.Delay(numberOfMillisecondsWhenAbsoluteExpirationStillNotMet).ConfigureAwait(false);
-            (found, _) = await Storage.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            await Task.Delay(numberOfMillisecondsWhenAbsoluteExpirationStillNotMet);
+            (found, _) = await Storage.TryGetAsync<string>(_testingKey);
             Assert.True(found);
 
             // Assert - after absolute timeout passed at 810 milliseconds since moment the key was stored.
             const int numberOfMillisecondsWhenAbsoluteExpirationOvers = 260;
 
-            await Task.Delay(numberOfMillisecondsWhenAbsoluteExpirationOvers).ConfigureAwait(false);
-            (found, _) = await Storage.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            await Task.Delay(numberOfMillisecondsWhenAbsoluteExpirationOvers);
+            (found, _) = await Storage.TryGetAsync<string>(_testingKey);
             Assert.False(found);
         }
 

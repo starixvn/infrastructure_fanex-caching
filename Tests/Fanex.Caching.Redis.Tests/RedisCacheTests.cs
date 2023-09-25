@@ -76,7 +76,7 @@
         public async Task ContainAsyncReturnsFalseForNullOrEmptyKey(string key)
         {
             // Act.
-            var found = await Cache.ContainAsync(key).ConfigureAwait(false);
+            var found = await Cache.ContainAsync(key);
 
             // Assert.
             Assert.False(found);
@@ -89,7 +89,7 @@
             var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            var found = await Cache.ContainAsync(unexistingKey).ConfigureAwait(false);
+            var found = await Cache.ContainAsync(unexistingKey);
 
             // Assert.
             Assert.False(found);
@@ -99,7 +99,7 @@
         public async Task ContainAsyncReturnsTrueForExistingKey()
         {
             // Act.
-            var found = await Cache.ContainAsync(_existingKey).ConfigureAwait(false);
+            var found = await Cache.ContainAsync(_existingKey);
 
             // Assert.
             Assert.True(found);
@@ -181,7 +181,7 @@
             // Act.
             var exception = await Record
                 .ExceptionAsync(() => Cache.TryGetAsync<string>(key))
-                .ConfigureAwait(false);
+                ;
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -194,7 +194,7 @@
             var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            var (found, _) = await Cache.TryGetAsync<string>(unexistingKey).ConfigureAwait(false);
+            var (found, _) = await Cache.TryGetAsync<string>(unexistingKey);
 
             // Assert.
             Assert.False(found);
@@ -207,7 +207,7 @@
             var unexistingKey = _fixture.Create<string>();
 
             // Act.
-            var (_, actualValue) = await Cache.TryGetAsync<string>(unexistingKey).ConfigureAwait(false);
+            var (_, actualValue) = await Cache.TryGetAsync<string>(unexistingKey);
 
             // Assert.
             Assert.Equal(default, actualValue);
@@ -217,7 +217,7 @@
         public async Task TryGetAsyncExistingKeyReturnsTrueAsFirstResult()
         {
             // Act.
-            var (found, _) = await Cache.TryGetAsync<string>(_existingKey).ConfigureAwait(false);
+            var (found, _) = await Cache.TryGetAsync<string>(_existingKey);
 
             // Assert.
             Assert.True(found);
@@ -227,7 +227,7 @@
         public async Task TryGetAsyncExistingKeyReturnsCachedObjectAsSecondResult()
         {
             // Act.
-            var (_, actualValue) = await Cache.TryGetAsync<string>(_existingKey).ConfigureAwait(false);
+            var (_, actualValue) = await Cache.TryGetAsync<string>(_existingKey);
 
             // Assert.
             Assert.Equal(_existingValue, actualValue);
@@ -237,7 +237,7 @@
         public async Task TryGetAsyncWithIncorrectValueTypeReturnsDefaultValueAsSecondResult()
         {
             // Act.
-            var (_, actualValue) = await Cache.TryGetAsync<int>(_existingKey).ConfigureAwait(false);
+            var (_, actualValue) = await Cache.TryGetAsync<int>(_existingKey);
 
             // Assert.
             Assert.Equal(default, actualValue);
@@ -317,7 +317,7 @@
             // Act.
             var exception = await Record
                 .ExceptionAsync(() => Cache.SetAsync(key, value, cacheOptions))
-                .ConfigureAwait(false);
+                ;
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -333,7 +333,7 @@
             // Act.
             var exception = await Record
                 .ExceptionAsync(() => Cache.SetAsync<string>(key, null, cacheOptions))
-                .ConfigureAwait(false);
+                ;
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -350,7 +350,7 @@
             // Act.
             var exception = await Record
                 .ExceptionAsync(() => Cache.SetAsync(key, value, cacheOptions))
-                .ConfigureAwait(false);
+                ;
 
             // Assert.
             Assert.IsType<ArgumentNullException>(exception);
@@ -365,10 +365,10 @@
             var cacheOptions = new CacheItemOptions();
 
             // Act.
-            await Cache.SetAsync(key, value, cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(key, value, cacheOptions);
 
             // Assert.
-            var (found, _) = await Cache.TryGetAsync<string>(key).ConfigureAwait(false);
+            var (found, _) = await Cache.TryGetAsync<string>(key);
 
             Assert.True(found);
         }
@@ -403,7 +403,7 @@
         public async Task RemoveAsyncNullOrEmptyKeyThrowsArgumentException(string key)
         {
             // Act.
-            var exception = await Record.ExceptionAsync(() => Cache.RemoveAsync(key)).ConfigureAwait(false);
+            var exception = await Record.ExceptionAsync(() => Cache.RemoveAsync(key));
 
             // Assert.
             Assert.IsType<ArgumentException>(exception);
@@ -413,10 +413,10 @@
         public async Task RemoveAsyncExistingKeyRemoveItOutOfCacheStroage()
         {
             // Act.
-            await Cache.RemoveAsync(_existingKey).ConfigureAwait(false);
+            await Cache.RemoveAsync(_existingKey);
 
             // Assert.
-            var (found, _) = await Cache.TryGetAsync<string>(_existingKey).ConfigureAwait(false);
+            var (found, _) = await Cache.TryGetAsync<string>(_existingKey);
 
             Assert.False(found);
         }

@@ -2,13 +2,13 @@
     <PropertyGroup>
         <Description>New storage of Fanex.Caching which is REDIS.</Description>
         <PackageTags>fanex.caching; redis</PackageTags>
-        <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net471;netstandard2.0;net7.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="MessagePack" Version="2.4.35" />
         <PackageReference Include="StackExchange.Redis" Version="2.6.111" />
     </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     </ItemGroup>
     <ItemGroup>

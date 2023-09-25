@@ -235,10 +235,10 @@
         }
 
         [Fact]
-        public void SetReplaceRemoveAreThreadSafe()
+        public async Task SetReplaceRemoveAreThreadSafe()
         {
             // Arrange.
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // Act.
@@ -247,8 +247,7 @@
             var thirdTask = Task.Run(() => RemoveRandomKey(cancellationToken), cancellationToken);
             var forthTask = Task.Run(() => cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(50)), cancellationToken);
 
-            Task.WaitAll(firstTask, secondTask, thirdTask, forthTask);
-            cancellationTokenSource.Dispose();
+            await Task.WhenAll(firstTask, secondTask, thirdTask, forthTask);
 
             // Assert.
             Assert.Equal(TaskStatus.RanToCompletion, firstTask.Status);
@@ -281,10 +280,10 @@
         }
 
         [Fact]
-        public void SetGetOneSpecificKeyAreThreadSafe()
+        public async Task SetGetOneSpecificKeyAreThreadSafe()
         {
             // Arrange.
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
             var key = _fixture.Create<string>();
 
@@ -293,8 +292,7 @@
             var secondTask = Task.Run(() => GetOneSpecificKey(key, cancellationToken), cancellationToken);
             var thirdTask = Task.Run(() => cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(50)), cancellationToken);
 
-            Task.WaitAll(firstTask, secondTask, thirdTask);
-            cancellationTokenSource.Dispose();
+            await Task.WhenAll(firstTask, secondTask, thirdTask);
 
             // Assert.
             Assert.Equal(TaskStatus.RanToCompletion, firstTask.Status);

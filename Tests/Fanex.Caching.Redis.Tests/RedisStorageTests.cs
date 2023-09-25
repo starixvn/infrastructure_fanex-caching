@@ -59,7 +59,7 @@
             var missingKey = _fixture.Create<string>();
 
             // Act.
-            var found = await Storage.ContainAsync(missingKey).ConfigureAwait(false);
+            var found = await Storage.ContainAsync(missingKey);
 
             // Assert.
             Assert.False(found);
@@ -69,7 +69,7 @@
         public async Task ContainAsyncExistingKeyReturnsTrue()
         {
             // Act.
-            var found = await Storage.ContainAsync(_existingKey).ConfigureAwait(false);
+            var found = await Storage.ContainAsync(_existingKey);
 
             // Assert.
             Assert.True(found);
@@ -128,7 +128,7 @@
             var missingKey = _fixture.Create<string>();
 
             // Act.
-            var (found, _) = await Storage.TryGetAsync<object>(missingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<object>(missingKey);
 
             // Assert.
             Assert.False(found);
@@ -141,7 +141,7 @@
             var missingKey = _fixture.Create<string>();
 
             // Act.
-            var (_, actualValue) = await Storage.TryGetAsync<object>(missingKey).ConfigureAwait(false);
+            var (_, actualValue) = await Storage.TryGetAsync<object>(missingKey);
 
             // Assert.
             Assert.Null(actualValue);
@@ -151,7 +151,7 @@
         public async Task TryGetAsyncExistingKeyReturnsTrue()
         {
             // Act.
-            var (found, _) = await Storage.TryGetAsync<string>(_existingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(_existingKey);
 
             // Assert.
             Assert.True(found);
@@ -161,7 +161,7 @@
         public async Task TryGetAsyncExistingKeyReturnsCachedObjectAsOutput()
         {
             // Act.
-            var (_, actualValue) = await Storage.TryGetAsync<string>(_existingKey).ConfigureAwait(false);
+            var (_, actualValue) = await Storage.TryGetAsync<string>(_existingKey);
 
             // Assert.
             Assert.Equal(_existingValue, actualValue);
@@ -219,7 +219,7 @@
             var caseSensitiveKey = _existingKey.ToUpperInvariant();
 
             // Act.
-            var (found, _) = await Storage.TryGetAsync<string>(caseSensitiveKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(caseSensitiveKey);
 
             // Assert.
             Assert.False(found);
@@ -233,10 +233,10 @@
             var newCacheOptions = new CacheItemOptions();
 
             // Act.
-            await Storage.SetAsync(_existingKey, newValue, newCacheOptions).ConfigureAwait(false);
+            await Storage.SetAsync(_existingKey, newValue, newCacheOptions);
 
             // Assert.
-            var (_, actualValue) = await Storage.TryGetAsync<string>(_existingKey).ConfigureAwait(false);
+            var (_, actualValue) = await Storage.TryGetAsync<string>(_existingKey);
 
             Assert.Equal(newValue, actualValue);
         }
@@ -250,10 +250,10 @@
             var expiredPolicy = new CacheItemOptions().SetAbsoluteExpiration(expiredTime);
 
             // Act.
-            await Storage.SetAsync(_existingKey, newValue, expiredPolicy).ConfigureAwait(false);
+            await Storage.SetAsync(_existingKey, newValue, expiredPolicy);
 
             // Assert.
-            var (found, _) = await Storage.TryGetAsync<string>(_existingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(_existingKey);
 
             Assert.False(found);
         }
@@ -274,10 +274,10 @@
         public async Task RemoveAsyncRemovesExistingKey()
         {
             // Act.
-            await Storage.RemoveAsync(_existingKey).ConfigureAwait(false);
+            await Storage.RemoveAsync(_existingKey);
 
             // Assert.
-            var (found, _) = await Storage.TryGetAsync<string>(_existingKey).ConfigureAwait(false);
+            var (found, _) = await Storage.TryGetAsync<string>(_existingKey);
 
             Assert.False(found);
         }

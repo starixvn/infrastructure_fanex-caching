@@ -30,10 +30,10 @@
             var anyString = _fixture.Create<string>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyString, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyString, _cacheOptions);
 
             // Assert.
-            var (_, cachedString) = await Cache.TryGetAsync<string>(_testingKey).ConfigureAwait(false);
+            var (_, cachedString) = await Cache.TryGetAsync<string>(_testingKey);
 
             Assert.Equal(anyString, cachedString);
         }
@@ -45,10 +45,10 @@
             var anyBool = _fixture.Create<bool>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyBool, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyBool, _cacheOptions);
 
             // Assert.
-            var (_, cachedBool) = await Cache.TryGetAsync<bool>(_testingKey).ConfigureAwait(false);
+            var (_, cachedBool) = await Cache.TryGetAsync<bool>(_testingKey);
 
             Assert.Equal(anyBool, cachedBool);
         }
@@ -60,10 +60,10 @@
             var anyByte = _fixture.Create<byte>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyByte, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyByte, _cacheOptions);
 
             // Assert.
-            var (_, cachedByte) = await Cache.TryGetAsync<byte>(_testingKey).ConfigureAwait(false);
+            var (_, cachedByte) = await Cache.TryGetAsync<byte>(_testingKey);
 
             Assert.Equal(anyByte, cachedByte);
         }
@@ -75,10 +75,10 @@
             var anyShort = _fixture.Create<short>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyShort, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyShort, _cacheOptions);
 
             // Assert.
-            var (_, cachedShort) = await Cache.TryGetAsync<short>(_testingKey).ConfigureAwait(false);
+            var (_, cachedShort) = await Cache.TryGetAsync<short>(_testingKey);
 
             Assert.Equal(anyShort, cachedShort);
         }
@@ -90,10 +90,10 @@
             var anyInt = _fixture.Create<int>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyInt, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyInt, _cacheOptions);
 
             // Assert.
-            var (_, cachedInt) = await Cache.TryGetAsync<int>(_testingKey).ConfigureAwait(false);
+            var (_, cachedInt) = await Cache.TryGetAsync<int>(_testingKey);
 
             Assert.Equal(anyInt, cachedInt);
         }
@@ -105,10 +105,10 @@
             var anyLong = _fixture.Create<long>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyLong, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyLong, _cacheOptions);
 
             // Assert.
-            var (_, cachedLong) = await Cache.TryGetAsync<long>(_testingKey).ConfigureAwait(false);
+            var (_, cachedLong) = await Cache.TryGetAsync<long>(_testingKey);
 
             Assert.Equal(anyLong, cachedLong);
         }
@@ -120,10 +120,10 @@
             var anyFloat = _fixture.Create<float>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyFloat, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyFloat, _cacheOptions);
 
             // Assert.
-            var (_, cachedFloat) = await Cache.TryGetAsync<float>(_testingKey).ConfigureAwait(false);
+            var (_, cachedFloat) = await Cache.TryGetAsync<float>(_testingKey);
 
             Assert.Equal(anyFloat, cachedFloat);
         }
@@ -135,10 +135,10 @@
             var anyDouble = _fixture.Create<double>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyDouble, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyDouble, _cacheOptions);
 
             // Assert.
-            var (_, cachedDouble) = await Cache.TryGetAsync<double>(_testingKey).ConfigureAwait(false);
+            var (_, cachedDouble) = await Cache.TryGetAsync<double>(_testingKey);
 
             Assert.Equal(anyDouble, cachedDouble);
         }
@@ -150,10 +150,10 @@
             var anyDecimal = _fixture.Create<decimal>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyDecimal, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyDecimal, _cacheOptions);
 
             // Assert.
-            var (_, cachedDecimal) = await Cache.TryGetAsync<decimal>(_testingKey).ConfigureAwait(false);
+            var (_, cachedDecimal) = await Cache.TryGetAsync<decimal>(_testingKey);
 
             Assert.Equal(anyDecimal, cachedDecimal);
         }
@@ -165,10 +165,10 @@
             var anyNullableInt = _fixture.Create<int?>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyNullableInt, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyNullableInt, _cacheOptions);
 
             // Assert.
-            var (_, cachedNullableInt) = await Cache.TryGetAsync<int?>(_testingKey).ConfigureAwait(false);
+            var (_, cachedNullableInt) = await Cache.TryGetAsync<int?>(_testingKey);
 
             Assert.Equal(anyNullableInt, cachedNullableInt);
         }
@@ -180,10 +180,10 @@
             var anyBinary = _fixture.Create<byte[]>();
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyBinary, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyBinary, _cacheOptions);
 
             // Assert.
-            var (_, cachedBinary) = await Cache.TryGetAsync<byte[]>(_testingKey).ConfigureAwait(false);
+            var (_, cachedBinary) = await Cache.TryGetAsync<byte[]>(_testingKey);
 
             Assert.Equal(anyBinary, cachedBinary);
         }
@@ -198,10 +198,10 @@
             };
 
             // Act.
-            await Cache.SetAsync(_testingKey, anyObject, _cacheOptions).ConfigureAwait(false);
+            await Cache.SetAsync(_testingKey, anyObject, _cacheOptions);
 
             // Assert.
-            var (_, cachedObject) = await Cache.TryGetAsync<Dictionary<string, string>>(_testingKey).ConfigureAwait(false);
+            var (_, cachedObject) = await Cache.TryGetAsync<Dictionary<string, string>>(_testingKey);
 
             Assert.Equal(anyObject, cachedObject);
         }
