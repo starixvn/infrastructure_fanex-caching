@@ -35,7 +35,7 @@
 
             if (timeToLive.HasValue)
             {
-                if (timeToSlide.HasValue && timeToLive > timeToSlide)
+                if (timeToLive > timeToSlide)
                 {
                     return new RedisCommand(
                         RedisScripts.SetValueWithSlidingAndRelativeExpiration,

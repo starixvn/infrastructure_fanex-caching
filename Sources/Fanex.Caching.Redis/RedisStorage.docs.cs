@@ -42,9 +42,9 @@
         public async Task ForceReconnectAsync()
         {
             var utcNow = DateTimeOffset.UtcNow;
-            long previousTicks = Interlocked.Read(ref _lastReconnectTicks);
+            var previousTicks = Interlocked.Read(ref _lastReconnectTicks);
             var previousReconnectTime = new DateTimeOffset(previousTicks, TimeSpan.Zero);
-            TimeSpan elapsedSinceLastReconnect = utcNow - previousReconnectTime;
+            var elapsedSinceLastReconnect = utcNow - previousReconnectTime;
 
             // If multiple threads call ForceReconnectAsync at the same time, we only want to honor one of them.
             if (elapsedSinceLastReconnect < ReconnectMinInterval)
@@ -81,10 +81,10 @@
                     return; // Some other thread made it through the check and the lock, so nothing to do.
                 }
 
-                TimeSpan elapsedSinceFirstError = utcNow - _firstErrorTime;
-                TimeSpan elapsedSinceMostRecentError = utcNow - _previousErrorTime;
+                var elapsedSinceFirstError = utcNow - _firstErrorTime;
+                var elapsedSinceMostRecentError = utcNow - _previousErrorTime;
 
-                bool shouldReconnect =
+                var shouldReconnect =
                     elapsedSinceFirstError >= ReconnectErrorThreshold // Make sure we gave the multiplexer enough time to reconnect on its own if it could.
                     && elapsedSinceMostRecentError <= ReconnectErrorThreshold; // Make sure we aren't working on stale data (e.g. if there was a gap in errors, don't reconnect yet).
 
@@ -99,7 +99,7 @@
                 _firstErrorTime = DateTimeOffset.MinValue;
                 _previousErrorTime = DateTimeOffset.MinValue;
 
-                ConnectionMultiplexer oldConnection = _connection;
+                var oldConnection = _connection;
                 await CloseConnectionAsync(oldConnection);
                 _connection = null;
                 _database = null;

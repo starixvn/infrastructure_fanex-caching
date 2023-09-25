@@ -1,70 +1,69 @@
-﻿namespace Fanex.Caching.Tests.Memory
+﻿namespace Fanex.Caching.Tests.Memory;
+
+using System;
+using Fanex.Caching.Memory;
+using Xunit;
+
+public class MemoryCacheOptionsTests
 {
-    using System;
-    using Fanex.Caching.Memory;
-    using Xunit;
-
-    public class MemoryCacheOptionsTests
+    [Fact]
+    public void NullSystemClockThrowsArgumentNullException()
     {
-        [Fact]
-        public void NullSystemClockThrowsArgumentNullException()
+        // Act.
+        var exception = Record.Exception(() => new MemoryCacheOptions
         {
-            // Act.
-            var exception = Record.Exception(() => new MemoryCacheOptions
-            {
-                Clock = null
-            });
+            Clock = null
+        });
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void ZeroExpirationScanFrequencyThrowsArgumentOutOfRangeException()
+    [Fact]
+    public void ZeroExpirationScanFrequencyThrowsArgumentOutOfRangeException()
+    {
+        // Arrange.
+        var zeroExpirationScanFrequency = TimeSpan.Zero;
+
+        // Act.
+        var exception = Record.Exception(() => new MemoryCacheOptions
         {
-            // Arrange.
-            var zeroExpirationScanFrequency = TimeSpan.Zero;
+            ExpirationScanFrequency = zeroExpirationScanFrequency
+        });
 
-            // Act.
-            var exception = Record.Exception(() => new MemoryCacheOptions
-            {
-                ExpirationScanFrequency = zeroExpirationScanFrequency
-            });
+        // Assert.
+        Assert.IsType<ArgumentOutOfRangeException>(exception);
+    }
 
-            // Assert.
-            Assert.IsType<ArgumentOutOfRangeException>(exception);
-        }
+    [Fact]
+    public void NegativeCompactionPercentageThrowsArgumentOutOfRangeException()
+    {
+        // Arrange.
+        const double negativeCompactionPercentage = -0.1;
 
-        [Fact]
-        public void NegativeCompactionPercentageThrowsArgumentOutOfRangeException()
+        // Act.
+        var exception = Record.Exception(() => new MemoryCacheOptions
         {
-            // Arrange.
-            const double negativeCompactionPercentage = -0.1;
+            CompactionPercentage = negativeCompactionPercentage
+        });
 
-            // Act.
-            var exception = Record.Exception(() => new MemoryCacheOptions
-            {
-                CompactionPercentage = negativeCompactionPercentage
-            });
+        // Assert.
+        Assert.IsType<ArgumentOutOfRangeException>(exception);
+    }
 
-            // Assert.
-            Assert.IsType<ArgumentOutOfRangeException>(exception);
-        }
+    [Fact]
+    public void GreaterThanOneCompactionPercentageThrowsArgumentOutOfRangeException()
+    {
+        // Arrange.
+        const double outOfRangeCompactionPercentage = 1.1;
 
-        [Fact]
-        public void GreaterThanOneCompactionPercentageThrowsArgumentOutOfRangeException()
+        // Act.
+        var exception = Record.Exception(() => new MemoryCacheOptions
         {
-            // Arrange.
-            const double outOfRangeCompactionPercentage = 1.1;
+            CompactionPercentage = outOfRangeCompactionPercentage
+        });
 
-            // Act.
-            var exception = Record.Exception(() => new MemoryCacheOptions
-            {
-                CompactionPercentage = outOfRangeCompactionPercentage
-            });
-
-            // Assert.
-            Assert.IsType<ArgumentOutOfRangeException>(exception);
-        }
+        // Assert.
+        Assert.IsType<ArgumentOutOfRangeException>(exception);
     }
 }

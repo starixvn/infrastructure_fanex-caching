@@ -98,6 +98,6 @@
             => _absoluteExpiration.HasValue && _absoluteExpiration.Value <= now;
 
         private bool IsSlidinglyExpired(DateTimeOffset now)
-            => Options.SlidingExpiration.HasValue && (now - LastAccess) >= Options.SlidingExpiration.Value;
+            => Options.SlidingExpiration.HasValue && now - LastAccess >= Options.SlidingExpiration.Value;
     }
 }

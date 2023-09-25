@@ -1,175 +1,174 @@
-﻿namespace Fanex.Caching.AspNetCore.Tests
+﻿namespace Fanex.Caching.AspNetCore.Tests;
+
+using System;
+using System.IO;
+using System.Linq;
+using Memory;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+public class MemoryCacheServiceCollectionExtensionsTests
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using Fanex.Caching.Memory;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Xunit;
+    private readonly IServiceCollection _services;
 
-    public class MemoryCacheServiceCollectionExtensionsTests
+    public MemoryCacheServiceCollectionExtensionsTests()
+        => _services = new ServiceCollection();
+
+    [Fact]
+    public void CallAddMemoryCacheOnNullServiceCollectionThrowsArgumentNullException()
     {
-        private readonly IServiceCollection _services;
+        // Act.
+        var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null));
 
-        public MemoryCacheServiceCollectionExtensionsTests()
-            => _services = new ServiceCollection();
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void CallAddMemoryCacheOnNullServiceCollectionThrowsArgumentNullException()
-        {
-            // Act.
-            var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null));
+    [Fact]
+    public void AddMemoryCacheRegistersMemoryCacheAsSingleton()
+    {
+        // Act.
+        _services.AddMemoryCache();
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        var memoryCache = _services.FirstOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ICache));
 
-        [Fact]
-        public void AddMemoryCacheRegistersMemoryCacheAsSingleton()
-        {
-            // Act.
-            _services.AddMemoryCache();
+        Assert.Equal(ServiceLifetime.Singleton, memoryCache?.Lifetime);
+    }
 
-            // Assert.
-            var memoryCache = _services.FirstOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ICache));
+    [Fact]
+    public void AddMemoryCacheRegistersCacheServiceAsSingleton()
+    {
+        // Act.
+        _services.AddMemoryCache();
 
-            Assert.Equal(ServiceLifetime.Singleton, memoryCache?.Lifetime);
-        }
+        // Assert.
+        var cacheService = _services.FirstOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ICacheService));
 
-        [Fact]
-        public void AddMemoryCacheRegistersCacheServiceAsSingleton()
-        {
-            // Act.
-            _services.AddMemoryCache();
+        Assert.Equal(ServiceLifetime.Singleton, cacheService?.Lifetime);
+    }
 
-            // Assert.
-            var cacheService = _services.FirstOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ICacheService));
+    [Fact]
+    public void AddMemoryCacheAllowsChaining()
+    {
+        // Act.
+        var returnedServices = _services.AddMemoryCache();
 
-            Assert.Equal(ServiceLifetime.Singleton, cacheService?.Lifetime);
-        }
+        // Assert.
+        Assert.Same(_services, returnedServices);
+    }
 
-        [Fact]
-        public void AddMemoryCacheAllowsChaining()
-        {
-            // Act.
-            var returnedServices = _services.AddMemoryCache();
+    [Fact]
+    public void CallAddMemoryCacheWithConfigurationSectionOnNullServiceCollectionThrowsArgumentNullException()
+    {
+        // Arrange.
+        var configuration = ReadConfiguration();
 
-            // Assert.
-            Assert.Same(_services, returnedServices);
-        }
+        // Act.
+        var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, configuration));
 
-        [Fact]
-        public void CallAddMemoryCacheWithConfigurationSectionOnNullServiceCollectionThrowsArgumentNullException()
-        {
-            // Arrange.
-            var configuration = ReadConfiguration();
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Act.
-            var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, configuration));
+    [Fact]
+    public void CallAddMemoryCacheWithNullConfigurationSectionThrowsArgumentNullException()
+    {
+        // Arrange.
+        IConfigurationSection configuration = null;
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Act.
+        var exception = Record.Exception(() => _services.AddMemoryCache(configuration));
 
-        [Fact]
-        public void CallAddMemoryCacheWithNullConfigurationSectionThrowsArgumentNullException()
-        {
-            // Arrange.
-            IConfigurationSection configuration = null;
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Act.
-            var exception = Record.Exception(() => _services.AddMemoryCache(configuration));
+    [Fact]
+    public void AddMemoryCacheWithConfigurationSectionAllowsChaining()
+    {
+        // Arrange.
+        var configuration = ReadConfiguration();
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Act.
+        var returnedServices = _services.AddMemoryCache(configuration);
 
-        [Fact]
-        public void AddMemoryCacheWithConfigurationSectionAllowsChaining()
-        {
-            // Arrange.
-            var configuration = ReadConfiguration();
+        // Assert.
+        Assert.Same(_services, returnedServices);
+    }
 
-            // Act.
-            var returnedServices = _services.AddMemoryCache(configuration);
+    [Fact]
+    public void AddMemoryCacheReadsInformationFromConfigurationSection()
+    {
+        // Arrange.
+        var configuration = ReadConfiguration();
 
-            // Assert.
-            Assert.Same(_services, returnedServices);
-        }
+        // Act.
+        _services.AddMemoryCache(configuration);
 
-        [Fact]
-        public void AddMemoryCacheReadsInformationFromConfigurationSection()
-        {
-            // Arrange.
-            var configuration = ReadConfiguration();
+        // Assert.
+        var options = _services.BuildServiceProvider().GetService<MemoryCacheOptions>();
 
-            // Act.
-            _services.AddMemoryCache(configuration);
+        Assert.NotNull(options);
+        Assert.True(options.CompactOnMemoryPressure);
+        Assert.Equal(TimeSpan.FromSeconds(30), options.ExpirationScanFrequency);
+    }
 
-            // Assert.
-            var options = _services.BuildServiceProvider().GetService<MemoryCacheOptions>();
+    [Fact]
+    public void AddMemoryCacheWithConfigurationSectionDoesNotOverwriteClock()
+    {
+        // Arrange.
+        var configuration = ReadConfiguration();
 
-            Assert.NotNull(options);
-            Assert.True(options.CompactOnMemoryPressure);
-            Assert.Equal(TimeSpan.FromSeconds(30), options.ExpirationScanFrequency);
-        }
+        // Act.
+        _services.AddMemoryCache(configuration);
 
-        [Fact]
-        public void AddMemoryCacheWithConfigurationSectionDoesNotOverwriteClock()
-        {
-            // Arrange.
-            var configuration = ReadConfiguration();
+        // Assert.
+        var options = _services.BuildServiceProvider().GetService<MemoryCacheOptions>();
 
-            // Act.
-            _services.AddMemoryCache(configuration);
+        Assert.NotNull(options.Clock);
+    }
 
-            // Assert.
-            var options = _services.BuildServiceProvider().GetService<MemoryCacheOptions>();
+    private static IConfigurationSection ReadConfiguration()
+    {
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(Path.GetFullPath("./"))
+            .AddJsonFile("appsettings.json", true, true);
 
-            Assert.NotNull(options.Clock);
-        }
+        return builder.Build().GetSection("fanex.caching");
+    }
 
-        private static IConfigurationSection ReadConfiguration()
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Path.GetFullPath("./"))
-                .AddJsonFile("appsettings.json", true, true);
+    [Fact]
+    public void CallAddMemoryCacheWithOptionAccessorOnNullServiceCollectionThrowsArgumentNullException()
+    {
+        // Act.
+        var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, _ => { }));
 
-            return builder.Build().GetSection("fanex.caching");
-        }
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void CallAddMemoryCacheWithOptionAccessorOnNullServiceCollectionThrowsArgumentNullException()
-        {
-            // Act.
-            var exception = Record.Exception(() => MemoryCacheServiceCollectionExtensions.AddMemoryCache(null, _ => { }));
+    [Fact]
+    public void CallAddMemoryCacheWithNullOptionAccessorThrowsArgumentNullException()
+    {
+        // Arrange.
+        Action<MemoryCacheOptions> setupAction = null;
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Act.
+        var exception = Record.Exception(() => _services.AddMemoryCache(setupAction));
 
-        [Fact]
-        public void CallAddMemoryCacheWithNullOptionAccessorThrowsArgumentNullException()
-        {
-            // Arrange.
-            Action<MemoryCacheOptions> setupAction = null;
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Act.
-            var exception = Record.Exception(() => _services.AddMemoryCache(setupAction));
+    [Fact]
+    public void AddMemoryCacheWithOptionAccessorAllowsChaining()
+    {
+        // Act.
+        var returnedServices = _services.AddMemoryCache(_ => { });
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
-
-        [Fact]
-        public void AddMemoryCacheWithOptionAccessorAllowsChaining()
-        {
-            // Act.
-            var returnedServices = _services.AddMemoryCache(_ => { });
-
-            // Assert.
-            Assert.Same(_services, returnedServices);
-        }
+        // Assert.
+        Assert.Same(_services, returnedServices);
     }
 }

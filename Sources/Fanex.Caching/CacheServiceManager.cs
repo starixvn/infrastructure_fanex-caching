@@ -1,7 +1,7 @@
 ﻿namespace Fanex.Caching
 {
     using System;
-    using Fanex.Caching.Memory;
+    using Memory;
 
     public static class CacheServiceManager
     {

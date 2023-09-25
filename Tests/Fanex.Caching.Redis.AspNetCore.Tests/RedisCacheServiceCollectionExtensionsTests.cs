@@ -1,176 +1,175 @@
-﻿namespace Fanex.Caching.Redis.AspNetCore.Tests
+﻿namespace Fanex.Caching.Redis.AspNetCore.Tests;
+
+using System;
+using System.IO;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+public class RedisCacheServiceCollectionExtensionsTests
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Xunit;
+    private readonly IServiceCollection _services;
 
-    public class RedisCacheServiceCollectionExtensionsTests
+    public RedisCacheServiceCollectionExtensionsTests()
+        => _services = new ServiceCollection();
+
+    [Fact]
+    public void CallAddRedisCacheOnNullServiceCollectionThrowsArgumentNullException()
     {
-        private readonly IServiceCollection _services;
+        // Act.
+        var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null));
 
-        public RedisCacheServiceCollectionExtensionsTests()
-            => _services = new ServiceCollection();
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void CallAddRedisCacheOnNullServiceCollectionThrowsArgumentNullException()
-        {
-            // Act.
-            var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null));
+    [Fact]
+    public void AddRedisCacheRegistersRedisCacheAsSingleton()
+    {
+        // Act.
+        _services.AddRedisCache();
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        var memoryCache = _services.FirstOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ICache));
 
-        [Fact]
-        public void AddRedisCacheRegistersRedisCacheAsSingleton()
-        {
-            // Act.
-            _services.AddRedisCache();
+        Assert.Equal(ServiceLifetime.Singleton, memoryCache?.Lifetime);
+    }
 
-            // Assert.
-            var memoryCache = _services.FirstOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ICache));
+    [Fact]
+    public void AddRedisCacheRegistersCacheServiceAsSingleton()
+    {
+        // Act.
+        _services.AddRedisCache();
 
-            Assert.Equal(ServiceLifetime.Singleton, memoryCache?.Lifetime);
-        }
+        // Assert.
+        var cacheService = _services.FirstOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ICacheService));
 
-        [Fact]
-        public void AddRedisCacheRegistersCacheServiceAsSingleton()
-        {
-            // Act.
-            _services.AddRedisCache();
+        Assert.Equal(ServiceLifetime.Singleton, cacheService?.Lifetime);
+    }
 
-            // Assert.
-            var cacheService = _services.FirstOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ICacheService));
+    [Fact]
+    public void AddRedisCacheAllowsChaining()
+    {
+        // Act.
+        var returnedServices = _services.AddRedisCache();
 
-            Assert.Equal(ServiceLifetime.Singleton, cacheService?.Lifetime);
-        }
+        // Assert.
+        Assert.Same(_services, returnedServices);
+    }
 
-        [Fact]
-        public void AddRedisCacheAllowsChaining()
-        {
-            // Act.
-            var returnedServices = _services.AddRedisCache();
+    [Fact]
+    public void CallAddRedisCacheWithConfigurationSectionOnNullServiceCollectionThrowsArgumentNullException()
+    {
+        // Arrange.
+        var configuration = ReadConfiguration();
 
-            // Assert.
-            Assert.Same(_services, returnedServices);
-        }
+        // Act.
+        var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null, configuration));
 
-        [Fact]
-        public void CallAddRedisCacheWithConfigurationSectionOnNullServiceCollectionThrowsArgumentNullException()
-        {
-            // Arrange.
-            var configuration = ReadConfiguration();
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Act.
-            var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null, configuration));
+    [Fact]
+    public void CallAddRedisCacheWithNullConfigurationSectionThrowsArgumentNullException()
+    {
+        // Arrange.
+        IConfigurationSection configuration = null;
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Act.
+        var exception = Record.Exception(() => _services.AddRedisCache(configuration));
 
-        [Fact]
-        public void CallAddRedisCacheWithNullConfigurationSectionThrowsArgumentNullException()
-        {
-            // Arrange.
-            IConfigurationSection configuration = null;
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Act.
-            var exception = Record.Exception(() => _services.AddRedisCache(configuration));
+    [Fact]
+    public void AddRedisCacheWithConfigurationSectionAllowsChaining()
+    {
+        // Arrange.
+        var configuration = ReadConfiguration();
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Act.
+        var returnedServices = _services.AddRedisCache(configuration);
 
-        [Fact]
-        public void AddRedisCacheWithConfigurationSectionAllowsChaining()
-        {
-            // Arrange.
-            var configuration = ReadConfiguration();
+        // Assert.
+        Assert.Same(_services, returnedServices);
+    }
 
-            // Act.
-            var returnedServices = _services.AddRedisCache(configuration);
+    [Fact]
+    public void AddRedisCacheReadsInformationFromConfigurationSection()
+    {
+        // Arrange.
+        var configuration = ReadConfiguration();
 
-            // Assert.
-            Assert.Same(_services, returnedServices);
-        }
+        // Act.
+        _services.AddRedisCache(configuration);
 
-        [Fact]
-        public void AddRedisCacheReadsInformationFromConfigurationSection()
-        {
-            // Arrange.
-            var configuration = ReadConfiguration();
+        // Assert.
+        const string expectedApplicationName = "Fanex.Caching.Redis.AspNetCore.Tests";
 
-            // Act.
-            _services.AddRedisCache(configuration);
+        var options = _services.BuildServiceProvider().GetService<RedisCacheOptions>();
 
-            // Assert.
-            const string expectedApplicationName = "Fanex.Caching.Redis.AspNetCore.Tests";
+        Assert.NotNull(options);
+        Assert.NotEmpty(options.ConnectionOptions.EndPoints);
+        Assert.Equal(expectedApplicationName, options.ApplicationName);
+    }
 
-            var options = _services.BuildServiceProvider().GetService<RedisCacheOptions>();
+    [Fact]
+    public void AddRedisCacheWithConfigurationSectionDoesNotOverwriteClock()
+    {
+        // Arrange.
+        var configuration = ReadConfiguration();
 
-            Assert.NotNull(options);
-            Assert.NotEmpty(options.ConnectionOptions.EndPoints);
-            Assert.Equal(expectedApplicationName, options.ApplicationName);
-        }
+        // Act.
+        _services.AddRedisCache(configuration);
 
-        [Fact]
-        public void AddRedisCacheWithConfigurationSectionDoesNotOverwriteClock()
-        {
-            // Arrange.
-            var configuration = ReadConfiguration();
+        // Assert.
+        var options = _services.BuildServiceProvider().GetService<RedisCacheOptions>();
 
-            // Act.
-            _services.AddRedisCache(configuration);
+        Assert.NotNull(options.Clock);
+    }
 
-            // Assert.
-            var options = _services.BuildServiceProvider().GetService<RedisCacheOptions>();
+    private static IConfigurationSection ReadConfiguration()
+    {
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(Path.GetFullPath("./"))
+            .AddJsonFile("appsettings.json", true, true);
 
-            Assert.NotNull(options.Clock);
-        }
+        return builder.Build().GetSection("fanex.caching.redis");
+    }
 
-        private static IConfigurationSection ReadConfiguration()
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Path.GetFullPath("./"))
-                .AddJsonFile("appsettings.json", true, true);
+    [Fact]
+    public void CallAddRedisCacheWithOptionAccessorOnNullServiceCollectionThrowsArgumentNullException()
+    {
+        // Act.
+        var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null, _ => { }));
 
-            return builder.Build().GetSection("fanex.caching.redis");
-        }
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void CallAddRedisCacheWithOptionAccessorOnNullServiceCollectionThrowsArgumentNullException()
-        {
-            // Act.
-            var exception = Record.Exception(() => RedisCacheServiceCollectionExtensions.AddRedisCache(null, _ => { }));
+    [Fact]
+    public void CallAddRedisCacheWithNullOptionAccessorThrowsArgumentNullException()
+    {
+        // Arrange.
+        Action<RedisCacheOptions> setupAction = null;
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Act.
+        var exception = Record.Exception(() => _services.AddRedisCache(setupAction));
 
-        [Fact]
-        public void CallAddRedisCacheWithNullOptionAccessorThrowsArgumentNullException()
-        {
-            // Arrange.
-            Action<RedisCacheOptions> setupAction = null;
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Act.
-            var exception = Record.Exception(() => _services.AddRedisCache(setupAction));
+    [Fact]
+    public void AddRedisCacheWithOptionAccessorAllowsChaining()
+    {
+        // Act.
+        var returnedServices = _services.AddRedisCache(_ => { });
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
-
-        [Fact]
-        public void AddRedisCacheWithOptionAccessorAllowsChaining()
-        {
-            // Act.
-            var returnedServices = _services.AddRedisCache(_ => { });
-
-            // Assert.
-            Assert.Same(_services, returnedServices);
-        }
+        // Assert.
+        Assert.Same(_services, returnedServices);
     }
 }

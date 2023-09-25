@@ -66,7 +66,7 @@
         {
             var endPoints = configuration.GetSection("ConnectionOptions:EndPoints").Get<string[]>();
 
-            if (endPoints != null && endPoints.Length > 0)
+            if (endPoints is { Length: > 0 })
             {
                 options.ConnectionOptions ??= new ConfigurationOptions();
 

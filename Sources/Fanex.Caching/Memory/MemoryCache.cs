@@ -35,7 +35,7 @@
                 throw new ArgumentException("Key must not be null or empty.", nameof(key));
             }
 
-            var found = MemoryStorage.TryGet(key, out object result);
+            var found = MemoryStorage.TryGet(key, out var result);
 
             if (result is T castedResult)
             {
