@@ -35,11 +35,11 @@
                 throw new ArgumentException("Key must not be null or empty.", nameof(key));
             }
 
-            var found = MemoryStorage.TryGet(key, out object result);
+            var found = MemoryStorage.TryGet(key, out var result);
 
-            if (result is T)
+            if (result is T castedResult)
             {
-                value = (T)result;
+                value = castedResult;
             }
             else
             {
@@ -82,7 +82,7 @@
 
             var memoryCacheItemOptions = options as MemoryCacheItemOptions;
 
-            memoryCacheItemOptions = memoryCacheItemOptions ?? new MemoryCacheItemOptions
+            memoryCacheItemOptions ??= new MemoryCacheItemOptions
             {
                 AbsoluteExpiration = options.AbsoluteExpiration,
                 RelativeExpiration = options.RelativeExpiration,

@@ -136,7 +136,7 @@
         {
             try
             {
-                return _database.ScriptEvaluate(redisCommand.Script, redisCommand.Keys, redisCommand.Values);
+                return _database.ScriptEvaluate( redisCommand.Script, redisCommand.Keys, redisCommand.Values);
             }
             catch (RedisServerException e) when (e.Message.Contains("READONLY"))
             {
@@ -169,8 +169,6 @@
             }
         }
 
-
-#pragma warning disable S2589 // Boolean expressions should not be gratuitous
 
         private void Connect()
         {
@@ -217,8 +215,6 @@
                 _connectionLock.Release();
             }
         }
-
-#pragma warning restore S2589 // Boolean expressions should not be gratuitous
 
         private string ModifyKey(string key)
             => $"{{{_applicationName}}}:{{{key}}}";

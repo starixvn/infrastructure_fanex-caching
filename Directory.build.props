@@ -9,7 +9,7 @@
         <DefaultLanguage>en-US</DefaultLanguage>
         <LangVersion>latest</LangVersion>
         <IncludeSymbols>false</IncludeSymbols>
-        <Version>2.2.2</Version>
+        <Version>2.2.3-beta1</Version>
     </PropertyGroup>
     <PropertyGroup>
         <NoWarn>AD0001,S1192,SA1302</NoWarn>
@@ -17,14 +17,14 @@
         <CodeAnalysisRuleSet>$(SolutionDir)\.sonarlint\Fanex.CachingCSharp.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.0.0.9566">
-            <PrivateAssets>All</PrivateAssets>
-        </PackageReference>
-        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.66">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.17.0.26580">
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
     </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
         <Reference Include="System.Core" Pack="false" />
+    </ItemGroup>
+    <ItemGroup>
+        <AdditionalFiles Include="$(SolutionDir)\.sonarlint\fanex.caching\CSharp\SonarLint.xml" Link="SonarLint.xml" />
     </ItemGroup>
 </Project>

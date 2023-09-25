@@ -1,85 +1,84 @@
-﻿namespace Fanex.Caching.Tests
+﻿namespace Fanex.Caching.Tests;
+
+using System;
+using Fanex.Caching.Memory;
+using NSubstitute;
+using Xunit;
+
+public class CacheServiceManagerTests
 {
-    using System;
-    using Fanex.Caching.Memory;
-    using NSubstitute;
-    using Xunit;
-
-    public class CacheServiceManagerTests
+    [Fact]
+    public void MemoryCacheAsDefaultStorageIfNoConfigurationProvided()
     {
-        [Fact]
-        public void MemoryCacheAsDefaultStorageIfNoConfigurationProvided()
-        {
-            // Arrange.
-            CacheServiceManager.Reset();
+        // Arrange.
+        CacheServiceManager.Reset();
 
-            // Act
-            var currentCacheStorage = CacheServiceManager.CacheStorage;
+        // Act
+        var currentCacheStorage = CacheServiceManager.CacheStorage;
 
-            // Assert.
-            Assert.IsType<MemoryCache>(currentCacheStorage);
-        }
+        // Assert.
+        Assert.IsType<MemoryCache>(currentCacheStorage);
+    }
 
-        [Fact]
-        public void ConfigureNullAsCacheStorageFactoryThrowsArgumentNullException()
-        {
-            // Arrange.
-            Func<ICache> cacheFactory = null;
+    [Fact]
+    public void ConfigureNullAsCacheStorageFactoryThrowsArgumentNullException()
+    {
+        // Arrange.
+        Func<ICache> cacheFactory = null;
 
-            CacheServiceManager.Reset();
+        CacheServiceManager.Reset();
 
-            // Act
-            var exception = Record.Exception(() => CacheServiceManager.Use(cacheFactory));
+        // Act
+        var exception = Record.Exception(() => CacheServiceManager.Use(cacheFactory));
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void UseConfiguredCacheStorageFactoryToCreateStorage()
-        {
-            // Arrange.
-            var fakeCacheStorage = Substitute.For<ICache>();
+    [Fact]
+    public void UseConfiguredCacheStorageFactoryToCreateStorage()
+    {
+        // Arrange.
+        var fakeCacheStorage = Substitute.For<ICache>();
 
-            CacheServiceManager.Reset();
-            CacheServiceManager.Use(() => fakeCacheStorage);
+        CacheServiceManager.Reset();
+        CacheServiceManager.Use(() => fakeCacheStorage);
 
-            // Act
-            var currentCacheStorage = CacheServiceManager.CacheStorage;
+        // Act
+        var currentCacheStorage = CacheServiceManager.CacheStorage;
 
-            // Assert.
-            Assert.Same(fakeCacheStorage, currentCacheStorage);
-        }
+        // Assert.
+        Assert.Same(fakeCacheStorage, currentCacheStorage);
+    }
 
-        [Fact]
-        public void ConfigureNullAsCacheStorageThrowsArgumentNullException()
-        {
-            // Arrange.
-            ICache cache = null;
+    [Fact]
+    public void ConfigureNullAsCacheStorageThrowsArgumentNullException()
+    {
+        // Arrange.
+        ICache cache = null;
 
-            CacheServiceManager.Reset();
+        CacheServiceManager.Reset();
 
-            // Act
-            var exception = Record.Exception(() => CacheServiceManager.Use(cache));
+        // Act
+        var exception = Record.Exception(() => CacheServiceManager.Use(cache));
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-        [Fact]
-        public void ConfigureCacheStorageDisposesCurrentCacheStorage()
-        {
-            // Arrange.
-            var preConfiguredCacheStorage = new MemoryCache();
+    [Fact]
+    public void ConfigureCacheStorageDisposesCurrentCacheStorage()
+    {
+        // Arrange.
+        var preConfiguredCacheStorage = new MemoryCache();
 
-            CacheServiceManager.Reset();
-            CacheServiceManager.Use(preConfiguredCacheStorage);
+        CacheServiceManager.Reset();
+        CacheServiceManager.Use(preConfiguredCacheStorage);
 
-            // Act
-            CacheServiceManager.Use(Substitute.For<ICache>());
+        // Act
+        CacheServiceManager.Use(Substitute.For<ICache>());
 
-            // Assert.
-            Assert.Null(preConfiguredCacheStorage.MemoryStorage);
-        }
+        // Assert.
+        Assert.Null(preConfiguredCacheStorage.MemoryStorage);
     }
 }

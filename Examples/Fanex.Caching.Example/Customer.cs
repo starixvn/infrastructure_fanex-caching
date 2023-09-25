@@ -1,18 +1,17 @@
-﻿namespace Fanex.Caching.Example
+﻿namespace Fanex.Caching.Example;
+
+public class Customer
 {
-    public class Customer
+    public Customer()
     {
-        public Customer()
-        {
-            FirstName = "First Name";
-            LastName = "Last Name";
-        }
-
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public override string ToString()
-            => $"{FirstName} {LastName}";
+        FirstName = "First Name";
+        LastName = "Last Name";
     }
+
+    public string FirstName { get; set; }
+
+    public string LastName { get; set; }
+
+    public override string ToString()
+        => $"{FirstName} {LastName}";
 }

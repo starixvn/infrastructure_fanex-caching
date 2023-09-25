@@ -45,7 +45,7 @@
             CheckDisposed();
             value = null;
 
-            if (_items.TryGetValue(key, out MemoryCacheItem item))
+            if (_items.TryGetValue(key, out var item))
             {
                 if (item.CheckExpired(now) && !item.IsReplaced)
                 {
@@ -68,7 +68,7 @@
         {
             CheckDisposed();
 
-            if (_items.TryRemove(key, out MemoryCacheItem item))
+            if (_items.TryRemove(key, out var item))
             {
                 item.SetExpired(EvictionReason.Removed);
                 item.InvokeEvictionCallbacks();
@@ -84,7 +84,7 @@
             var utcNow = _clock.UtcNow;
             var item = new MemoryCacheItem(key, value, options, utcNow);
 
-            if (_items.TryGetValue(key, out MemoryCacheItem previousItem))
+            if (_items.TryGetValue(key, out var previousItem))
             {
                 previousItem.SetExpired(EvictionReason.Replaced);
             }
@@ -166,7 +166,7 @@
 
         private static bool DoMemoryPreassureCollection(object state)
         {
-            if (state is MemoryStorage storage && !storage._disposed)
+            if (state is MemoryStorage { _disposed: false } storage)
             {
                 storage.Compact(storage._compactionPercentage);
 
@@ -264,11 +264,9 @@
 
             try
             {
-                MemoryCacheItem item;
-
                 while (orderedPriorityItems.MoveNext() && removalCountTarget > expiredItems.Count)
                 {
-                    item = orderedPriorityItems.Current;
+                    var item = orderedPriorityItems.Current;
                     item.SetExpired(EvictionReason.Capacity);
                     expiredItems.Add(item);
                 }

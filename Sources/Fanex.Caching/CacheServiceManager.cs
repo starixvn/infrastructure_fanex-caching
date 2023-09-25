@@ -1,7 +1,7 @@
 ﻿namespace Fanex.Caching
 {
     using System;
-    using Fanex.Caching.Memory;
+    using Memory;
 
     public static class CacheServiceManager
     {
@@ -12,10 +12,7 @@
         {
             get
             {
-                if (_cacheStorage == null)
-                {
-                    _cacheStorage = _cacheStorageFactory != null ? _cacheStorageFactory() : new MemoryCache();
-                }
+                _cacheStorage ??= _cacheStorageFactory != null ? _cacheStorageFactory() : new MemoryCache();
 
                 return _cacheStorage;
             }

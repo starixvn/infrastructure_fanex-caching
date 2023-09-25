@@ -1,58 +1,56 @@
-﻿namespace Fanex.Caching.Tests.Memory
+﻿namespace Fanex.Caching.Tests.Memory;
+
+using System;
+using AutoFixture;
+using Fanex.Caching.Memory;
+using Xunit;
+
+public class MemoryCacheItemOptionsTests
 {
-    using System;
-    using AutoFixture;
-    using Fanex.Caching.Memory;
-    using Xunit;
+    private readonly Fixture _fixture;
+    private readonly MemoryCacheItemOptions _options;
 
-    public class MemoryCacheItemOptionsTests
+    public MemoryCacheItemOptionsTests()
     {
-        private readonly Fixture _fixture;
-        private readonly MemoryCacheItemOptions _options;
+        _fixture = new Fixture();
+        _options = new MemoryCacheItemOptions();
+    }
 
-        public MemoryCacheItemOptionsTests()
-        {
-            _fixture = new Fixture();
-            _options = new MemoryCacheItemOptions();
-        }
+    [Fact]
+    public void RegisterNullPostEvictionCallbackThrowsArgumentNullException()
+    {
+        // Act.
+        var exception = Record.Exception(() => _options.RegisterPostEvictionCallback(null));
 
-        [Fact]
-        public void RegisterNullPostEvictionCallbackThrowsArgumentNullException()
-        {
-            // Act.
-            var exception = Record.Exception(() => _options.RegisterPostEvictionCallback(null));
+        // Assert.
+        Assert.IsType<ArgumentNullException>(exception);
+    }
 
-            // Assert.
-            Assert.IsType<ArgumentNullException>(exception);
-        }
+    [Fact]
+    public void RegisterPostEvictionCallbackAddsCallbackToPostEvictionCallbacks()
+    {
+        // Arrange.
+        var state = _fixture.Create<object>();
 
-        [Fact]
-        public void RegisterPostEvictionCallbackAddsCallbackToPostEvictionCallbacks()
-        {
-            // Arrange.
-            var state = _fixture.Create<object>();
+        // Act.
+        _options.RegisterPostEvictionCallback(_fixture.Create<PostEvictionDelegate>(), state);
 
-            // Act.
-            _options.RegisterPostEvictionCallback(_fixture.Create<PostEvictionDelegate>(), state);
+        // Assert.
 
-            // Assert.
-            const int expectedNumberOfCallbacks = 1;
+        Assert.Single(_options.PostEvictionCallbacks);
+        Assert.Same(state, _options.PostEvictionCallbacks[0].State);
+    }
 
-            Assert.Equal(expectedNumberOfCallbacks, _options.PostEvictionCallbacks.Count);
-            Assert.Same(state, _options.PostEvictionCallbacks[0].State);
-        }
+    [Fact]
+    public void SetCachePriorityTakesAnyDefinedCachePriority()
+    {
+        // Arrange.
+        const CachePriority priority = CachePriority.High;
 
-        [Fact]
-        public void SetCachePriorityTakesAnyDefinedCachePriority()
-        {
-            // Arrange.
-            const CachePriority priority = CachePriority.High;
+        // Act.
+        _options.SetCachePriority(priority);
 
-            // Act.
-            _options.SetCachePriority(priority);
-
-            // Assert.
-            Assert.Equal(priority, _options.Priority);
-        }
+        // Assert.
+        Assert.Equal(priority, _options.Priority);
     }
 }

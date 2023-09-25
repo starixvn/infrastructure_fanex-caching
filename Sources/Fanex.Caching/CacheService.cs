@@ -3,8 +3,6 @@
     using System;
     using System.Threading.Tasks;
 
-#pragma warning disable S1200 // Classes should not be coupled to too many other classes (Single Responsibility Principle)
-
     public class CacheService : ICacheService
     {
         public CacheService(ICache cacheStorage = null)
