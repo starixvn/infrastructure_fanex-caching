@@ -8,7 +8,7 @@ public sealed class RedisCacheFixture : IDisposable
     {
         CacheOptions = new RedisCacheOptions
         {
-            ConnectionString = "ha.nexdev.net:16339,password=foo1@bared,defaultDatabase=11",
+            ConnectionString = "10.18.200.131:16379,password=foo1@bared,defaultDatabase=11",
             ApplicationName = "Fanex.Caching.Redis.Tests"
         };
         Cache = new RedisCache(CacheOptions);

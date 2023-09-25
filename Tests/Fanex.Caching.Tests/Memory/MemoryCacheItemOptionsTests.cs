@@ -36,9 +36,8 @@ public class MemoryCacheItemOptionsTests
         _options.RegisterPostEvictionCallback(_fixture.Create<PostEvictionDelegate>(), state);
 
         // Assert.
-        const int expectedNumberOfCallbacks = 1;
 
-        Assert.Equal(expectedNumberOfCallbacks, _options.PostEvictionCallbacks.Count);
+        Assert.Single(_options.PostEvictionCallbacks);
         Assert.Same(state, _options.PostEvictionCallbacks[0].State);
     }
 
