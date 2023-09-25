@@ -105,10 +105,10 @@ public sealed class DataTypesTests : IClassFixture<RedisCacheFixture>, IDisposab
         var anyLong = _fixture.Create<long>();
 
         // Act.
-        await Cache.SetAsync(_testingKey, anyLong, _cacheOptions);
+        await Cache.SetAsync("Jacob", anyLong, _cacheOptions);
 
         // Assert.
-        var (_, cachedLong) = await Cache.TryGetAsync<long>(_testingKey);
+        var (result, cachedLong) = await Cache.TryGetAsync<long>("Jacob");
 
         Assert.Equal(anyLong, cachedLong);
     }
