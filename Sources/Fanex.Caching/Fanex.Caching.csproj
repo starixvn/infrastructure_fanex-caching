@@ -1,11 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>net471;netstandard2.0;net7.0</TargetFrameworks>
-    </PropertyGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
+  <PropertyGroup>
+    <TargetFrameworks>net472;net5.0;net8.0</TargetFrameworks>
+    <Description>Fanex.Caching</Description>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Version>2.2.5</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <Title>Fanex.Caching</Title>
+    <Copyright>NexDev</Copyright>
+    <PackageProjectUrl>https://gitlab.nexdev.net/infrastructure/fanex-caching</PackageProjectUrl>
+    <RepositoryUrl>https://gitlab.nexdev.net/infrastructure/fanex-caching</RepositoryUrl>
+    <PackageTags>fanex.caching</PackageTags>
+  </PropertyGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Properties\" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Update="SonarAnalyzer.CSharp" Version="9.32.0.97167" />
     </ItemGroup>
 </Project>
