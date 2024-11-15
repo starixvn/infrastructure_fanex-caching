@@ -1,11 +1,10 @@
-﻿namespace Fanex.Caching.Memory
+﻿namespace Fanex.Caching.Memory;
+
+public delegate void PostEvictionDelegate(string key, object value, EvictionReason reason, object state);
+
+internal class PostEvictionCallbackRegistration
 {
-    public delegate void PostEvictionDelegate(string key, object value, EvictionReason reason, object state);
+    public PostEvictionDelegate EvictionCallback { get; set; }
 
-    internal class PostEvictionCallbackRegistration
-    {
-        public PostEvictionDelegate EvictionCallback { get; set; }
-
-        public object State { get; set; }
-    }
+    public object State { get; set; }
 }

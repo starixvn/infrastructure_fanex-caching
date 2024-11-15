@@ -16,11 +16,7 @@
         <Features>IOperation</Features>
         <CodeAnalysisRuleSet>$(SolutionDir)\.sonarlint\Fanex.CachingCSharp.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.17.0.26580">
-            <PrivateAssets>All</PrivateAssets>
-        </PackageReference>
-    </ItemGroup>
+    
     <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
         <Reference Include="System.Core" Pack="false" />
     </ItemGroup>

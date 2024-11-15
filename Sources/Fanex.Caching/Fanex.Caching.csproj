@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net472;net5.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net472;net6.0;net8.0</TargetFrameworks>
     <Description>Fanex.Caching</Description>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
@@ -16,10 +16,8 @@
     <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     </ItemGroup>
+   
     <ItemGroup>
         <Folder Include="Properties\" />
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Update="SonarAnalyzer.CSharp" Version="9.32.0.97167" />
     </ItemGroup>
 </Project>

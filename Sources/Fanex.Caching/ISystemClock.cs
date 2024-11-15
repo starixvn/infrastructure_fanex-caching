@@ -1,9 +1,8 @@
-﻿namespace Fanex.Caching
-{
-    using System;
+﻿namespace Fanex.Caching;
 
-    public interface ISystemClock
-    {
-        DateTimeOffset UtcNow { get; }
-    }
+using System;
+
+public interface ISystemClock
+{
+    DateTimeOffset UtcNow { get; }
 }

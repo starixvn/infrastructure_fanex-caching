@@ -1,23 +1,22 @@
-﻿namespace Fanex.Caching.Redis
+﻿namespace Fanex.Caching.Redis;
+
+using MessagePack.Resolvers;
+using MP = MessagePack;
+
+public class MessagePackSerializer : ISerializer
 {
-    using MessagePack.Resolvers;
-    using MP = MessagePack;
+    public byte[] Serialize(object obj)
+        => MP.MessagePackSerializer.Serialize(obj, ContractlessStandardResolver.Options);
 
-    public class MessagePackSerializer : ISerializer
+    public T Deserialize<T>(byte[] binaryData)
     {
-        public byte[] Serialize(object obj)
-            => MP.MessagePackSerializer.Serialize(obj, ContractlessStandardResolver.Options);
-
-        public T Deserialize<T>(byte[] binaryData)
+        try
         {
-            try
-            {
-                return MP.MessagePackSerializer.Deserialize<T>(binaryData, ContractlessStandardResolver.Options);
-            }
-            catch
-            {
-                return default;
-            }
+            return MP.MessagePackSerializer.Deserialize<T>(binaryData, ContractlessStandardResolver.Options);
+        }
+        catch
+        {
+            return default;
         }
     }
 }

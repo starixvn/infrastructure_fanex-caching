@@ -13,18 +13,17 @@
     <RepositoryUrl>https://gitlab.nexdev.net/infrastructure/fanex-caching</RepositoryUrl>
     <PackageTags>fanex.caching; redis</PackageTags>
   </PropertyGroup>
+ 
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.5.172" />
+    <PackageReference Include="MessagePack" Version="2.5.192" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.16" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Memory" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fanex.Caching\Fanex.Caching.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="SonarAnalyzer.CSharp" Version="9.32.0.97167" />
-  </ItemGroup>
+  
 </Project>

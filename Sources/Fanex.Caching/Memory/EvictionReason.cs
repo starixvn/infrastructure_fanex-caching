@@ -1,11 +1,10 @@
-﻿namespace Fanex.Caching.Memory
+﻿namespace Fanex.Caching.Memory;
+
+public enum EvictionReason
 {
-    public enum EvictionReason
-    {
-        None,
-        Removed,
-        Replaced,
-        Expired,
-        Capacity
-    }
+    None,
+    Removed,
+    Replaced,
+    Expired,
+    Capacity
 }

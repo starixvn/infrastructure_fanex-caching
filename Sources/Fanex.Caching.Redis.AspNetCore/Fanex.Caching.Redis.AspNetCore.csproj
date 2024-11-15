@@ -13,14 +13,14 @@
     <RepositoryUrl>https://gitlab.nexdev.net/infrastructure/fanex-caching</RepositoryUrl>
     <PackageTags>fanex.caching; redis</PackageTags>
   </PropertyGroup>
+
     <ItemGroup>
+        <PackageReference Include="MessagePack" Version="2.5.192" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Fanex.Caching.Redis\Fanex.Caching.Redis.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <PackageReference Update="SonarAnalyzer.CSharp" Version="9.32.0.97167" />
-    </ItemGroup>
+   
 </Project>

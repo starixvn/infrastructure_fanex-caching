@@ -1,132 +1,131 @@
-﻿namespace Fanex.Caching.Memory
+﻿namespace Fanex.Caching.Memory;
+
+using System;
+using System.Threading.Tasks;
+
+public sealed class MemoryCache : ICache
 {
-    using System;
-    using System.Threading.Tasks;
-
-    public sealed class MemoryCache : ICache
+    internal MemoryCache()
+        : this(new MemoryCacheOptions())
     {
-        internal MemoryCache()
-            : this(new MemoryCacheOptions())
+    }
+
+    public MemoryCache(MemoryCacheOptions options)
+    {
+        if (options == null)
         {
+            throw new ArgumentNullException(nameof(options));
         }
 
-        public MemoryCache(MemoryCacheOptions options)
-        {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+        MemoryStorage = new MemoryStorage(options);
+    }
 
-            MemoryStorage = new MemoryStorage(options);
+    internal IMemoryStorage MemoryStorage { get; private set; }
+
+    public bool Contain(string key)
+        => !string.IsNullOrEmpty(key) && MemoryStorage.Contain(key);
+
+    public Task<bool> ContainAsync(string key)
+        => Task.FromResult(Contain(key));
+
+    public bool TryGet<T>(string key, out T value)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+            throw new ArgumentException("Key must not be null or empty.", nameof(key));
         }
 
-        internal IMemoryStorage MemoryStorage { get; private set; }
+        var found = MemoryStorage.TryGet(key, out var result);
 
-        public bool Contain(string key)
-            => !string.IsNullOrEmpty(key) && MemoryStorage.Contain(key);
-
-        public Task<bool> ContainAsync(string key)
-            => Task.FromResult(Contain(key));
-
-        public bool TryGet<T>(string key, out T value)
+        if (result is T castedResult)
         {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentException("Key must not be null or empty.", nameof(key));
-            }
-
-            var found = MemoryStorage.TryGet(key, out var result);
-
-            if (result is T castedResult)
-            {
-                value = castedResult;
-            }
-            else
-            {
-                value = default;
-                found = false;
-            }
-
-            return found;
+            value = castedResult;
+        }
+        else
+        {
+            value = default;
+            found = false;
         }
 
-        public Task<(bool found, T value)> TryGetAsync<T>(string key)
-        {
-            var found = TryGet(key, out T value);
+        return found;
+    }
 
-            return Task.FromResult((found, value));
+    public Task<(bool found, T value)> TryGetAsync<T>(string key)
+    {
+        var found = TryGet(key, out T value);
+
+        return Task.FromResult((found, value));
+    }
+
+    public void Set<T>(string key, T value, CacheItemOptions options)
+        => SetInternal(key, value, options);
+
+    public void Set<T>(string key, T value, MemoryCacheItemOptions options)
+        => SetInternal(key, value, options);
+
+    private void SetInternal<T>(string key, T value, CacheItemOptions options)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+            throw new ArgumentException("Key must not be null or empty.", nameof(key));
         }
 
-        public void Set<T>(string key, T value, CacheItemOptions options)
-            => SetInternal(key, value, options);
-
-        public void Set<T>(string key, T value, MemoryCacheItemOptions options)
-            => SetInternal(key, value, options);
-
-        private void SetInternal<T>(string key, T value, CacheItemOptions options)
+        if (ReferenceEquals(value, null))
         {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentException("Key must not be null or empty.", nameof(key));
-            }
-
-            if (ReferenceEquals(value, null))
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            var memoryCacheItemOptions = options as MemoryCacheItemOptions;
-
-            memoryCacheItemOptions ??= new MemoryCacheItemOptions
-            {
-                AbsoluteExpiration = options.AbsoluteExpiration,
-                RelativeExpiration = options.RelativeExpiration,
-                SlidingExpiration = options.SlidingExpiration
-            };
-
-            MemoryStorage.Set(key, value, memoryCacheItemOptions);
+            throw new ArgumentNullException(nameof(value));
         }
 
-        public Task SetAsync<T>(string key, T value, CacheItemOptions options)
+        if (options == null)
         {
-            SetInternal(key, value, options);
-
-            return Task.CompletedTask;
+            throw new ArgumentNullException(nameof(options));
         }
 
-        public Task SetAsync<T>(string key, T value, MemoryCacheItemOptions options)
-        {
-            SetInternal(key, value, options);
+        var memoryCacheItemOptions = options as MemoryCacheItemOptions;
 
-            return Task.CompletedTask;
+        memoryCacheItemOptions ??= new MemoryCacheItemOptions
+        {
+            AbsoluteExpiration = options.AbsoluteExpiration,
+            RelativeExpiration = options.RelativeExpiration,
+            SlidingExpiration = options.SlidingExpiration
+        };
+
+        MemoryStorage.Set(key, value, memoryCacheItemOptions);
+    }
+
+    public Task SetAsync<T>(string key, T value, CacheItemOptions options)
+    {
+        SetInternal(key, value, options);
+
+        return Task.CompletedTask;
+    }
+
+    public Task SetAsync<T>(string key, T value, MemoryCacheItemOptions options)
+    {
+        SetInternal(key, value, options);
+
+        return Task.CompletedTask;
+    }
+
+    public void Remove(string key)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+            throw new ArgumentException("Key must not be null or empty.", nameof(key));
         }
 
-        public void Remove(string key)
-        {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentException("Key must not be null or empty.", nameof(key));
-            }
+        MemoryStorage.Remove(key);
+    }
 
-            MemoryStorage.Remove(key);
-        }
+    public Task RemoveAsync(string key)
+    {
+        Remove(key);
 
-        public Task RemoveAsync(string key)
-        {
-            Remove(key);
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            MemoryStorage.Dispose();
-            MemoryStorage = null;
-        }
+    public void Dispose()
+    {
+        MemoryStorage.Dispose();
+        MemoryStorage = null;
     }
 }

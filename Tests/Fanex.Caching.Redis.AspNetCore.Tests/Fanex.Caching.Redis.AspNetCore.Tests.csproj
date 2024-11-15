@@ -3,12 +3,14 @@
         <TargetFrameworks>net8.0</TargetFrameworks>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
+   
     <ItemGroup>
         <Content Include="appsettings.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="MessagePack" Version="2.5.192" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     </ItemGroup>
@@ -17,7 +19,6 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-      <PackageReference Update="SonarAnalyzer.CSharp" Version="9.32.0.97167" />
       <PackageReference Update="xunit" Version="2.9.2" />
       <PackageReference Update="xunit.runner.visualstudio" Version="2.8.2">
         <PrivateAssets>all</PrivateAssets>

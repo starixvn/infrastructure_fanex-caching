@@ -1,50 +1,49 @@
-﻿namespace Fanex.Caching
+﻿namespace Fanex.Caching;
+
+using System;
+using Memory;
+
+public static class CacheServiceManager
 {
-    using System;
-    using Memory;
+    private static ICache _cacheStorage;
+    private static Func<ICache> _cacheStorageFactory;
 
-    public static class CacheServiceManager
+    internal static ICache CacheStorage
     {
-        private static ICache _cacheStorage;
-        private static Func<ICache> _cacheStorageFactory;
-
-        internal static ICache CacheStorage
+        get
         {
-            get
-            {
-                _cacheStorage ??= _cacheStorageFactory != null ? _cacheStorageFactory() : new MemoryCache();
+            _cacheStorage ??= _cacheStorageFactory != null ? _cacheStorageFactory() : new MemoryCache();
 
-                return _cacheStorage;
-            }
+            return _cacheStorage;
+        }
+    }
+
+    public static void Use(ICache cacheStorage)
+    {
+        if (cacheStorage == null)
+        {
+            throw new ArgumentNullException(nameof(cacheStorage));
         }
 
-        public static void Use(ICache cacheStorage)
+        if (_cacheStorage != null)
         {
-            if (cacheStorage == null)
-            {
-                throw new ArgumentNullException(nameof(cacheStorage));
-            }
-
-            if (_cacheStorage != null)
-            {
-                _cacheStorage.Dispose();
-            }
-
-            _cacheStorage = cacheStorage;
+            _cacheStorage.Dispose();
         }
 
-        public static void Use(Func<ICache> cacheStorageFactory)
-            => _cacheStorageFactory = cacheStorageFactory ?? throw new ArgumentNullException(nameof(cacheStorageFactory));
+        _cacheStorage = cacheStorage;
+    }
 
-        internal static void Reset()
+    public static void Use(Func<ICache> cacheStorageFactory)
+        => _cacheStorageFactory = cacheStorageFactory ?? throw new ArgumentNullException(nameof(cacheStorageFactory));
+
+    internal static void Reset()
+    {
+        _cacheStorageFactory = null;
+
+        if (_cacheStorage != null)
         {
-            _cacheStorageFactory = null;
-
-            if (_cacheStorage != null)
-            {
-                _cacheStorage.Dispose();
-                _cacheStorage = null;
-            }
+            _cacheStorage.Dispose();
+            _cacheStorage = null;
         }
     }
 }
