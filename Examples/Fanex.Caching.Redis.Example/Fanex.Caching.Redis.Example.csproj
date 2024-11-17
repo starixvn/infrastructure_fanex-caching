@@ -17,7 +17,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Sources\Fanex.Caching.Redis.AspNetCore\Fanex.Caching.Redis.AspNetCore.csproj" />
     <ProjectReference Include="..\..\Sources\Fanex.Caching.Redis\Fanex.Caching.Redis.csproj" />
   </ItemGroup>
 </Project>
