@@ -11,8 +11,8 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="MessagePack" Version="2.5.192" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Sources\Fanex.Caching.Redis.AspNetCore\Fanex.Caching.Redis.AspNetCore.csproj" />

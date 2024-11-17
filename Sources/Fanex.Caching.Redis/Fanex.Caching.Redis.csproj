@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net472;net5.0;net8.0</TargetFrameworks>
-    <LangVersion>13.0</LangVersion>
+    <TargetFrameworks>net472;net6.0;net8.0</TargetFrameworks>
     <Description>New storage of Fanex.Caching which is REDIS.</Description>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
