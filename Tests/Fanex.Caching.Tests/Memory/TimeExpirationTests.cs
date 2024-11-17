@@ -133,9 +133,9 @@ public sealed class TimeExpirationTests : IDisposable
     public void KeyWithSlidingExpirationExpiresIfNotTouched()
     {
         // Arrange.
-        var sliddingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
+        var slidingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
 
-        _storage.Set(_testingKey, _testingValue, sliddingExpirationPolicy);
+        _storage.Set(_testingKey, _testingValue, slidingExpirationPolicy);
 
         // Act.
         _clock.Add(TimeToExpire);
@@ -148,9 +148,9 @@ public sealed class TimeExpirationTests : IDisposable
     public void KeyWithSlidingExpirationRenewedOnceTouched()
     {
         // Arrange.
-        var sliddingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
+        var slidingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
 
-        _storage.Set(_testingKey, _testingValue, sliddingExpirationPolicy);
+        _storage.Set(_testingKey, _testingValue, slidingExpirationPolicy);
 
         // Act - after 10 seconds.
         var firstTouchWhenKeyLivesWell = TimeSpan.FromSeconds(10);

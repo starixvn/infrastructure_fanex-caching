@@ -48,13 +48,13 @@ public sealed class MemoryCacheTests : IDisposable
     }
 
     [Fact]
-    public void ContainReturnsFalseForUnexistingKey()
+    public void ContainReturnsFalseForNotExistedKey()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var found = _cache.Contain(unexistingKey);
+        var found = _cache.Contain(notExistedKey);
 
         // Assert.
         Assert.False(found);
@@ -83,13 +83,13 @@ public sealed class MemoryCacheTests : IDisposable
     }
 
     [Fact]
-    public async Task ContainAsyncReturnsFalseForUnexistingKey()
+    public async Task ContainAsyncReturnsFalseForNotExistedKey()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var found = await _cache.ContainAsync(unexistingKey);
+        var found = await _cache.ContainAsync(notExistedKey);
 
         // Assert.
         Assert.False(found);
@@ -118,26 +118,26 @@ public sealed class MemoryCacheTests : IDisposable
     }
 
     [Fact]
-    public void TryGetUnexistingKeyReturnsFalse()
+    public void TryGetNotExistedKeyReturnsFalse()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var found = _cache.TryGet(unexistingKey, out object _);
+        var found = _cache.TryGet(notExistedKey, out object _);
 
         // Assert.
         Assert.False(found);
     }
 
     [Fact]
-    public void TryGetUnexistingKeyTakesDefaultValueAsOutputParameter()
+    public void TryGetNotExistedKeyTakesDefaultValueAsOutputParameter()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        _cache.TryGet(unexistingKey, out object actualValue);
+        _cache.TryGet(notExistedKey, out object actualValue);
 
         // Assert.
         var expectedValue = default(object);
@@ -172,7 +172,7 @@ public sealed class MemoryCacheTests : IDisposable
         _cache.TryGet(_existingKey, out int actualValue);
 
         // Assert.
-        const int expectedValue = default(int);
+        const int expectedValue = default;
 
         Assert.Equal(expectedValue, actualValue);
     }
@@ -192,26 +192,26 @@ public sealed class MemoryCacheTests : IDisposable
     }
 
     [Fact]
-    public async Task TryGetAsyncUnexistingKeyReturnsFalseAsFirstResult()
+    public async Task TryGetAsyncNotExistedKeyReturnsFalseAsFirstResult()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var (found, _) = await _cache.TryGetAsync<object>(unexistingKey);
+        var (found, _) = await _cache.TryGetAsync<object>(notExistedKey);
 
         // Assert.
         Assert.False(found);
     }
 
     [Fact]
-    public async Task TryGetAsyncUnexistingKeyReturnsDefaultValueAsSecondResult()
+    public async Task TryGetAsyncNotExistedKeyReturnsDefaultValueAsSecondResult()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var (_, actualValue) = await _cache.TryGetAsync<object>(unexistingKey);
+        var (_, actualValue) = await _cache.TryGetAsync<object>(notExistedKey);
 
         // Assert.
         var expectedValue = default(object);
@@ -246,7 +246,7 @@ public sealed class MemoryCacheTests : IDisposable
         var (_, actualValue) = await _cache.TryGetAsync<int>(_existingKey);
 
         // Assert.
-        const int expectedValue = default(int);
+        const int expectedValue = default;
 
         Assert.Equal(expectedValue, actualValue);
     }
@@ -287,10 +287,9 @@ public sealed class MemoryCacheTests : IDisposable
         // Arrange.
         var key = _fixture.Create<string>();
         var value = _fixture.Create<object>();
-        CacheItemOptions cacheOptions = null;
 
         // Act.
-        var exception = Record.Exception(() => _cache.Set(key, value, cacheOptions));
+        var exception = Record.Exception(() => _cache.Set(key, value, (CacheItemOptions)null));
 
         // Assert.
         Assert.IsType<ArgumentNullException>(exception);
@@ -370,11 +369,10 @@ public sealed class MemoryCacheTests : IDisposable
         // Arrange.
         var key = _fixture.Create<string>();
         var value = _fixture.Create<object>();
-        CacheItemOptions cacheOptions = null;
 
         // Act.
         var exception = await Record
-            .ExceptionAsync(() => _cache.SetAsync(key, value, cacheOptions))
+            .ExceptionAsync(() => _cache.SetAsync(key, value, (CacheItemOptions)null))
             ;
 
         // Assert.
@@ -428,14 +426,14 @@ public sealed class MemoryCacheTests : IDisposable
     }
 
     [Fact]
-    public void RemoveUnexistingKeyDoesNoChangeCacheStorage()
+    public void RemoveNotExistedKeyDoesNoChangeCacheStorage()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
         var numberOfExistingKeys = _cache.MemoryStorage.Count;
 
         // Act.
-        _cache.Remove(unexistingKey);
+        _cache.Remove(notExistedKey);
 
         // Assert.
         Assert.Equal(numberOfExistingKeys, _cache.MemoryStorage.Count);
@@ -466,14 +464,14 @@ public sealed class MemoryCacheTests : IDisposable
     }
 
     [Fact]
-    public async Task RemoveAsyncUnexistingKeyDoesNoChangeCacheStorage()
+    public async Task RemoveAsyncNotExistedKeyDoesNoChangeCacheStorage()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
         var numberOfExistingKeys = _cache.MemoryStorage.Count;
 
         // Act.
-        await _cache.RemoveAsync(unexistingKey);
+        await _cache.RemoveAsync(notExistedKey);
 
         // Assert.
         Assert.Equal(numberOfExistingKeys, _cache.MemoryStorage.Count);

@@ -40,6 +40,5 @@ internal class GcNotification
         }
     }
 
-    public static GcNotification Register(Func<object, bool> callback, object state)
-        => new GcNotification(callback, state);
+    public static GcNotification Register(Func<object, bool> callback, object state) => new(callback, state);
 }

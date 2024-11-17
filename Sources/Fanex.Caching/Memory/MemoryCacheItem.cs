@@ -5,36 +5,25 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-internal class MemoryCacheItem
+internal class MemoryCacheItem(
+    string key,
+    object value,
+    MemoryCacheItemOptions options,
+    DateTimeOffset createdTime)
 {
-    private readonly DateTimeOffset? _absoluteExpiration;
+    private readonly DateTimeOffset? _absoluteExpiration = options.CalculateAbsoluteExpiration(createdTime);
 
-    private IList<PostEvictionCallbackRegistration> _postEvictionCallbacks;
+    private IList<PostEvictionCallbackRegistration> _postEvictionCallbacks = options.PostEvictionCallbacks;
     private EvictionReason _evictionReason;
     private bool _isExpired;
 
-    public MemoryCacheItem(
-        string key,
-        object value,
-        MemoryCacheItemOptions options,
-        DateTimeOffset createdTime)
-    {
-        Key = key;
-        Value = value;
-        Options = options;
-        LastAccess = createdTime;
+    public string Key { get; } = key;
 
-        _absoluteExpiration = options.CalculateAbsoluteExpiration(createdTime);
-        _postEvictionCallbacks = options.PostEvictionCallbacks;
-    }
+    public object Value { get; } = value;
 
-    public string Key { get; }
+    public MemoryCacheItemOptions Options { get; } = options;
 
-    public object Value { get; }
-
-    public MemoryCacheItemOptions Options { get; }
-
-    public DateTimeOffset LastAccess { get; private set; }
+    public DateTimeOffset LastAccess { get; private set; } = createdTime;
 
     public bool IsReplaced => _evictionReason == EvictionReason.Replaced;
 
@@ -63,18 +52,20 @@ internal class MemoryCacheItem
     {
         var callbackRegistrations = Interlocked.Exchange(ref item._postEvictionCallbacks, null);
 
-        if (callbackRegistrations != null)
+        if (callbackRegistrations == null)
         {
-            foreach (var registration in callbackRegistrations)
+            return;
+        }
+
+        foreach (var registration in callbackRegistrations)
+        {
+            try
             {
-                try
-                {
-                    registration.EvictionCallback?.Invoke(item.Key, item.Value, item._evictionReason, registration.State);
-                }
-                catch
-                {
-                    // Ignore all exceptions throw during executing callbacks.
-                }
+                registration.EvictionCallback?.Invoke(item.Key, item.Value, item._evictionReason, registration.State);
+            }
+            catch
+            {
+                // Ignore all exceptions throw during executing callbacks.
             }
         }
     }
@@ -84,19 +75,20 @@ internal class MemoryCacheItem
 
     private bool CheckForExpiredTime(DateTimeOffset now)
     {
-        if (IsAbsolutelyExpired(now) || IsSlidinglyExpired(now))
+        if (!IsAbsolutelyExpired(now) && !IsSlidingExpired(now))
         {
-            SetExpired(EvictionReason.Expired);
-
-            return true;
+            return false;
         }
 
-        return false;
+        SetExpired(EvictionReason.Expired);
+
+        return true;
+
     }
 
     private bool IsAbsolutelyExpired(DateTimeOffset now)
         => _absoluteExpiration.HasValue && _absoluteExpiration.Value <= now;
 
-    private bool IsSlidinglyExpired(DateTimeOffset now)
+    private bool IsSlidingExpired(DateTimeOffset now)
         => Options.SlidingExpiration.HasValue && now - LastAccess >= Options.SlidingExpiration.Value;
 }

@@ -245,15 +245,14 @@ public sealed class GetSetTests : IDisposable
         var firstTask = Task.Run(() => SetRandomKey(cancellationToken), cancellationToken);
         var secondTask = Task.Run(() => SetRandomKey(cancellationToken), cancellationToken);
         var thirdTask = Task.Run(() => RemoveRandomKey(cancellationToken), cancellationToken);
-        var forthTask = Task.Run(() => cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(50)), cancellationToken);
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(50));
 
-        await Task.WhenAll(firstTask, secondTask, thirdTask, forthTask);
+        await Task.WhenAll(firstTask, secondTask, thirdTask);
 
         // Assert.
         Assert.Equal(TaskStatus.RanToCompletion, firstTask.Status);
         Assert.Equal(TaskStatus.RanToCompletion, secondTask.Status);
         Assert.Equal(TaskStatus.RanToCompletion, thirdTask.Status);
-        Assert.Equal(TaskStatus.RanToCompletion, forthTask.Status);
     }
 
     private void SetRandomKey(CancellationToken cancellationToken)
@@ -290,14 +289,13 @@ public sealed class GetSetTests : IDisposable
         // Act.
         var firstTask = Task.Run(() => SetOneSpecificKey(key, cancellationToken), cancellationToken);
         var secondTask = Task.Run(() => GetOneSpecificKey(key, cancellationToken), cancellationToken);
-        var thirdTask = Task.Run(() => cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(50)), cancellationToken);
+        cancellationTokenSource.CancelAfter(TimeSpan.FromMilliseconds(50));
 
-        await Task.WhenAll(firstTask, secondTask, thirdTask);
+        await Task.WhenAll(firstTask, secondTask);
 
         // Assert.
         Assert.Equal(TaskStatus.RanToCompletion, firstTask.Status);
         Assert.Equal(TaskStatus.RanToCompletion, secondTask.Status);
-        Assert.Equal(TaskStatus.RanToCompletion, thirdTask.Status);
     }
 
     private void SetOneSpecificKey(string key, CancellationToken cancellationToken)

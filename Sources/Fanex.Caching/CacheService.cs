@@ -3,12 +3,9 @@
 using System;
 using System.Threading.Tasks;
 
-public class CacheService : ICacheService
+public class CacheService(ICache cacheStorage = null) : ICacheService
 {
-    public CacheService(ICache cacheStorage = null)
-        => CacheStorage = cacheStorage ?? CacheServiceManager.CacheStorage;
-
-    public ICache CacheStorage { get; }
+    public ICache CacheStorage { get; } = cacheStorage ?? CacheServiceManager.CacheStorage;
 
     public bool Contain(string key)
         => CacheStorage.Contain(key);
@@ -40,13 +37,15 @@ public class CacheService : ICacheService
     {
         var found = CacheStorage.TryGet(key, out T value);
 
-        if (!found && factory != null)
+        if (found || factory == null)
         {
-            var options = new CacheItemOptions().UseDefaultExpiration();
-
-            value = factory();
-            CacheStorage.Set(key, value, options);
+            return value;
         }
+
+        var options = new CacheItemOptions().UseDefaultExpiration();
+
+        value = factory();
+        CacheStorage.Set(key, value, options);
 
         return value;
     }
@@ -55,11 +54,13 @@ public class CacheService : ICacheService
     {
         var found = CacheStorage.TryGet(key, out T value);
 
-        if (!found && factory != null)
+        if (found || factory == null)
         {
-            value = factory();
-            CacheStorage.Set(key, value, options);
+            return value;
         }
+
+        value = factory();
+        CacheStorage.Set(key, value, options);
 
         return value;
     }
@@ -68,13 +69,15 @@ public class CacheService : ICacheService
     {
         var (found, value) = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
-        if (!found && factory != null)
+        if (found || factory == null)
         {
-            var options = new CacheItemOptions().UseDefaultExpiration();
-
-            value = await factory().ConfigureAwait(false);
-            await CacheStorage.SetAsync(key, value, options).ConfigureAwait(false);
+            return value;
         }
+
+        var options = new CacheItemOptions().UseDefaultExpiration();
+
+        value = await factory().ConfigureAwait(false);
+        await CacheStorage.SetAsync(key, value, options).ConfigureAwait(false);
 
         return value;
     }
@@ -83,11 +86,13 @@ public class CacheService : ICacheService
     {
         var (found, value) = await CacheStorage.TryGetAsync<T>(key).ConfigureAwait(false);
 
-        if (!found && factory != null)
+        if (found || factory == null)
         {
-            value = await factory().ConfigureAwait(false);
-            await CacheStorage.SetAsync(key, value, options).ConfigureAwait(false);
+            return value;
         }
+
+        value = await factory().ConfigureAwait(false);
+        await CacheStorage.SetAsync(key, value, options).ConfigureAwait(false);
 
         return value;
     }

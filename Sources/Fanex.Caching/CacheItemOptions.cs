@@ -98,11 +98,6 @@ public class CacheItemOptions
             return now + RelativeExpiration.Value;
         }
 
-        if (AbsoluteExpiration.HasValue)
-        {
-            return AbsoluteExpiration.Value;
-        }
-
-        return null;
+        return AbsoluteExpiration;
     }
 }

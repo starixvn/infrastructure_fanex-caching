@@ -26,7 +26,7 @@ internal sealed class MemoryStorage : IMemoryStorage
 
         if (options.CompactOnMemoryPressure)
         {
-            RegisterMemoryPreassureCollection();
+            RegisterMemoryPressureCollection();
         }
     }
 
@@ -93,10 +93,7 @@ internal sealed class MemoryStorage : IMemoryStorage
         {
             TryAddOrUpdateItem(item, previousItem);
 
-            if (previousItem != null)
-            {
-                previousItem.InvokeEvictionCallbacks();
-            }
+            previousItem?.InvokeEvictionCallbacks();
         }
         else
         {
@@ -129,26 +126,30 @@ internal sealed class MemoryStorage : IMemoryStorage
             }
         }
 
-        if (!added)
+        if (added)
         {
-            item.SetExpired(EvictionReason.Replaced);
-            item.InvokeEvictionCallbacks();
+            return;
         }
+
+        item.SetExpired(EvictionReason.Replaced);
+        item.InvokeEvictionCallbacks();
     }
 
-    private void RegisterMemoryPreassureCollection()
-        => GcNotification.Register(DoMemoryPreassureCollection, this);
+    private void RegisterMemoryPressureCollection()
+        => GcNotification.Register(DoMemoryPressureCollection, this);
 
     private void StartScanForExpiredItems()
     {
         var now = _clock.UtcNow;
 
-        if (_expirationScanFrequency < now - _lastExpirationScan)
+        if (_expirationScanFrequency >= now - _lastExpirationScan)
         {
-            _lastExpirationScan = now;
-
-            Task.Run(() => ScanForExpiredItems(this));
+            return;
         }
+
+        _lastExpirationScan = now;
+
+        Task.Run(() => ScanForExpiredItems(this));
     }
 
     private static void ScanForExpiredItems(MemoryStorage cache)
@@ -164,16 +165,17 @@ internal sealed class MemoryStorage : IMemoryStorage
         }
     }
 
-    private static bool DoMemoryPreassureCollection(object state)
+    private static bool DoMemoryPressureCollection(object state)
     {
-        if (state is MemoryStorage { _disposed: false } storage)
+        if (state is not MemoryStorage { _disposed: false } storage)
         {
-            storage.Compact(storage._compactionPercentage);
-
-            return true;
+            return false;
         }
 
-        return false;
+        storage.Compact(storage._compactionPercentage);
+
+        return true;
+
     }
 
     internal void Compact(double percentage)
@@ -231,6 +233,8 @@ internal sealed class MemoryStorage : IMemoryStorage
                     case CachePriority.High:
                         highPriorityItems.Add(item);
                         break;
+                    case CachePriority.NeverRemove:
+                        break;
                 }
             }
         }
@@ -267,6 +271,11 @@ internal sealed class MemoryStorage : IMemoryStorage
             while (orderedPriorityItems.MoveNext() && removalCountTarget > expiredItems.Count)
             {
                 var item = orderedPriorityItems.Current;
+                if (item == null)
+                {
+                    continue;
+                }
+
                 item.SetExpired(EvictionReason.Capacity);
                 expiredItems.Add(item);
             }

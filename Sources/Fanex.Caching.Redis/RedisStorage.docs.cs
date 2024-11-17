@@ -10,11 +10,11 @@ using StackExchange.Redis;
 /// </summary>
 internal sealed partial class RedisStorage
 {
-    private static long _lastReconnectTicks = DateTimeOffset.MinValue.UtcTicks;
-    private static DateTimeOffset _firstErrorTime = DateTimeOffset.MinValue;
-    private static DateTimeOffset _previousErrorTime = DateTimeOffset.MinValue;
+    private static long lastReconnectTicks = DateTimeOffset.MinValue.UtcTicks;
+    private static DateTimeOffset firstErrorTime = DateTimeOffset.MinValue;
+    private static DateTimeOffset previousErrorTime = DateTimeOffset.MinValue;
 
-    private static SemaphoreSlim _reconnectSemaphore = new SemaphoreSlim(initialCount: 1, maxCount: 1);
+    private static readonly SemaphoreSlim ReconnectSemaphore = new(initialCount: 1, maxCount: 1);
 
     // In general, let StackExchange.Redis handle most reconnects,
     // so limit the frequency of how often ForceReconnect() will
@@ -42,7 +42,7 @@ internal sealed partial class RedisStorage
     public async Task ForceReconnectAsync()
     {
         var utcNow = DateTimeOffset.UtcNow;
-        var previousTicks = Interlocked.Read(ref _lastReconnectTicks);
+        var previousTicks = Interlocked.Read(ref lastReconnectTicks);
         var previousReconnectTime = new DateTimeOffset(previousTicks, TimeSpan.Zero);
         var elapsedSinceLastReconnect = utcNow - previousReconnectTime;
 
@@ -54,7 +54,7 @@ internal sealed partial class RedisStorage
 
         try
         {
-            await _reconnectSemaphore.WaitAsync(RestartConnectionTimeout);
+            await ReconnectSemaphore.WaitAsync(RestartConnectionTimeout);
         }
         catch
         {
@@ -68,11 +68,11 @@ internal sealed partial class RedisStorage
             utcNow = DateTimeOffset.UtcNow;
             elapsedSinceLastReconnect = utcNow - previousReconnectTime;
 
-            if (_firstErrorTime == DateTimeOffset.MinValue)
+            if (firstErrorTime == DateTimeOffset.MinValue)
             {
                 // We haven't seen an error since last reconnect, so set initial values.
-                _firstErrorTime = utcNow;
-                _previousErrorTime = utcNow;
+                firstErrorTime = utcNow;
+                previousErrorTime = utcNow;
                 return;
             }
 
@@ -81,34 +81,34 @@ internal sealed partial class RedisStorage
                 return; // Some other thread made it through the check and the lock, so nothing to do.
             }
 
-            var elapsedSinceFirstError = utcNow - _firstErrorTime;
-            var elapsedSinceMostRecentError = utcNow - _previousErrorTime;
+            var elapsedSinceFirstError = utcNow - firstErrorTime;
+            var elapsedSinceMostRecentError = utcNow - previousErrorTime;
 
             var shouldReconnect =
                 elapsedSinceFirstError >= ReconnectErrorThreshold // Make sure we gave the multiplexer enough time to reconnect on its own if it could.
                 && elapsedSinceMostRecentError <= ReconnectErrorThreshold; // Make sure we aren't working on stale data (e.g. if there was a gap in errors, don't reconnect yet).
 
-            // Update the previousErrorTime timestamp to be now (e.g. this reconnect request).
-            _previousErrorTime = utcNow;
+            // Update the previousErrorTime timestamp to be now (e.g. this reconnecting request).
+            previousErrorTime = utcNow;
 
             if (!shouldReconnect)
             {
                 return;
             }
 
-            _firstErrorTime = DateTimeOffset.MinValue;
-            _previousErrorTime = DateTimeOffset.MinValue;
+            firstErrorTime = DateTimeOffset.MinValue;
+            previousErrorTime = DateTimeOffset.MinValue;
 
             var oldConnection = _connection;
             await CloseConnectionAsync(oldConnection);
             _connection = null;
             _database = null;
             await ConnectAsync();
-            Interlocked.Exchange(ref _lastReconnectTicks, utcNow.UtcTicks);
+            Interlocked.Exchange(ref lastReconnectTicks, utcNow.UtcTicks);
         }
         finally
         {
-            _reconnectSemaphore.Release();
+            ReconnectSemaphore.Release();
         }
     }
 

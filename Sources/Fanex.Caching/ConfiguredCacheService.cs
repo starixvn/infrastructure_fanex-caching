@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 public static class ConfiguredCacheService
 {
-    private static ICacheService _currentInstance;
+    private static ICacheService currentInstance;
 
     public static ICache CacheStorage
         => CurrentInstance.CacheStorage;
@@ -14,14 +14,14 @@ public static class ConfiguredCacheService
     {
         get
         {
-            _currentInstance ??= new CacheService();
+            currentInstance ??= new CacheService();
 
-            return _currentInstance;
+            return currentInstance;
         }
     }
 
     internal static void Initialize(ICacheService newInstance)
-        => _currentInstance = newInstance;
+        => currentInstance = newInstance;
 
     public static bool Contain(string key)
         => CurrentInstance.Contain(key);

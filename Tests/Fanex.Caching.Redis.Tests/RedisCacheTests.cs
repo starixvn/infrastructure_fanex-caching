@@ -48,13 +48,13 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
     }
 
     [Fact]
-    public void ContainReturnsFalseForUnexistingKey()
+    public void ContainReturnsFalseForNotExistedKey()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var found = Cache.Contain(unexistingKey);
+        var found = Cache.Contain(notExistedKey);
 
         // Assert.
         Assert.False(found);
@@ -83,13 +83,13 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
     }
 
     [Fact]
-    public async Task ContainAsyncReturnsFalseForUnexistingKey()
+    public async Task ContainAsyncReturnsFalseForNotExistedKey()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var found = await Cache.ContainAsync(unexistingKey);
+        var found = await Cache.ContainAsync(notExistedKey);
 
         // Assert.
         Assert.False(found);
@@ -118,26 +118,26 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
     }
 
     [Fact]
-    public void TryGetUnexistingKeyReturnsFalse()
+    public void TryGetNotExistedKeyReturnsFalse()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var found = Cache.TryGet(unexistingKey, out string _);
+        var found = Cache.TryGet(notExistedKey, out string _);
 
         // Assert.
         Assert.False(found);
     }
 
     [Fact]
-    public void TryGetUnexistingKeyTakesDefaultValueAsOutputParameter()
+    public void TryGetNotExistedKeyTakesDefaultValueAsOutputParameter()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        Cache.TryGet(unexistingKey, out string actualValue);
+        Cache.TryGet(notExistedKey, out string actualValue);
 
         // Assert.
         Assert.Equal(default, actualValue);
@@ -188,26 +188,26 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
     }
 
     [Fact]
-    public async Task TryGetAsyncUnexistingKeyReturnsFalseAsFirstResult()
+    public async Task TryGetAsyncNotExistedKeyReturnsFalseAsFirstResult()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var (found, _) = await Cache.TryGetAsync<string>(unexistingKey);
+        var (found, _) = await Cache.TryGetAsync<string>(notExistedKey);
 
         // Assert.
         Assert.False(found);
     }
 
     [Fact]
-    public async Task TryGetAsyncUnexistingKeyReturnsDefaultValueAsSecondResult()
+    public async Task TryGetAsyncNotExistedKeyReturnsDefaultValueAsSecondResult()
     {
         // Arrange.
-        var unexistingKey = _fixture.Create<string>();
+        var notExistedKey = _fixture.Create<string>();
 
         // Act.
-        var (_, actualValue) = await Cache.TryGetAsync<string>(unexistingKey);
+        var (_, actualValue) = await Cache.TryGetAsync<string>(notExistedKey);
 
         // Assert.
         Assert.Equal(default, actualValue);
@@ -279,10 +279,9 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
         // Arrange.
         var key = _fixture.Create<string>();
         var value = _fixture.Create<string>();
-        CacheItemOptions cacheOptions = null;
 
         // Act.
-        var exception = Record.Exception(() => Cache.Set(key, value, cacheOptions));
+        var exception = Record.Exception(() => Cache.Set(key, value, null));
 
         // Assert.
         Assert.IsType<ArgumentNullException>(exception);
@@ -345,11 +344,10 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
         // Arrange.
         var key = _fixture.Create<string>();
         var value = _fixture.Create<string>();
-        CacheItemOptions cacheOptions = null;
 
         // Act.
         var exception = await Record
-                .ExceptionAsync(() => Cache.SetAsync(key, value, cacheOptions))
+                .ExceptionAsync(() => Cache.SetAsync(key, value, null))
             ;
 
         // Assert.
@@ -410,7 +408,7 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
     }
 
     [Fact]
-    public async Task RemoveAsyncExistingKeyRemoveItOutOfCacheStroage()
+    public async Task RemoveAsyncExistingKeyRemoveItOutOfCacheStorage()
     {
         // Act.
         await Cache.RemoveAsync(_existingKey);

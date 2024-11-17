@@ -4,7 +4,7 @@
     <Description>Fanex.Caching</Description>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <Version>2.2.5</Version>
+    <Version>2.2.6</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <Title>Fanex.Caching</Title>

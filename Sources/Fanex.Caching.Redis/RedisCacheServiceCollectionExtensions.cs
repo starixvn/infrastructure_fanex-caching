@@ -1,9 +1,9 @@
 ﻿#if NET6_0_OR_GREATER
-namespace Microsoft.Extensions.Configuration;
+namespace Fanex.Caching.Redis;
 
 using System;
-using Fanex.Caching;
-using Fanex.Caching.Redis;
+using Caching;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StackExchange.Redis;
@@ -68,14 +68,16 @@ public static class RedisCacheServiceCollectionExtensions
     {
         var endPoints = configuration.GetSection("ConnectionOptions:EndPoints").Get<string[]>();
 
-        if (endPoints is { Length: > 0 })
+        if (endPoints is not { Length: > 0 })
         {
-            options.ConnectionOptions ??= new ConfigurationOptions();
+            return;
+        }
 
-            foreach (var endPoint in endPoints)
-            {
-                options.ConnectionOptions.EndPoints.Add(endPoint);
-            }
+        options.ConnectionOptions ??= new ConfigurationOptions();
+
+        foreach (var endPoint in endPoints)
+        {
+            options.ConnectionOptions.EndPoints.Add(endPoint);
         }
     }
 }

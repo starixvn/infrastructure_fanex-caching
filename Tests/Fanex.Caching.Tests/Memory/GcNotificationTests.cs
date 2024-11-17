@@ -7,10 +7,7 @@ using Xunit;
 
 public sealed class GcNotificationTests : IDisposable
 {
-    private ManualResetEventSlim _callbackInvoked;
-
-    public GcNotificationTests()
-        => _callbackInvoked = new ManualResetEventSlim(false);
+    private ManualResetEventSlim _callbackInvoked = new(false);
 
     [Fact]
     public void CallbackRegisteredAndInvoked()

@@ -24,12 +24,11 @@ public class CacheServiceManagerTests
     public void ConfigureNullAsCacheStorageFactoryThrowsArgumentNullException()
     {
         // Arrange.
-        Func<ICache> cacheFactory = null;
 
         CacheServiceManager.Reset();
 
         // Act
-        var exception = Record.Exception(() => CacheServiceManager.Use(cacheFactory));
+        var exception = Record.Exception(() => CacheServiceManager.Use((Func<ICache>)null));
 
         // Assert.
         Assert.IsType<ArgumentNullException>(exception);
@@ -55,12 +54,11 @@ public class CacheServiceManagerTests
     public void ConfigureNullAsCacheStorageThrowsArgumentNullException()
     {
         // Arrange.
-        ICache cache = null;
 
         CacheServiceManager.Reset();
 
         // Act
-        var exception = Record.Exception(() => CacheServiceManager.Use(cache));
+        var exception = Record.Exception(() => CacheServiceManager.Use((ICache)null));
 
         // Assert.
         Assert.IsType<ArgumentNullException>(exception);

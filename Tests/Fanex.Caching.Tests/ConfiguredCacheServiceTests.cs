@@ -1,6 +1,5 @@
 ﻿namespace Fanex.Caching.Tests;
 
-using System;
 using System.Threading.Tasks;
 using AutoFixture;
 using NSubstitute;
@@ -119,24 +118,24 @@ public class ConfiguredCacheServiceTests
     public void GetOrSetPropagatesCallToRegisteredCacheService()
     {
         // Act.
-        ConfiguredCacheService.GetOrSet(_testingKey, CreateValueFakely, _testingCacheItemOptions);
+        ConfiguredCacheService.GetOrSet(_testingKey, CreateFakedValue, _testingCacheItemOptions);
 
         // Assert.
         _cacheService
             .Received()
-            .GetOrSet(Arg.Is(_testingKey), Arg.Is<Func<object>>(CreateValueFakely), Arg.Is(_testingCacheItemOptions));
+            .GetOrSet(Arg.Is(_testingKey), Arg.Is(CreateFakedValue), Arg.Is(_testingCacheItemOptions));
     }
 
     [Fact]
     public void GetOrSetWithNoCacheItemOptionsPropagatesCallToRegisteredCacheService()
     {
         // Act.
-        ConfiguredCacheService.GetOrSet(_testingKey, CreateValueFakely);
+        ConfiguredCacheService.GetOrSet(_testingKey, CreateFakedValue);
 
         // Assert.
         _cacheService
             .Received()
-            .GetOrSet(Arg.Is(_testingKey), Arg.Is<Func<object>>(CreateValueFakely));
+            .GetOrSet(Arg.Is(_testingKey), Arg.Is(CreateFakedValue));
     }
 
     [Fact]
@@ -144,13 +143,13 @@ public class ConfiguredCacheServiceTests
     {
         // Act.
         await ConfiguredCacheService
-            .GetOrSetAsync(_testingKey, CreateValueFakelyAsync, _testingCacheItemOptions)
+            .GetOrSetAsync(_testingKey, CreateFakedValueAsync, _testingCacheItemOptions)
             ;
 
         // Assert.
         await _cacheService
             .Received()
-            .GetOrSetAsync(Arg.Is(_testingKey), Arg.Is<Func<Task<object>>>(CreateValueFakelyAsync), Arg.Is(_testingCacheItemOptions))
+            .GetOrSetAsync(Arg.Is(_testingKey), Arg.Is(CreateFakedValueAsync), Arg.Is(_testingCacheItemOptions))
             ;
     }
 
@@ -159,13 +158,13 @@ public class ConfiguredCacheServiceTests
     {
         // Act.
         await ConfiguredCacheService
-            .GetOrSetAsync(_testingKey, CreateValueFakelyAsync)
+            .GetOrSetAsync(_testingKey, CreateFakedValueAsync)
             ;
 
         // Assert.
         await _cacheService
             .Received()
-            .GetOrSetAsync(Arg.Is(_testingKey), Arg.Is<Func<Task<object>>>(CreateValueFakelyAsync))
+            .GetOrSetAsync(Arg.Is(_testingKey), Arg.Is(CreateFakedValueAsync))
             ;
     }
 
@@ -242,9 +241,9 @@ public class ConfiguredCacheServiceTests
             ;
     }
 
-    private object CreateValueFakely()
+    private object CreateFakedValue()
         => _newlyCreatedValue;
 
-    private Task<object> CreateValueFakelyAsync()
+    private Task<object> CreateFakedValueAsync()
         => Task.FromResult(_newlyCreatedValue);
 }

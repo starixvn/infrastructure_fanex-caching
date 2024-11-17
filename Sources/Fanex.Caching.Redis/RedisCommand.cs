@@ -10,7 +10,7 @@ internal class RedisCommand
         RedisKey key,
         params RedisValue[] values)
     {
-        Keys = new[] { key };
+        Keys = [key];
         Values = values;
         Script = script;
     }
@@ -21,8 +21,7 @@ internal class RedisCommand
 
     public RedisValue[] Values { get; }
 
-    public static RedisCommand CreateGetCommand(RedisKey key)
-        => new RedisCommand(RedisScripts.GetValue, key, null);
+    public static RedisCommand CreateGetCommand(RedisKey key) => new(RedisScripts.GetValue, key, null);
 
     public static RedisCommand CreateSetCommand(
         RedisKey key,

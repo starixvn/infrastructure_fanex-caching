@@ -1,5 +1,6 @@
 ﻿namespace Fanex.Caching.Redis;
 
+using System;
 using StackExchange.Redis;
 
 internal static class RedisTypeConverter
@@ -17,10 +18,9 @@ internal static class RedisTypeConverter
     public static T ToObject<T>(RedisResult value, ISerializer serializer)
     {
         var binary = (byte[])value;
-
-        if (binary is T resultInBinary)
+        if (typeof(T) == typeof(byte[]))
         {
-            return resultInBinary;
+            return (T)Convert.ChangeType(binary, typeof(T)); 
         }
 
         return serializer.Deserialize<T>(binary);

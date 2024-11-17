@@ -1,12 +1,11 @@
 ﻿#if NET6_0_OR_GREATER
-namespace Microsoft.Extensions.Configuration;
+namespace Fanex.Caching;
 
 using System;
-using DependencyInjection;
-using DependencyInjection.Extensions;
-using Fanex.Caching;
-using Fanex.Caching.Memory;
-
+using Memory;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 public static class MemoryCacheServiceCollectionExtensions
 {

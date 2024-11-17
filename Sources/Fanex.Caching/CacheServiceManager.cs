@@ -5,45 +5,44 @@ using Memory;
 
 public static class CacheServiceManager
 {
-    private static ICache _cacheStorage;
-    private static Func<ICache> _cacheStorageFactory;
+    private static ICache cacheStorage;
+    private static Func<ICache> cacheStorageFactory;
 
     internal static ICache CacheStorage
     {
         get
         {
-            _cacheStorage ??= _cacheStorageFactory != null ? _cacheStorageFactory() : new MemoryCache();
+            cacheStorage ??= cacheStorageFactory != null ? cacheStorageFactory() : new MemoryCache();
 
-            return _cacheStorage;
+            return cacheStorage;
         }
     }
 
-    public static void Use(ICache cacheStorage)
+    public static void Use(ICache cache)
     {
-        if (cacheStorage == null)
+        if (cache == null)
         {
-            throw new ArgumentNullException(nameof(cacheStorage));
+            throw new ArgumentNullException(nameof(cache));
         }
 
-        if (_cacheStorage != null)
-        {
-            _cacheStorage.Dispose();
-        }
+        cacheStorage?.Dispose();
 
-        _cacheStorage = cacheStorage;
+        cacheStorage = cache;
     }
 
-    public static void Use(Func<ICache> cacheStorageFactory)
-        => _cacheStorageFactory = cacheStorageFactory ?? throw new ArgumentNullException(nameof(cacheStorageFactory));
+    public static void Use(Func<ICache> factory)
+        => cacheStorageFactory = factory ?? throw new ArgumentNullException(nameof(factory));
 
     internal static void Reset()
     {
-        _cacheStorageFactory = null;
+        cacheStorageFactory = null;
 
-        if (_cacheStorage != null)
+        if (cacheStorage == null)
         {
-            _cacheStorage.Dispose();
-            _cacheStorage = null;
+            return;
         }
+
+        cacheStorage.Dispose();
+        cacheStorage = null;
     }
 }
