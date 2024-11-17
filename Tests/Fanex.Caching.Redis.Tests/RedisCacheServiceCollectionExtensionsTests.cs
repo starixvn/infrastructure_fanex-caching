@@ -1,4 +1,4 @@
-﻿namespace Fanex.Caching.Redis.AspNetCore.Tests;
+﻿namespace Fanex.Caching.Redis.Tests;
 
 using System;
 using System.IO;
@@ -9,10 +9,7 @@ using Xunit;
 
 public class RedisCacheServiceCollectionExtensionsTests
 {
-    private readonly IServiceCollection _services;
-
-    public RedisCacheServiceCollectionExtensionsTests()
-        => _services = new ServiceCollection();
+    private readonly IServiceCollection _services = new ServiceCollection();
 
     [Fact]
     public void CallAddRedisCacheOnNullServiceCollectionThrowsArgumentNullException()
@@ -75,10 +72,9 @@ public class RedisCacheServiceCollectionExtensionsTests
     public void CallAddRedisCacheWithNullConfigurationSectionThrowsArgumentNullException()
     {
         // Arrange.
-        IConfigurationSection configuration = null;
 
         // Act.
-        var exception = Record.Exception(() => _services.AddRedisCache(configuration));
+        var exception = Record.Exception(() => _services.AddRedisCache((IConfigurationSection)null));
 
         // Assert.
         Assert.IsType<ArgumentNullException>(exception);
@@ -154,10 +150,9 @@ public class RedisCacheServiceCollectionExtensionsTests
     public void CallAddRedisCacheWithNullOptionAccessorThrowsArgumentNullException()
     {
         // Arrange.
-        Action<RedisCacheOptions> setupAction = null;
 
         // Act.
-        var exception = Record.Exception(() => _services.AddRedisCache(setupAction));
+        var exception = Record.Exception(() => _services.AddRedisCache((Action<RedisCacheOptions>)null));
 
         // Assert.
         Assert.IsType<ArgumentNullException>(exception);

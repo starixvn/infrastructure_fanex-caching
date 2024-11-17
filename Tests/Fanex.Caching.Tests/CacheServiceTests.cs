@@ -175,7 +175,7 @@ public class CacheServiceTests
             });
 
         // Act.
-        var result = _cacheService.GetOrSet(_testingKey, CreateValueFakely, _testingCacheItemOptions);
+        var result = _cacheService.GetOrSet(_testingKey, CreateFakedValue, _testingCacheItemOptions);
 
         // Assert.
         Assert.Same(_testingValue, result);
@@ -215,7 +215,7 @@ public class CacheServiceTests
             });
 
         // Act.
-        var result = _cacheService.GetOrSet(_testingKey, CreateValueFakely, _testingCacheItemOptions);
+        var result = _cacheService.GetOrSet(_testingKey, CreateFakedValue, _testingCacheItemOptions);
 
         // Assert.
         _cacheStorage
@@ -239,7 +239,7 @@ public class CacheServiceTests
             });
 
         // Act.
-        var result = _cacheService.GetOrSet(_testingKey, CreateValueFakely);
+        var result = _cacheService.GetOrSet(_testingKey, CreateFakedValue);
 
         // Assert.
         Assert.Same(_testingValue, result);
@@ -259,7 +259,7 @@ public class CacheServiceTests
             });
 
         // Act.
-        _cacheService.GetOrSet(_testingKey, CreateValueFakely);
+        _cacheService.GetOrSet(_testingKey, CreateFakedValue);
 
         // Assert.
         _cacheStorage
@@ -278,7 +278,7 @@ public class CacheServiceTests
 
         // Act.
         var result = await _cacheService
-            .GetOrSetAsync(_testingKey, CreateValueFakelyAsync, _testingCacheItemOptions)
+            .GetOrSetAsync(_testingKey, CreateFakedValueAsync, _testingCacheItemOptions)
             ;
 
         // Assert.
@@ -308,7 +308,7 @@ public class CacheServiceTests
 
         // Act.
         var result = await _cacheService
-            .GetOrSetAsync(_testingKey, CreateValueFakelyAsync, _testingCacheItemOptions)
+            .GetOrSetAsync(_testingKey, CreateFakedValueAsync, _testingCacheItemOptions)
             ;
 
         // Assert.
@@ -328,7 +328,7 @@ public class CacheServiceTests
 
         // Act.
         var result = await _cacheService
-            .GetOrSetAsync(_testingKey, CreateValueFakelyAsync)
+            .GetOrSetAsync(_testingKey, CreateFakedValueAsync)
             ;
 
         // Assert.
@@ -342,7 +342,7 @@ public class CacheServiceTests
         _cacheStorage.TryGetAsync<object>(_testingKey).Returns((false, null));
 
         // Act.
-        await _cacheService.GetOrSetAsync(_testingKey, CreateValueFakelyAsync);
+        await _cacheService.GetOrSetAsync(_testingKey, CreateFakedValueAsync);
 
         // Assert.
         await _cacheStorage
@@ -438,9 +438,9 @@ public class CacheServiceTests
     private static bool IsUsingDefaultRelativeExpiration(CacheItemOptions options)
         => options.RelativeExpiration == CacheItemOptions.DefaultRelativeExpiration;
 
-    private object CreateValueFakely()
+    private object CreateFakedValue()
         => _newlyCreatedValue;
 
-    private Task<object> CreateValueFakelyAsync()
+    private Task<object> CreateFakedValueAsync()
         => Task.FromResult(_newlyCreatedValue);
 }

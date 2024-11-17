@@ -143,7 +143,7 @@ public sealed class MemoryCompactTests : IDisposable
     }
 
     [Fact]
-    public void CompactPrioritizesLRU()
+    public void CompactPrioritizesLru()
     {
         // Arrange.
         const int numberOfNewKeys = 8;
@@ -162,7 +162,7 @@ public sealed class MemoryCompactTests : IDisposable
     }
 
     [Fact]
-    public void CompactOnMemoryPressureTriggersDoMemoryPreassureCollection()
+    public void CompactOnMemoryPressureTriggersDoMemoryPressureCollection()
     {
         // Arrange.
         const int numberOfNewKeys = 4;
@@ -170,7 +170,7 @@ public sealed class MemoryCompactTests : IDisposable
         InitializeCache(numberOfNewKeys, _cacheOptions);
 
         // Act.
-        TriggerGargabeCollectionInItsOwnScope();
+        TriggerGarbageCollectionInItsOwnScope();
 
         // Assert.
         const int numberOfCachedKeys = numberOfNewKeys + NumberOfPreInitializedKeys;
@@ -179,7 +179,7 @@ public sealed class MemoryCompactTests : IDisposable
     }
 
     [Fact]
-    public void DoMemoryPreassureCollectionTriesToSatisfyRemovalCountTarget()
+    public void DoMemoryPressureCollectionTriesToSatisfyRemovalCountTarget()
     {
         // Arrange.
         const int numberOfNewKeys = 8;
@@ -187,18 +187,18 @@ public sealed class MemoryCompactTests : IDisposable
         InitializeCache(numberOfNewKeys, _cacheOptions);
 
         // Act.
-        TriggerGargabeCollectionInItsOwnScope();
+        TriggerGarbageCollectionInItsOwnScope();
 
         // Assert.
         const int numberOfCachedKeys = numberOfNewKeys + NumberOfPreInitializedKeys;
-        var expectedCount = numberOfCachedKeys - (int)(CompactionPercentage * numberOfCachedKeys);
+        const int expectedCount = numberOfCachedKeys - (int)(CompactionPercentage * numberOfCachedKeys);
 
         Assert.Equal(expectedCount, _storage.Count);
     }
 
 #pragma warning disable S1215 // "GC.Collect" should not be called
 
-    private static void TriggerGargabeCollectionInItsOwnScope()
+    private static void TriggerGarbageCollectionInItsOwnScope()
     {
         const int oldestGenerationBeCollected = 2;
 

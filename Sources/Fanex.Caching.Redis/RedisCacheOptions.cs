@@ -1,42 +1,41 @@
-﻿namespace Fanex.Caching.Redis
+﻿namespace Fanex.Caching.Redis;
+
+using System;
+using StackExchange.Redis;
+
+public class RedisCacheOptions
 {
-    using System;
-    using StackExchange.Redis;
+    private ISystemClock _clock = new SystemClock();
+    private ISerializer _serializer = new MessagePackSerializer();
 
-    public class RedisCacheOptions
+    public string ConnectionString { get; set; }
+
+    public ConfigurationOptions ConnectionOptions { get; set; }
+
+    public string ApplicationName { get; set; }
+
+    public ISystemClock Clock
     {
-        private ISystemClock _clock = new SystemClock();
-        private ISerializer _serializer = new MessagePackSerializer();
+        get => _clock;
+        set => _clock = value ?? throw new ArgumentNullException(nameof(value));
+    }
 
-        public string ConnectionString { get; set; }
+    public ISerializer Serializer
+    {
+        get => _serializer;
+        set => _serializer = value ?? throw new ArgumentNullException(nameof(value));
+    }
 
-        public ConfigurationOptions ConnectionOptions { get; set; }
-
-        public string ApplicationName { get; set; }
-
-        public ISystemClock Clock
+    internal ConfigurationOptions ToRedisConnectionOptions()
+    {
+        if (ConnectionOptions != null)
         {
-            get => _clock;
-            set => _clock = value ?? throw new ArgumentNullException(nameof(value));
+            return ConnectionOptions;
         }
 
-        public ISerializer Serializer
-        {
-            get => _serializer;
-            set => _serializer = value ?? throw new ArgumentNullException(nameof(value));
-        }
+        var configuration = ConfigurationOptions.Parse(ConnectionString, true);
+        configuration.AbortOnConnectFail = false;
 
-        internal ConfigurationOptions ToRedisConnectionOptions()
-        {
-            if (ConnectionOptions != null)
-            {
-                return ConnectionOptions;
-            }
-
-            var configuration = ConfigurationOptions.Parse(ConnectionString, true);
-            configuration.AbortOnConnectFail = false;
-
-            return configuration;
-        }
+        return configuration;
     }
 }

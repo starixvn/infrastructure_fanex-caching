@@ -6,16 +6,9 @@ using Xunit;
 
 public class CacheItemOptionsTests
 {
-    private readonly Fixture _fixture;
-    private readonly CacheItemOptions _options;
-    private readonly SystemClockMock _clock;
-
-    public CacheItemOptionsTests()
-    {
-        _fixture = new Fixture();
-        _options = new CacheItemOptions();
-        _clock = new SystemClockMock();
-    }
+    private readonly Fixture _fixture = new();
+    private readonly CacheItemOptions _options = new();
+    private readonly SystemClockMock _clock = new();
 
     [Fact]
     public void SetAbsoluteExpirationTakesAnyDateTime()
@@ -252,8 +245,8 @@ public class CacheItemOptionsTests
         // Arrange.
         var checkingTime = _clock.UtcNow;
         var soonerRelativeExpiration = _fixture.Create<TimeSpan>();
-        var litteBitMoreTimePassed = _fixture.Create<TimeSpan>();
-        var laterAbsoluteExpiration = checkingTime + soonerRelativeExpiration + litteBitMoreTimePassed;
+        var littleBitMoreTimePassed = _fixture.Create<TimeSpan>();
+        var laterAbsoluteExpiration = checkingTime + soonerRelativeExpiration + littleBitMoreTimePassed;
 
         _options
             .SetAbsoluteExpiration(soonerRelativeExpiration)

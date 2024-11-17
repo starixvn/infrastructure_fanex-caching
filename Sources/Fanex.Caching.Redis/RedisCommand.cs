@@ -1,73 +1,71 @@
-﻿namespace Fanex.Caching.Redis
+﻿namespace Fanex.Caching.Redis;
+
+using System;
+using StackExchange.Redis;
+
+internal class RedisCommand
 {
-    using System;
-    using StackExchange.Redis;
-
-    internal class RedisCommand
+    private RedisCommand(
+        string script,
+        RedisKey key,
+        params RedisValue[] values)
     {
-        private RedisCommand(
-            string script,
-            RedisKey key,
-            params RedisValue[] values)
+        Keys = [key];
+        Values = values;
+        Script = script;
+    }
+
+    public string Script { get; }
+
+    public RedisKey[] Keys { get; }
+
+    public RedisValue[] Values { get; }
+
+    public static RedisCommand CreateGetCommand(RedisKey key) => new(RedisScripts.GetValue, key, null);
+
+    public static RedisCommand CreateSetCommand(
+        RedisKey key,
+        RedisValue value,
+        CacheItemOptions options,
+        DateTimeOffset createdTime)
+    {
+        var timeToLive = options.CalculateRelativeExpiration(createdTime);
+        var timeToSlide = options.SlidingExpiration;
+
+        if (timeToLive.HasValue)
         {
-            Keys = new[] { key };
-            Values = values;
-            Script = script;
-        }
-
-        public string Script { get; }
-
-        public RedisKey[] Keys { get; }
-
-        public RedisValue[] Values { get; }
-
-        public static RedisCommand CreateGetCommand(RedisKey key)
-            => new RedisCommand(RedisScripts.GetValue, key, null);
-
-        public static RedisCommand CreateSetCommand(
-            RedisKey key,
-            RedisValue value,
-            CacheItemOptions options,
-            DateTimeOffset createdTime)
-        {
-            var timeToLive = options.CalculateRelativeExpiration(createdTime);
-            var timeToSlide = options.SlidingExpiration;
-
-            if (timeToLive.HasValue)
+            if (timeToLive > timeToSlide)
             {
-                if (timeToLive > timeToSlide)
-                {
-                    return new RedisCommand(
-                        RedisScripts.SetValueWithSlidingAndRelativeExpiration,
-                        key,
-                        value,
-                        CalculateTotalMilliseconds(timeToSlide.Value),
-                        CalculateTotalMilliseconds(timeToLive.Value));
-                }
-
                 return new RedisCommand(
-                    RedisScripts.SetValueWithRelativeExpiration,
+                    RedisScripts.SetValueWithSlidingAndRelativeExpiration,
                     key,
                     value,
+                    CalculateTotalMilliseconds(timeToSlide.Value),
                     CalculateTotalMilliseconds(timeToLive.Value));
             }
 
-            if (timeToSlide.HasValue)
-            {
-                return new RedisCommand(
-                    RedisScripts.SetValueWithSlidingExpiration,
-                    key,
-                    value,
-                    CalculateTotalMilliseconds(timeToSlide.Value));
-            }
-
             return new RedisCommand(
-                RedisScripts.SetValueWithoutExpiration,
+                RedisScripts.SetValueWithRelativeExpiration,
                 key,
-                value);
+                value,
+                CalculateTotalMilliseconds(timeToLive.Value));
         }
 
-        private static long CalculateTotalMilliseconds(TimeSpan expiration)
-            => expiration.Ticks / TimeSpan.TicksPerMillisecond;
+        if (timeToSlide.HasValue)
+        {
+            return new RedisCommand(
+                RedisScripts.SetValueWithSlidingExpiration,
+                key,
+                value,
+                CalculateTotalMilliseconds(timeToSlide.Value));
+        }
+
+        return new RedisCommand(
+            RedisScripts.SetValueWithoutExpiration,
+            key,
+            value);
     }
+
+    private static long CalculateTotalMilliseconds(TimeSpan expiration)
+        => expiration.Ticks / TimeSpan.TicksPerMillisecond;
 }

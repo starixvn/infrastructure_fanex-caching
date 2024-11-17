@@ -7,7 +7,7 @@
         <PackageReleaseNotes>https://gitlab.nexdev.net/infrastructure/fanex-caching/milestones/1</PackageReleaseNotes>
         <PackageIconUrl>https://gitlab.nexdev.net/uploads/-/system/project/avatar/696/new-idea.png</PackageIconUrl>
         <DefaultLanguage>en-US</DefaultLanguage>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>13.0</LangVersion>
         <IncludeSymbols>false</IncludeSymbols>
         <Version>2.2.3-beta1</Version>
     </PropertyGroup>
@@ -16,15 +16,9 @@
         <Features>IOperation</Features>
         <CodeAnalysisRuleSet>$(SolutionDir)\.sonarlint\Fanex.CachingCSharp.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.17.0.26580">
-            <PrivateAssets>All</PrivateAssets>
-        </PackageReference>
-    </ItemGroup>
+    
     <ItemGroup Condition="'$(TargetFramework)' == 'net471'">
         <Reference Include="System.Core" Pack="false" />
     </ItemGroup>
-    <ItemGroup>
-        <AdditionalFiles Include="$(SolutionDir)\.sonarlint\fanex.caching\CSharp\SonarLint.xml" Link="SonarLint.xml" />
-    </ItemGroup>
+   
 </Project>

@@ -2,15 +2,9 @@
 
 public class Customer
 {
-    public Customer()
-    {
-        FirstName = "First Name";
-        LastName = "Last Name";
-    }
+    public string FirstName { get; set; } = "First Name";
 
-    public string FirstName { get; set; }
-
-    public string LastName { get; set; }
+    public string LastName { get; set; } = "Last Name";
 
     public override string ToString()
         => $"{FirstName} {LastName}";

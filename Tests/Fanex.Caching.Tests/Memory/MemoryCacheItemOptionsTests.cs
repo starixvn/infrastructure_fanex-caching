@@ -7,14 +7,8 @@ using Xunit;
 
 public class MemoryCacheItemOptionsTests
 {
-    private readonly Fixture _fixture;
-    private readonly MemoryCacheItemOptions _options;
-
-    public MemoryCacheItemOptionsTests()
-    {
-        _fixture = new Fixture();
-        _options = new MemoryCacheItemOptions();
-    }
+    private readonly Fixture _fixture = new();
+    private readonly MemoryCacheItemOptions _options = new();
 
     [Fact]
     public void RegisterNullPostEvictionCallbackThrowsArgumentNullException()

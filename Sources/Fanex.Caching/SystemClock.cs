@@ -1,9 +1,8 @@
-﻿namespace Fanex.Caching
-{
-    using System;
+﻿namespace Fanex.Caching;
 
-    public class SystemClock : ISystemClock
-    {
-        public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
-    }
+using System;
+
+public class SystemClock : ISystemClock
+{
+    public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
 }

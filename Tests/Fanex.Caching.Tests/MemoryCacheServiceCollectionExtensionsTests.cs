@@ -1,19 +1,17 @@
-﻿namespace Fanex.Caching.AspNetCore.Tests;
+﻿#if NET6_0_OR_GREATER
+namespace Fanex.Caching.Tests;
 
 using System;
 using System.IO;
 using System.Linq;
-using Memory;
+using Fanex.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 public class MemoryCacheServiceCollectionExtensionsTests
 {
-    private readonly IServiceCollection _services;
-
-    public MemoryCacheServiceCollectionExtensionsTests()
-        => _services = new ServiceCollection();
+    private readonly IServiceCollection _services = new ServiceCollection();
 
     [Fact]
     public void CallAddMemoryCacheOnNullServiceCollectionThrowsArgumentNullException()
@@ -76,10 +74,9 @@ public class MemoryCacheServiceCollectionExtensionsTests
     public void CallAddMemoryCacheWithNullConfigurationSectionThrowsArgumentNullException()
     {
         // Arrange.
-        IConfigurationSection configuration = null;
 
         // Act.
-        var exception = Record.Exception(() => _services.AddMemoryCache(configuration));
+        var exception = Record.Exception(() => _services.AddMemoryCache((IConfigurationSection)null));
 
         // Assert.
         Assert.IsType<ArgumentNullException>(exception);
@@ -153,10 +150,9 @@ public class MemoryCacheServiceCollectionExtensionsTests
     public void CallAddMemoryCacheWithNullOptionAccessorThrowsArgumentNullException()
     {
         // Arrange.
-        Action<MemoryCacheOptions> setupAction = null;
 
         // Act.
-        var exception = Record.Exception(() => _services.AddMemoryCache(setupAction));
+        var exception = Record.Exception(() => _services.AddMemoryCache((Action<MemoryCacheOptions>)null));
 
         // Assert.
         Assert.IsType<ArgumentNullException>(exception);
@@ -172,3 +168,5 @@ public class MemoryCacheServiceCollectionExtensionsTests
         Assert.Same(_services, returnedServices);
     }
 }
+
+#endif

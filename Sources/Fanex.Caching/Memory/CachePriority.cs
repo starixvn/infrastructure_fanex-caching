@@ -1,10 +1,9 @@
-﻿namespace Fanex.Caching.Memory
+﻿namespace Fanex.Caching.Memory;
+
+public enum CachePriority
 {
-    public enum CachePriority
-    {
-        Low,
-        Normal,
-        High,
-        NeverRemove
-    }
+    Low,
+    Normal,
+    High,
+    NeverRemove
 }

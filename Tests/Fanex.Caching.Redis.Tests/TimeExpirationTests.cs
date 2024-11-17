@@ -70,9 +70,9 @@ public sealed class TimeExpirationTests : IClassFixture<RedisCacheFixture>, IDis
     public async Task KeyWithSlidingExpirationExpiresIfNotTouched()
     {
         // Arrange.
-        var sliddingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
+        var slidingExpirationPolicy = _cacheOptions.SetSlidingExpiration(InitialExpiry);
 
-        await Storage.SetAsync(_testingKey, _testingValue, sliddingExpirationPolicy);
+        await Storage.SetAsync(_testingKey, _testingValue, slidingExpirationPolicy);
 
         // Act.
         await Task.Delay(NumberOfMillisecondsPassedForKeyToBeExpired);
@@ -88,9 +88,9 @@ public sealed class TimeExpirationTests : IClassFixture<RedisCacheFixture>, IDis
     {
         // Arrange.
         var timeToSlide = TimeSpan.FromMilliseconds(500);
-        var sliddingExpirationPolicy = _cacheOptions.SetSlidingExpiration(timeToSlide);
+        var slidingExpirationPolicy = _cacheOptions.SetSlidingExpiration(timeToSlide);
 
-        await Storage.SetAsync(_testingKey, _testingValue, sliddingExpirationPolicy);
+        await Storage.SetAsync(_testingKey, _testingValue, slidingExpirationPolicy);
 
         // Act - after 200 milliseconds.
         const int numberOfMillisecondsPassedToMakeFirstTouch = 200;

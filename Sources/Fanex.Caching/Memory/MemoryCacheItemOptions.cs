@@ -1,68 +1,67 @@
-﻿namespace Fanex.Caching.Memory
+﻿namespace Fanex.Caching.Memory;
+
+using System;
+using System.Collections.Generic;
+
+public class MemoryCacheItemOptions : CacheItemOptions
 {
-    using System;
-    using System.Collections.Generic;
+    internal CachePriority Priority { get; private set; }
+        = CachePriority.Normal;
 
-    public class MemoryCacheItemOptions : CacheItemOptions
+    internal IList<PostEvictionCallbackRegistration> PostEvictionCallbacks { get; }
+        = new List<PostEvictionCallbackRegistration>();
+
+    public MemoryCacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback)
+        => RegisterPostEvictionCallback(callback, null);
+
+    public MemoryCacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback, object state)
     {
-        internal CachePriority Priority { get; private set; }
-            = CachePriority.Normal;
-
-        internal IList<PostEvictionCallbackRegistration> PostEvictionCallbacks { get; }
-            = new List<PostEvictionCallbackRegistration>();
-
-        public MemoryCacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback)
-            => RegisterPostEvictionCallback(callback, null);
-
-        public MemoryCacheItemOptions RegisterPostEvictionCallback(PostEvictionDelegate callback, object state)
+        if (callback == null)
         {
-            if (callback == null)
-            {
-                throw new ArgumentNullException(nameof(callback));
-            }
-
-            PostEvictionCallbacks.Add(new PostEvictionCallbackRegistration
-            {
-                EvictionCallback = callback,
-                State = state
-            });
-
-            return this;
+            throw new ArgumentNullException(nameof(callback));
         }
 
-        public MemoryCacheItemOptions SetCachePriority(CachePriority priority)
+        PostEvictionCallbacks.Add(new PostEvictionCallbackRegistration
         {
-            Priority = priority;
+            EvictionCallback = callback,
+            State = state
+        });
 
-            return this;
-        }
+        return this;
+    }
 
-        public new MemoryCacheItemOptions SetAbsoluteExpiration(DateTimeOffset absolute)
-        {
-            base.SetAbsoluteExpiration(absolute);
+    public MemoryCacheItemOptions SetCachePriority(CachePriority priority)
+    {
+        Priority = priority;
 
-            return this;
-        }
+        return this;
+    }
 
-        public new MemoryCacheItemOptions SetAbsoluteExpiration(TimeSpan relative)
-        {
-            base.SetAbsoluteExpiration(relative);
+    public new MemoryCacheItemOptions SetAbsoluteExpiration(DateTimeOffset absolute)
+    {
+        base.SetAbsoluteExpiration(absolute);
 
-            return this;
-        }
+        return this;
+    }
 
-        public new MemoryCacheItemOptions SetSlidingExpiration(TimeSpan offset)
-        {
-            base.SetSlidingExpiration(offset);
+    public new MemoryCacheItemOptions SetAbsoluteExpiration(TimeSpan relative)
+    {
+        base.SetAbsoluteExpiration(relative);
 
-            return this;
-        }
+        return this;
+    }
 
-        public new MemoryCacheItemOptions UseDefaultExpiration()
-        {
-            base.UseDefaultExpiration();
+    public new MemoryCacheItemOptions SetSlidingExpiration(TimeSpan offset)
+    {
+        base.SetSlidingExpiration(offset);
 
-            return this;
-        }
+        return this;
+    }
+
+    public new MemoryCacheItemOptions UseDefaultExpiration()
+    {
+        base.UseDefaultExpiration();
+
+        return this;
     }
 }

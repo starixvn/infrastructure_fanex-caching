@@ -1,29 +1,28 @@
-﻿namespace Fanex.Caching.Redis
+﻿namespace Fanex.Caching.Redis;
+
+using System;
+using StackExchange.Redis;
+
+internal static class RedisTypeConverter
 {
-    using StackExchange.Redis;
-
-    internal static class RedisTypeConverter
+    public static RedisValue ToRedisValue(object value, ISerializer serializer)
     {
-        public static RedisValue ToRedisValue(object value, ISerializer serializer)
+        if (typeof(byte[]) == value.GetType())
         {
-            if (typeof(byte[]) == value.GetType())
-            {
-                return (byte[])value;
-            }
-
-            return serializer.Serialize(value);
+            return (byte[])value;
         }
 
-        public static T ToObject<T>(RedisResult value, ISerializer serializer)
+        return serializer.Serialize(value);
+    }
+
+    public static T ToObject<T>(RedisResult value, ISerializer serializer)
+    {
+        var binary = (byte[])value;
+        if (typeof(T) == typeof(byte[]))
         {
-            var binary = (byte[])value;
-
-            if (binary is T resultInBinary)
-            {
-                return resultInBinary;
-            }
-
-            return serializer.Deserialize<T>(binary);
+            return (T)Convert.ChangeType(binary, typeof(T)); 
         }
+
+        return serializer.Deserialize<T>(binary);
     }
 }
