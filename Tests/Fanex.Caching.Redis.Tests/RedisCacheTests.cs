@@ -462,10 +462,10 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
         await Cache.StringSetAsync(key, "5");
 
         // Act
-        var incrementedValue = await Cache.StringIncrementAsync(key, 3);
+        var incrementedValue = await Cache.StringIncrementAsync(key);
 
         // Assert
-        Assert.Equal(8, incrementedValue);
+        Assert.Equal(6, incrementedValue);
 
         // Cleanup
         await Cache.RemoveAsync(key);
@@ -478,10 +478,10 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
         var key = _fixture.Create<string>();
 
         // Act
-        var incrementedValue = await Cache.StringIncrementAsync(key, 10);
+        var incrementedValue = await Cache.StringIncrementAsync(key);
 
         // Assert
-        Assert.Equal(10, incrementedValue);
+        Assert.Equal(1, incrementedValue);
 
         // Cleanup
         await Cache.RemoveAsync(key);

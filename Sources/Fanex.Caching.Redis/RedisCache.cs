@@ -157,7 +157,7 @@ public sealed class RedisCache : ICache
         }
     }
 
-    public async Task<bool> StringSetAsyn(string key, string value)
+    public async Task<bool> StringSetAsync(string key, string value)
     {
         if (string.IsNullOrEmpty(key))
         {
@@ -174,7 +174,7 @@ public sealed class RedisCache : ICache
         }
     }
 
-    public async Task<string> StringGetAsyn(string key)
+    public async Task<string> StringGetAsync(string key)
     {
         if (string.IsNullOrEmpty(key))
         {
@@ -187,7 +187,7 @@ public sealed class RedisCache : ICache
         }
         catch (RedisTimeoutException e)
         {
-            throw new TimeoutException($"StringGetAsyn timeout on key: {key}. Inner exception: " + e.Message, e);
+            throw new TimeoutException($"StringGetAsync timeout on key: {key}. Inner exception: " + e.Message, e);
         }
     }
 
