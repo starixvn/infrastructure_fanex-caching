@@ -282,6 +282,74 @@ public sealed class RedisStorageTests : IClassFixture<RedisCacheFixture>, IDispo
         Assert.False(found);
     }
 
+    [Fact]
+    public async Task StringSetAsync_SetsValueSuccessfully()
+    {
+        // Arrange
+        var key = _fixture.Create<string>();
+        var value = _fixture.Create<string>();
+
+        // Act
+        var setResult = await Storage.StringSetAsync(key, value);
+
+        // Assert
+        Assert.True(setResult);
+
+        // Cleanup
+        await Storage.RemoveAsync(key);
+    }
+
+    [Fact]
+    public async Task StringGetAsync_ReturnsSetValue()
+    {
+        // Arrange
+        var key = _fixture.Create<string>();
+        var value = _fixture.Create<string>();
+        await Storage.StringSetAsync(key, value);
+
+        // Act
+        var result = await Storage.StringGetAsync(key);
+
+        // Assert
+        Assert.Equal(value, result);
+
+        // Cleanup
+        await Storage.RemoveAsync(key);
+    }
+
+    [Fact]
+    public async Task StringIncrementAsync_IncrementsValueCorrectly()
+    {
+        // Arrange
+        var key = _fixture.Create<string>();
+        await Storage.StringSetAsync(key, "5");
+
+        // Act
+        var incrementedValue = await Storage.StringIncrementAsync(key);
+
+        // Assert
+        Assert.Equal(6, incrementedValue);
+
+        // Cleanup
+        await Storage.RemoveAsync(key);
+    }
+
+    [Fact]
+    public async Task StringIncrementAsync_OnNonExistingKey_SetsAndReturnsIncrement()
+    {
+        // Arrange
+        var key = _fixture.Create<string>();
+
+        // Act
+        var incrementedValue = await Storage.StringIncrementAsync(key);
+
+        // Assert
+        Assert.Equal(1, incrementedValue);
+
+        // Cleanup
+        await Storage.RemoveAsync(key);
+    }
+
     public void Dispose()
         => Storage.Remove(_existingKey);
 }

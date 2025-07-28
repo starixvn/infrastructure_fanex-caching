@@ -419,6 +419,74 @@ public sealed class RedisCacheTests : IClassFixture<RedisCacheFixture>, IDisposa
         Assert.False(found);
     }
 
+    [Fact]
+    public async Task StringSetAsync_SetsValueSuccessfully()
+    {
+        // Arrange
+        var key = _fixture.Create<string>();
+        var value = _fixture.Create<string>();
+
+        // Act
+        var setResult = await Cache.StringSetAsync(key, value);
+
+        // Assert
+        Assert.True(setResult);
+
+        // Cleanup
+        await Cache.RemoveAsync(key);
+    }
+
+    [Fact]
+    public async Task StringGetAsync_ReturnsSetValue()
+    {
+        // Arrange
+        var key = _fixture.Create<string>();
+        var value = _fixture.Create<string>();
+        await Cache.StringSetAsync(key, value);
+
+        // Act
+        var result = await Cache.StringGetAsync(key);
+
+        // Assert
+        Assert.Equal(value, result);
+
+        // Cleanup
+        await Cache.RemoveAsync(key);
+    }
+
+    [Fact]
+    public async Task StringIncrementAsync_IncrementsValueCorrectly()
+    {
+        // Arrange
+        var key = _fixture.Create<string>();
+        await Cache.StringSetAsync(key, "5");
+
+        // Act
+        var incrementedValue = await Cache.StringIncrementAsync(key, 3);
+
+        // Assert
+        Assert.Equal(8, incrementedValue);
+
+        // Cleanup
+        await Cache.RemoveAsync(key);
+    }
+
+    [Fact]
+    public async Task StringIncrementAsync_OnNonExistingKey_SetsAndReturnsIncrement()
+    {
+        // Arrange
+        var key = _fixture.Create<string>();
+
+        // Act
+        var incrementedValue = await Cache.StringIncrementAsync(key, 10);
+
+        // Assert
+        Assert.Equal(10, incrementedValue);
+
+        // Cleanup
+        await Cache.RemoveAsync(key);
+    }
+
     public void Dispose()
         => Cache.RedisStorage.Remove(_existingKey);
 }

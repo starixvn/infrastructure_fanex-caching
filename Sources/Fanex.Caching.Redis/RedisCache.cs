@@ -140,6 +140,57 @@ public sealed class RedisCache : ICache
         }
     }
 
+    public async Task<long> StringIncrementAsync(string key)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+            throw new ArgumentException("Key must not be null or empty.", nameof(key));
+        }
+
+        try
+        {
+            return await RedisStorage.StringIncrementAsync(key);
+        }
+        catch (RedisTimeoutException e)
+        {
+            throw new TimeoutException($"StringIncrementAsync timeout on key: {key}. Inner exception: " + e.Message, e);
+        }
+    }
+
+    public async Task<bool> StringSetAsyn(string key, string value)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+
+            throw new ArgumentException("Key must not be null or empty.", nameof(key));
+        }
+        try
+        {
+            return await RedisStorage.StringSetAsync(key, value);
+        }
+        catch (RedisTimeoutException e)
+        {
+            throw new TimeoutException($"StringSetAsync timeout on key: {key}. Inner exception: " + e.Message, e);
+        }
+    }
+
+    public async Task<string> StringGetAsyn(string key)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+
+            throw new ArgumentException("Key must not be null or empty.", nameof(key));
+        }
+        try
+        {
+            return await RedisStorage.StringGetAsync(key);
+        }
+        catch (RedisTimeoutException e)
+        {
+            throw new TimeoutException($"StringGetAsyn timeout on key: {key}. Inner exception: " + e.Message, e);
+        }
+    }
+
     public void Dispose()
     {
         RedisStorage.Dispose();

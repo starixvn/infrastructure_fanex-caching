@@ -124,6 +124,63 @@ internal sealed partial class RedisStorage(RedisCacheOptions storageOptions) : I
         await EvaluateCommandAsync(redisCommand).ConfigureAwait(false);
     }
 
+    public async Task<long> StringIncrementAsync(string key)
+    {
+        await ConnectAsync().ConfigureAwait(false);
+        try
+        {
+            return await _database.StringIncrementAsync(key);
+        }
+        catch (RedisServerException e) when (e.Message.Contains("READONLY"))
+        {
+            await ForceReconnectAsync().ConfigureAwait(false);
+            throw;
+        }
+        catch (Exception e) when (e is RedisConnectionException or SocketException)
+        {
+            await ForceReconnectAsync().ConfigureAwait(false);
+            throw;
+        }
+    }
+
+    public async Task<bool> StringSetAsync(string key, string value)
+    {
+        await ConnectAsync().ConfigureAwait(false);
+        try
+        {
+            return await _database.StringSetAsync(key, value);
+        }
+        catch (RedisServerException e) when (e.Message.Contains("READONLY"))
+        {
+            await ForceReconnectAsync().ConfigureAwait(false);
+            throw;
+        }
+        catch (Exception e) when (e is RedisConnectionException or SocketException)
+        {
+            await ForceReconnectAsync().ConfigureAwait(false);
+            throw;
+        }
+    }
+
+    public async Task<string> StringGetAsync(string key)
+    {
+        await ConnectAsync().ConfigureAwait(false);
+        try
+        {
+            return await _database.StringGetAsync(key);
+        }
+        catch (RedisServerException e) when (e.Message.Contains("READONLY"))
+        {
+            await ForceReconnectAsync().ConfigureAwait(false);
+            throw;
+        }
+        catch (Exception e) when (e is RedisConnectionException or SocketException)
+        {
+            await ForceReconnectAsync().ConfigureAwait(false);
+            throw;
+        }
+    }
+
     private RedisResult EvaluateCommand(RedisCommand redisCommand)
     {
         try
